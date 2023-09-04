@@ -5,31 +5,38 @@ import axios from '../../api/axios';
 import Cookies from 'js-cookie';
 import { Alert, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+import { toast } from 'react-hot-toast/headless';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('')
   const [msg, setMsg] = useState('')
+  const [status, setStatus] = useState(false)
   const navigate = useNavigate()
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
   const handleLogin = async (e: any) => {
     e.preventDefault()
-    try {
-      await axios.post(`${import.meta.env.VITE_URL}user/login`, {
+    setTimeout(() => {
+      axios.post(`${import.meta.env.VITE_URL}user/login`, {
         username: username,
         password: password
+      }).then((response) => {
+        Cookies.set('token', JSON.stringify(response.data.token))
+        setStatus(false)
+        navigate("/")
+        toast.success('Successfully toasted!')
       })
-      setMsg("Success berhasil login")
-      navigate("/")
-    } catch (error: any) {
-      if (error.response.status == 404) {
-        setMsg(error.response.data.message)
-      } else {
-        console.log(error)
-        setMsg(error.response.data.message)
-      }
-    }
+        .catch((error: any) => {
+          if (error.response.status == 404) {
+            setMsg(error.response.data.message)
+          } else {
+            console.log(error)
+            setMsg(error.response.data.message)
+          }
+        })
+    }, 1000);
+    setStatus(true)
   };
   useEffect(() => {
     if (msg) {
@@ -78,7 +85,7 @@ const Login = () => {
                 </div>
                 <input type="password" id="password" value={password} onChange={((e) => setPassword(e.target.value))} className="bg-gray-50 border border-gray-300 text-mainColors text-[14px] rounded-lg  block w-full p-2.5" required />
               </div>
-              <button type="submit" className="text-white  bg-secondColors hover:bg-hoverMainColors font-medium rounded-lg text-[14px] lg:w-full sm:w-auto px-5 py-3 text-center"><Spin indicator={antIcon} />Masuk</button>
+              <button type="submit" className="text-white  bg-secondColors hover:bg-hoverMainColors font-medium rounded-lg text-[14px] lg:w-full sm:w-auto px-5 py-3 text-center"> {status ? <Spin indicator={antIcon} /> : "Masuk"}</button>
             </form>
           </div>
         </div>

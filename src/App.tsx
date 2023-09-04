@@ -11,10 +11,15 @@ import ProfileEo from './pages/user/profileeo/ProfileEo';
 import DetailEvents from './pages/user/profileeo/DetailEvents';
 import Riwayat from './pages/user/profileeo/Riwayat';
 import RiwayatTiket from './pages/user/profileeo/RiwayatTiket';
+import { Toaster } from 'react-hot-toast';
 function App() {
 
   return (
     <>
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+      />
       <Router>
         <Routes>
           <Route path="/signin" element={<Login />} />

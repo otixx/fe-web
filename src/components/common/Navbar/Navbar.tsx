@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import Cookies from 'js-cookie';
+import { LuXCircle } from 'react-icons/lu';
 
 const Navbar = () => {
     const [click, setClick] = useState(false)
@@ -25,11 +26,11 @@ const Navbar = () => {
             <header className='bg-mainColors'>
                 <nav className='flex p-4 mx-auto lg:px-6 justify-between items-center'>
                     <div className="flex">
-                        <Link to="/profile">
+                        <div onClick={() => navigate('/')}>
                             <div className="font-bold -m-1.5 p-1.5 text-white cursor-pointer text-[18px]">
                                 Otakutixx
                             </div>
-                        </Link>
+                        </div>
                     </div>
                     <div className="hidden md:block lg:block">
                         {location.pathname !== "/profile" && !location.pathname.startsWith("/profile/eo") && (
@@ -53,24 +54,24 @@ const Navbar = () => {
                                 <div onClick={() => setClick(true)} className="btnSignup cursor-pointer items-center text-[14px] bg-secondColors rounded-full h-10 w-10">
                                 </div>
                                 {click ? (
-                                    <div className='absolute right-10 z-10 top-[70px] bg-gray-100 h-60 w-40 rounded-md'>
-                                        <div className='flex justify-end px-4'>
-                                            <button onClick={() => setClick(false)} className='cursor-pointer px-4 py-1'>X</button>
-                                        </div>
-                                        <hr className='h-0.5 bg-black' />
-                                        <div className='flex flex-col gap-2'>
-                                            <Link to="/profile">
-                                                <div className='px-4 font-semibold py-1'>
-                                                    <div>
-                                                        Profile
-                                                    </div>
-                                                </div>
-                                            </Link>
-                                            <div onClick={() => handleOut()} className="px-4 font-semibold py-1 cursor-pointer">
-                                                <div>
-                                                    Log Out
+                                    <div className="absolute right-10 z-10 top-[70px] bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+                                        <div className="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                                            <div className='flex justify-end'>
+                                                <div className='cursor-pointer' onClick={() => setClick(false)}>
+                                                <LuXCircle size={20} />
                                                 </div>
                                             </div>
+                                        </div>
+                                        <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="avatarButton">
+                                            <li>
+                                                <div onClick={()=> {navigate('/profile'); setClick(false)}} className="block px-4 py-2 hover:bg-gray-100 cursor-pointer font-semibold">Profile</div>
+                                            </li>
+                                            <li>
+                                                <div onClick={()=> {navigate('/profile/eo/events'); setClick(false)}} className="block px-4 py-2 hover:bg-gray-100 cursor-pointer font-semibold">Profile EO</div>
+                                            </li>
+                                        </ul>
+                                        <div className="py-1">
+                                            <div onClick={()=> {handleOut(); setClick(false)}} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer font-semibold">Sign out</div>
                                         </div>
                                     </div>
                                 ) : null}
@@ -78,20 +79,20 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <Link to="/signup">
+                                <div onClick={()=> navigate('/signup')}>
                                     <div className="btnSignup hidden cursor-pointer lg:block border-2 text-[14px] border-secondColors hover:border-mainColors hover:bg-secondColors rounded-full py-3 px-8">
                                         <button className='text-white font-semibold'>
                                             Daftar
                                         </button>
                                     </div>
-                                </Link>
-                                <Link to="/signin">
+                                </div>
+                                <div onClick={()=> navigate('/signin')}>
                                     <div className="btnSignin bg-secondColors hover:bg-mainColors hover:border-secondColors cursor-pointer rounded-full py-3 px-8">
                                         <button className='text-white font-semibold text-[14px]'>
                                             Masuk
                                         </button>
                                     </div>
-                                </Link>
+                                </div>
                             </>
                         )}
                     </div>

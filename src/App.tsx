@@ -7,11 +7,13 @@ import UserLayout from './layout/UserLayout';
 import Index from './pages/user/Dashboard/Index';
 import Profile from './pages/user/Profile/Profile';
 import Error from './pages/error/Error';
-import ProfileEo from './pages/user/profileeo/ProfileEo';
+import ProfileEo from './pages/user/profileeo/ProfileEO';
 import DetailEvents from './pages/user/profileeo/DetailEvents';
 import Riwayat from './pages/user/profileeo/Riwayat';
 import RiwayatTiket from './pages/user/profileeo/RiwayatTiket';
 import { Toaster } from 'react-hot-toast';
+import RegisterEO from './pages/user/profileeo/RegisterEO';
+import DashboardEO from './pages/user/profileeo/DashboardEO';
 function App() {
 
   return (
@@ -29,7 +31,9 @@ function App() {
           <Route path="/" element={<UserLayout />}>
             <Route index element={<Index />} />
             <Route path='/profile' element={<Profile />} />
-            <Route path='/profile/eo/events' element={<ProfileEo />} />
+            <Route path='/profile/eo' element={<ProfileEo />} />
+            <Route path='/profile/eo/register' element={<RegisterEO />} />
+            <Route path='/profile/eo/events' element={<DashboardEO />} />
             <Route path='/profile/eo/events/:id' element={<DetailEvents />} />
             <Route path='/profile/eo/riwayat' element={<Riwayat />} />
             <Route path='/profile/eo/riwayat/tiket/:id' element={<RiwayatTiket />} />

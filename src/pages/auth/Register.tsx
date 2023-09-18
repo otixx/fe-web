@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from '../../api/axios'
+import axios from 'axios'
 import { Alert } from 'antd'
 export const Register = () => {
   const [email, setEmail] = useState('')
@@ -13,7 +13,7 @@ export const Register = () => {
   const handleRegister = async (e: any) => {
     e.preventDefault();
     try {
-      await axios.post('/user/register', {
+      await axios.post(`${import.meta.env.VITE_URL}user/register`, {
         username: username,
         email: email,
         password: password,

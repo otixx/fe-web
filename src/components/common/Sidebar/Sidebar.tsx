@@ -1,35 +1,47 @@
-import { useState } from "react"
-
+import { LuHome, LuUser, LuUsers } from 'react-icons/lu'
+import { Link, useLocation } from 'react-router-dom';
 const Sidebar = () => {
-    const [activeIndex, setactiveIndex] = useState(0)
-    const dataSide = [
-        {
-            name: "Event"
-        }, {
-            name: "Riwayat Pembeli"
-        }, {
-            name: "Edit Profile EO"
-        }
+    const location = useLocation();
+    const sideLink = [{
+        id: 1,
+        to: "/profile/eo/events",
+        url: <LuHome />,
+        name: "Events"
+    }, {
+        id: 2,
+        to: "/profile/eo/riwayat",
+        url: <LuUsers />,
+        name: "Riwayat Pembeli"
+    }
+        , {
+        id: 3,
+        to: "/profile/eo",
+        url: <LuUser />,
+        name: "Edit Profile EO"
+    }
     ]
     return (
-        <div className="w-1/6 h-screen border-r-2 border">
-            <div className="flex flex-col">
-                <div className="sd">
-                    <img src="" alt="" />
-                </div>
-                <div className="px-4 py-10">
-                    {
-                        dataSide.map((element, index) => (
-                            <div key={index} className="py-2">
-                                <div className={`${activeIndex === index ? `bg-secondColors text-white` : " "} rounded-sm px-2 cursor-pointer font-bold text-lg`}>
-                                    {element.name}
+        <div className='h-screen py-5'>
+            <div className="space-y-4 bg-white">
+                {
+                    sideLink.map((element, index) => {
+                        return (
+                            <div key={index}>
+                                <div className="space-y-2 font-medium">
+                                    <Link to={element.to}>
+                                        <div
+                                            className={`cursor-pointer flex items-center py-2 px-4 text-black hover:bg-[#03034F] hover:text-white ${location.pathname === element.to ? "bg-[#03034F] text-white" : ""
+                                                }`}
+                                        >
+                                            <span>{element.url}</span>
+                                            <h1 className="px-4 hidden md:block lg:block font-semibold text-sm">{element.name}</h1>
+                                        </div>
+                                    </Link>
                                 </div>
                             </div>
-                        ))
-                    }
-                </div>
-
-
+                        )
+                    })
+                }
             </div>
         </div>
     )

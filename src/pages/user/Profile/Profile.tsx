@@ -1,9 +1,12 @@
 import { LuMail, LuMapPin, LuPhone, LuTarget, LuUser, LuXCircle } from 'react-icons/lu'
 import Cookies from 'js-cookie';
 import { useEffect, useState } from 'react'
-import axios from '../../../api/axios'
+import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
-import Popup from '../../../components/popup/Popup';
+import Popup from '../../../components/Popup';
+import { toast } from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchProfile } from '../../../feature/Profile/ProfileSlice';
 
 interface Profile {
     name: string;
@@ -16,21 +19,15 @@ interface Profile {
 const Profile = () => {
     const getToken: any = Cookies.get('token')
     const token = JSON.parse(getToken)
-    const [profile, setProfile] = useState({
-        name: '',
-        email: '',
-        noHp: '',
-        alamat: '',
-        status_eo: false,
-    });
+    const profileData = useSelector((state: any) => state.reducer.profile.data)
+    const dispatch = useDispatch()
     const [open, setOpen] = useState(false)
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
     const [phone, setPhone] = useState('')
     const [alamat, setAlamat] = useState('')
-    
-    
     const navigate = useNavigate()
+
     const handleOpen = () => {
         setOpen(true);
     };
@@ -44,24 +41,11 @@ const Profile = () => {
             navigate("/signin")
         }
     })
-
-    const getProfile = async () => {
-        await axios.get(`${import.meta.env.VITE_URL}profile`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        }).then((response) => {
-            setProfile(response.data)
-        }).catch((error) => {
-            console.log(error.response.data)
-        })
-    }
     useEffect(() => {
-        getProfile();
-    }, [profile]);
-
+        dispatch(fetchProfile())
+    }, []);
     const updateProfile = async () => {
-        await axios.put(`${import.meta.env.VITE_URL}profile/update`, {
+        await axios.put(`${import.meta.env.VITE_URL}profile`, {
             name: username,
             email: email,
             nohp: phone,
@@ -70,10 +54,11 @@ const Profile = () => {
             headers: {
                 Authorization: `Bearer ${token}`
             }
-        }).then((response) => {
-            setProfile(response.data);
+        }).then(() => {
+            toast.success('Berhasil Update Profile')
+            setOpen(false)
         }).catch((error) => {
-            console.error(error);
+            toast.error(error.response.data.message)
         });
     }
     return (
@@ -184,7 +169,7 @@ const Profile = () => {
                             <div className="relative">
                                 <div className="flex gap-4 items-center p-2 pointer-events-none">
                                     <LuUser />
-                                    <h1>{profile.name}</h1>
+                                    <h1>{profileData.name}</h1>
                                 </div>
                             </div>
                         </div>
@@ -193,7 +178,7 @@ const Profile = () => {
                             <div className="relative">
                                 <div className="flex gap-4 items-center p-2 pointer-events-none">
                                     <LuMail />
-                                    <h1>{profile.email}</h1>
+                                    <h1>{profileData.email}</h1>
                                 </div>
                             </div>
                         </div>
@@ -202,7 +187,7 @@ const Profile = () => {
                             <div className="relative">
                                 <div className="flex gap-4 items-center p-2 pointer-events-none">
                                     <LuPhone />
-                                    <h1>{profile.noHp}</h1>
+                                    <h1>{profileData.nohp}</h1>
                                 </div>
                             </div>
                         </div>
@@ -211,7 +196,7 @@ const Profile = () => {
                             <div className="relative">
                                 <div className="flex gap-4 items-center p-2 pointer-events-none">
                                     <LuMapPin />
-                                    <h1>{profile.alamat}</h1>
+                                    <h1>{profileData.alamat}</h1>
                                 </div>
                             </div>
                         </div>
@@ -220,7 +205,7 @@ const Profile = () => {
                             <div className="relative">
                                 <div className="flex gap-4 items-center p-2 pointer-events-none">
                                     <LuTarget />
-                                    <h1>{profile.status_eo}</h1>
+                                    <h1>{`${profileData.status_eo === true ? "Akun anda adalah EO" : "Belum Menjadi EO"}`}</h1>
                                 </div>
                             </div>
                         </div>

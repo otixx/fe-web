@@ -1,11 +1,11 @@
 
 import { Link, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import axios from '../../api/axios';
+import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Alert, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
-import { toast } from 'react-hot-toast/headless';
+import { toast } from 'react-hot-toast';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -18,34 +18,41 @@ const Login = () => {
   const handleLogin = async (e: any) => {
     e.preventDefault()
     setTimeout(() => {
-      axios.post(`${import.meta.env.VITE_URL}user/login`, {
+      axios.post("https://api.otixx.online/user/login", {
         username: username,
         password: password
       }).then((response) => {
         Cookies.set('token', JSON.stringify(response.data.token))
         setStatus(false)
         navigate("/")
-        toast.success('Successfully toasted!')
+        toast.success('Login Berhasil!')
       })
         .catch((error: any) => {
           if (error.response.status == 404) {
             setMsg(error.response.data.message)
+            setStatus(false)
           } else {
-            console.log(error)
+            setStatus(false)
             setMsg(error.response.data.message)
           }
         })
     }, 1000);
     setStatus(true)
   };
+
   useEffect(() => {
     if (msg) {
       setTimeout(() => {
         setMsg('');
-      }, 2000);
-
+      }, 2000); 
     }
   }, [msg]);
+
+  useEffect(() => {
+    if (Cookies.get('token')) {
+        navigate('/')
+    }
+}, [navigate])
   return (
     <div className="container mx-auto">
       <div className="p-4">

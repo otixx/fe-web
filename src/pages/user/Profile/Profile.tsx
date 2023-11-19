@@ -12,7 +12,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Popup from "../../../components/Popup";
 import { toast } from "react-hot-toast";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 
 interface Profile {
   name: string;
@@ -25,13 +25,20 @@ interface Profile {
 const Profile = () => {
   const getToken: any = Cookies.get("token");
   const token = JSON.parse(getToken);
-  const profileData = useSelector((state: any) => state.reducer.profile.data);
-  // const dispatch = useDispatch()
+  // const profileData = useSelector((state: any) => state.reducer.profile.data);
+  // const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [alamat, setAlamat] = useState("");
+  const [profile, setProfile] = useState<Profile>({
+    name: "",
+    email: "",
+    noHp: "",
+    alamat: "",
+    status_eo: false,
+  });
   const navigate = useNavigate();
 
   const handleOpen = () => {
@@ -47,9 +54,22 @@ const Profile = () => {
       navigate("/signin");
     }
   });
-  // useEffect(() => {
-  //     dispatch(fetchProfile())
-  // }, []);
+  useEffect(() => {
+    const getProfile = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setProfile(response.data);
+      } catch (error: any) {
+        console.log(error.response);
+      }
+    };
+    getProfile();
+  }, []);
+
   const updateProfile = async () => {
     await axios
       .put(
@@ -177,7 +197,10 @@ const Profile = () => {
           <div className="col-span-4 lg:col-span-1">
             <div className="flex justify-center lg:justify-start">
               <img
-                className="w-40 h-40 object-cover items-center ring-mainColors ring p-2 rounded-full"
+                src={
+                  "https://instasize.com/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fmunkee%2Fimage%2Fupload%2Fw_1000%2Cc_fill%2Car_1%3A1%2Cg_auto%2Cr_max%2Fv1681855894%2Finstasize-website%2Flearn%2Fblonde-woman-selfie-instagram-influencer.webp&w=640&q=75"
+                }
+                className="w-40 h-40 object-cover items-center ring-mainColors ring rounded-full"
                 alt=""
               />
             </div>
@@ -190,7 +213,7 @@ const Profile = () => {
               <div className="relative">
                 <div className="flex gap-4 items-center p-2 pointer-events-none">
                   <LuUser />
-                  <h1>{profileData.name}</h1>
+                  <h1>{profile.name}</h1>
                 </div>
               </div>
             </div>
@@ -201,7 +224,7 @@ const Profile = () => {
               <div className="relative">
                 <div className="flex gap-4 items-center p-2 pointer-events-none">
                   <LuMail />
-                  <h1>{profileData.email}</h1>
+                  <h1>{profile.email}</h1>
                 </div>
               </div>
             </div>
@@ -212,7 +235,7 @@ const Profile = () => {
               <div className="relative">
                 <div className="flex gap-4 items-center p-2 pointer-events-none">
                   <LuPhone />
-                  <h1>{profileData.nohp}</h1>
+                  <h1>{profile.noHp}</h1>
                 </div>
               </div>
             </div>
@@ -223,7 +246,7 @@ const Profile = () => {
               <div className="relative">
                 <div className="flex gap-4 items-center p-2 pointer-events-none">
                   <LuMapPin />
-                  <h1>{profileData.alamat}</h1>
+                  <h1>{profile.alamat}</h1>
                 </div>
               </div>
             </div>
@@ -235,7 +258,7 @@ const Profile = () => {
                 <div className="flex gap-4 items-center p-2 pointer-events-none">
                   <LuTarget />
                   <h1>{`${
-                    profileData.status_eo === true
+                    profile.status_eo === true
                       ? "Akun anda adalah EO"
                       : "Belum Menjadi EO"
                   }`}</h1>

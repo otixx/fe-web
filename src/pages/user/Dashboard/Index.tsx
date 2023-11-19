@@ -83,7 +83,10 @@ const Index = () => {
               ).toLocaleString("default", { month: "long" })} ${new Date(
                 item.event["tanggal_acara"]
               ).getFullYear()}`}
-              price={item.harga}
+              price={new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+              }).format(Number(item.harga))}
               location={item.event["lokasi"]}
               id={item.id}
             />

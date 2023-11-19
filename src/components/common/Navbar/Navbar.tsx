@@ -39,7 +39,15 @@ const Navbar = () => {
                 <div
                   onClick={() => setClick(true)}
                   className="btnSignup cursor-pointer items-center text-[14px] bg-secondColors rounded-full h-10 w-10"
-                ></div>
+                >
+                  <img
+                    src={
+                      "https://instasize.com/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fmunkee%2Fimage%2Fupload%2Fw_1000%2Cc_fill%2Car_1%3A1%2Cg_auto%2Cr_max%2Fv1681855894%2Finstasize-website%2Flearn%2Fblonde-woman-selfie-instagram-influencer.webp&w=640&q=75"
+                    }
+                    className="object-cover items-center ring-mainColors ring rounded-full"
+                    alt=""
+                  />
+                </div>
                 {click ? (
                   <div className="absolute right-10 z-10 top-[70px] bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
                     <div className="px-4 py-3 text-sm text-gray-900 dark:text-white">

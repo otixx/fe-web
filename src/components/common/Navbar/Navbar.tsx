@@ -1,14 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { LuXCircle } from "react-icons/lu";
+import axios from "axios";
 
 const Navbar = () => {
+  interface Profile {
+    name: string;
+    email: string;
+    noHp: string;
+    alamat: string;
+    status_eo: boolean;
+  }
   const [click, setClick] = useState(false);
-  const token = Cookies.get("token");
+  const getToken: any = Cookies.get("token");
+
   const navigate = useNavigate();
-  const profileData = useSelector((state: any) => state.reducer.profile.data);
+  const [profile, setProfile] = useState<Profile>({
+    name: "",
+    email: "",
+    noHp: "",
+    alamat: "",
+    status_eo: false,
+  });
+  // const profileData = useSelector((state: any) => state.reducer.profile.data);
   // const dispatch = useDispatch();
 
   const handleOut = () => {
@@ -20,6 +36,24 @@ const Navbar = () => {
   //   // Dispatch the action
   //   dispatch(fetchProfile());
   // }, [dispatch]);
+
+  useEffect(() => {
+    const token = JSON.parse(getToken);
+
+    const getProfile = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setProfile(response.data);
+      } catch (error: any) {
+        console.log(error.response);
+      }
+    };
+    getProfile();
+  }, []);
 
   return (
     <>
@@ -34,7 +68,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex gap-4">
-            {token ? (
+            {getToken ? (
               <>
                 <div
                   onClick={() => setClick(true)}
@@ -75,7 +109,7 @@ const Navbar = () => {
                           Profile
                         </div>
                       </li>
-                      {profileData.status_eo === true ? (
+                      {profile.status_eo === true ? (
                         <li>
                           <div
                             onClick={() => {

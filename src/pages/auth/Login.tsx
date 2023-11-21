@@ -18,7 +18,7 @@ const Login = () => {
     e.preventDefault();
     setTimeout(() => {
       axios
-        .post("https://api.otixx.online/user/login", {
+        .post("http://localhost:5000/user/login", {
           username: username,
           password: password,
         })

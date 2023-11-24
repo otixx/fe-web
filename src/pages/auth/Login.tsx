@@ -18,7 +18,7 @@ const Login = () => {
     e.preventDefault();
     setTimeout(() => {
       axios
-        .post("http://localhost:5000/user/login", {
+        .post(`${import.meta.env.VITE_BE_URL}/user/login`, {
           username: username,
           password: password,
         })

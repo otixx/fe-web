@@ -36,24 +36,28 @@ const Navbar = () => {
   //   // Dispatch the action
   //   dispatch(fetchProfile());
   // }, [dispatch]);
+  if (getToken !== undefined) {
+    useEffect(() => {
+      const token = JSON.parse(getToken);
 
-  useEffect(() => {
-    const token = JSON.parse(getToken);
-
-    const getProfile = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setProfile(response.data);
-      } catch (error: any) {
-        console.log(error.response);
-      }
-    };
-    getProfile();
-  }, []);
+      const getProfile = async () => {
+        try {
+          const response = await axios.get(
+            `${import.meta.env.VITE_BE_URL}/profile`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          setProfile(response.data);
+        } catch (error: any) {
+          console.log(error.response);
+        }
+      };
+      getProfile();
+    }, []);
+  }
 
   return (
     <>

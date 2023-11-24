@@ -22,19 +22,22 @@ const DashboardEO = () => {
   const [description, setDescription] = useState("");
   const [tanggal, setTanggal] = useState("");
   const [lokasi, setLokasi] = useState("");
-  const [file, setFile] = useState("");
+  const [file, setFile] = useState<File[]>([]);
   const [open, setOpen] = useState(false);
+  const [eventUpdate, setEventUpdate] = useState(false);
   const [event, setEvent] = useState<Event[]>([]);
 
   useEffect(() => {
     const getEvent = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/event`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log(response.data.data);
+        const response = await axios.get(
+          `${import.meta.env.VITE_BE_URL}/event`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setEvent(response.data.data);
       } catch (error: any) {
         console.log(error.response);
@@ -49,7 +52,12 @@ const DashboardEO = () => {
   const handleClose = () => {
     setOpen(false);
   };
-
+  const handleOpenUpdate = () => {
+    setEventUpdate(true);
+  };
+  const handleCloseUpdate = () => {
+    setEventUpdate(false);
+  };
   const handleAddEvents = async () => {
     console.log(acara, description, tanggal, lokasi, file);
     await axios
@@ -75,6 +83,45 @@ const DashboardEO = () => {
         console.log(error.response.data);
       });
   };
+  const handleUpdateEvents = async () => {
+    console.log(acara, description, tanggal, lokasi, file);
+    // await axios
+    //   .post(
+    //     `${import.meta.env.VITE_URL}event`,
+    //     {
+    //       nama_acara: acara,
+    //       description: description,
+    //       tanggal_acara: tanggal,
+    //       lokasi: lokasi,
+    //       image: file,
+    //     },
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     }
+    //   )
+    //   .then((response) => {
+    //     console.log(response);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error.response.data);
+    //   });
+  };
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+
+    if (fileList) {
+      // Convert the FileList to an array
+      const imageArray = Array.from(fileList);
+
+      // Limit the number of selected images to a maximum of 5
+      const selectedImages = imageArray.slice(0, 5);
+
+      // Update the state with the selected images
+      setFile(selectedImages);
+    }
+  };
   return (
     <div className="flex flex-row">
       <Sidebar />
@@ -89,104 +136,202 @@ const DashboardEO = () => {
               Tambah Event
             </button>
           </div>
-          {open && (
-            <Popup onConfirm={handleClose}>
-              <div className="relative w-full max-w-md max-h-full">
-                <div className="relative bg-white rounded-lg shadow">
-                  <button
-                    type="button"
-                    onClick={() => handleClose()}
-                    className="absolute top-3 right-2.5 bg-transparent hover:bg-gray-200 rounded-full text-black w-8 h-8 inline-flex justify-center items-center"
-                    data-modal-hide="authentication-modal"
-                  >
-                    <LuXCircle />
-                  </button>
-                  <div className="px-6 py-6 lg:px-8">
-                    <h3 className="mb-4 text-2xl font-semibold text-black">
-                      Tambahkan Events
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="flex gap-3">
-                        <div>
-                          <label className="block text-sm font-semibold text-black">
-                            Nama Acara
-                          </label>
-                          <input
-                            type="text"
-                            onChange={(e) => setAcara(e.target.value)}
-                            className=" border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-semibold text-black">
-                            Dekripsi
-                          </label>
-                          <input
-                            type="text"
-                            onChange={(e) => setDescription(e.target.value)}
-                            className=" border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
-                          />
-                        </div>
-                      </div>
+        </div>
+        {open && (
+          <Popup onConfirm={handleClose}>
+            <div className="relative w-full max-w-md max-h-full">
+              <div className="relative bg-white rounded-lg shadow">
+                <button
+                  type="button"
+                  onClick={() => handleClose()}
+                  className="absolute top-3 right-2.5 bg-transparent hover:bg-gray-200 rounded-full text-black w-8 h-8 inline-flex justify-center items-center"
+                  data-modal-hide="authentication-modal"
+                >
+                  <LuXCircle />
+                </button>
+                <div className="px-6 py-6 lg:px-8">
+                  <h3 className="mb-4 text-2xl font-semibold text-black">
+                    Tambahkan Events
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex gap-3">
                       <div>
                         <label className="block text-sm font-semibold text-black">
-                          Lokasi
-                        </label>
-                        <select
-                          value={lokasi}
-                          className="border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
-                          onChange={(e) => setLokasi(e.target.value)}
-                        >
-                          <option selected value="">
-                            {" "}
-                            Pilih Kota
-                          </option>
-                          <option value={`Jember`}> Jember</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          Alamat
+                          Nama Acara
                         </label>
                         <input
-                          type="date"
-                          onChange={(e) => setTanggal(e.target.value)}
+                          type="text"
+                          onChange={(e) => setAcara(e.target.value)}
                           className=" border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-black">
-                          Gambar Event
+                          Dekripsi
                         </label>
                         <input
-                          type="file"
-                          onChange={(e) => setFile(e.target.value)}
+                          type="text"
+                          onChange={(e) => setDescription(e.target.value)}
                           className=" border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
                         />
                       </div>
-                      <div className="flex gap-2 py-2 justify-end">
-                        <button
-                          type="submit"
-                          onClick={() => handleClose()}
-                          className=" text-black border border-mainColors focus:ring-4 focus:outline-none font-semibold rounded-full text-sm px-10 py-2 text-center"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleAddEvents()}
-                          className=" text-white bg-mainColors focus:ring-4 focus:outline-none font-semibold rounded-full text-sm px-10 py-2 text-center"
-                        >
-                          Update
-                        </button>
-                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-black">
+                        Lokasi
+                      </label>
+                      <select
+                        value={lokasi}
+                        className="border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
+                        onChange={(e) => setLokasi(e.target.value)}
+                      >
+                        <option selected value="">
+                          {" "}
+                          Pilih Kota
+                        </option>
+                        <option value={`Jember`}> Jember</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-black">
+                        Alamat
+                      </label>
+                      <input
+                        type="date"
+                        onChange={(e) => setTanggal(e.target.value)}
+                        className=" border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-black">
+                        Gambar Event
+                      </label>
+                      <input
+                        type="file"
+                        onChange={(e) => setFile(e.target.value)}
+                        className=" border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
+                      />
+                    </div>
+                    <div className="flex gap-2 py-2 justify-end">
+                      <button
+                        type="submit"
+                        onClick={() => handleClose()}
+                        className=" text-black border border-mainColors focus:ring-4 focus:outline-none font-semibold rounded-full text-sm px-10 py-2 text-center"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleAddEvents()}
+                        className=" text-white bg-mainColors focus:ring-4 focus:outline-none font-semibold rounded-full text-sm px-10 py-2 text-center"
+                      >
+                        Update
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
-            </Popup>
-          )}
-        </div>
+            </div>
+          </Popup>
+        )}
+        {eventUpdate && (
+          <Popup onConfirm={handleCloseUpdate}>
+            <div className="relative w-full max-w-md max-h-full">
+              <div className="relative bg-white rounded-lg shadow">
+                <button
+                  type="button"
+                  onClick={() => handleCloseUpdate()}
+                  className="absolute top-3 right-2.5 bg-transparent hover:bg-gray-200 rounded-full text-black w-8 h-8 inline-flex justify-center items-center"
+                  data-modal-hide="authentication-modal"
+                >
+                  <LuXCircle />
+                </button>
+                <div className="px-6 py-6 lg:px-8">
+                  <h3 className="mb-4 text-2xl font-semibold text-black">
+                    Update Events
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-black">
+                        Nama Acara
+                      </label>
+                      <input
+                        type="text"
+                        onChange={(e) => setAcara(e.target.value)}
+                        className=" border border-gray-300 text-black text-sm rounded-sm  block w-full h-10 p-2.5"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-black">
+                        Dekripsi
+                      </label>
+                      <textarea
+                        onChange={(e) => setDescription(e.target.value)}
+                        className=" border border-gray-300 text-black text-sm rounded-sm  block w-full h-20 p-2.5"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-black">
+                        Lokasi
+                      </label>
+                      <select
+                        value={lokasi}
+                        className="border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
+                        onChange={(e) => setLokasi(e.target.value)}
+                      >
+                        <option selected value="">
+                          {" "}
+                          Lokasi
+                        </option>
+                        <option value={`Jember`}> Jember</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-black">
+                        Tanggal Acara
+                      </label>
+                      <input
+                        type="date"
+                        onChange={(e) => setTanggal(e.target.value)}
+                        className=" border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-black">
+                        Gambar Event
+                      </label>
+                      <input
+                        type="file"
+                        id="imageUpload"
+                        name="imageUpload"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageChange}
+                        className=" border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
+                      />
+                    </div>
+                    <div className="flex gap-2 py-2 justify-end">
+                      <button
+                        type="submit"
+                        onClick={() => handleCloseUpdate()}
+                        className=" text-black border border-mainColors focus:ring-4 focus:outline-none font-semibold rounded-full text-sm px-10 py-2 text-center"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateEvents()}
+                        className=" text-white bg-mainColors focus:ring-4 focus:outline-none font-semibold rounded-full text-sm px-10 py-2 text-center"
+                      >
+                        Update
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Popup>
+        )}
         <div className="py-4">
           <div className=" bg-red-200 shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -241,7 +386,15 @@ const DashboardEO = () => {
                       {element.tanggal_acara > new Date().toISOString() ? (
                         <>
                           <div
-                            onClick={() => navigate("/profile/eo/events/12")}
+                            onClick={() => handleOpenUpdate()}
+                            className="font-medium cursor-pointer text-blue-600 dark:text-blue-500 hover:underline"
+                          >
+                            Edit
+                          </div>
+                          <div
+                            onClick={() =>
+                              navigate(`/profile/eo/events/${element.id}`)
+                            }
                             className="font-medium cursor-pointer text-blue-600 dark:text-blue-500 hover:underline "
                           >
                             View
@@ -249,6 +402,12 @@ const DashboardEO = () => {
                         </>
                       ) : (
                         <>
+                          <div
+                            style={{ pointerEvents: "none" }}
+                            className="font-medium cursor-pointer text-gray-600 dark:text-blue-500 hover:underline"
+                          >
+                            Edit
+                          </div>
                           <div
                             style={{ pointerEvents: "none" }}
                             className="font-medium cursor-pointer text-gray-600 dark:text-blue-500 hover:underline "

@@ -19,7 +19,9 @@ export const AppStore = create<Store>((set) => ({
 
 export const refreshToken = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/user/token");
+    const response = await axios.get(
+      "${import.meta.env.VITE_BE_URL}/user/token"
+    );
     const decode = jwtDecode(response.data);
     console.log(response);
     console.log(decode);

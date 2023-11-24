@@ -1,12 +1,21 @@
 import Sidebar from "../../../components/common/Sidebar/Sidebar";
-import dataEvent from "../../../api/dummy.json";
+// import dataEvent from "../../../api/dummy.json";
 import Popup from "../../../components/Popup";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LuXCircle } from "react-icons/lu";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { useParams } from "react-router-dom";
 
 const DetailEvents = () => {
+  interface Tiket {
+    id: string;
+    nama_kegiatan: string;
+    tags: string;
+    tanggal_preorder: string;
+    tanggal_expired: string;
+    harga: string;
+  }
   const [open, setOpen] = useState(false);
   const [kegiatan, setKegiatan] = useState("");
   const [harga, setHarga] = useState("");
@@ -14,9 +23,31 @@ const DetailEvents = () => {
   const [preorder, setPreorder] = useState("");
   const [expired, setExpired] = useState("");
   const [file, setFile] = useState("");
+  const [tiket, setTiket] = useState<Tiket[]>([]);
+  const idEvent = useParams().id;
 
   const getToken: any = Cookies.get("token");
   const token = JSON.parse(getToken);
+
+  useEffect(() => {
+    const getEvent = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BE_URL}/tiket/event/${idEvent}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setTiket(response.data.data);
+      } catch (error: any) {
+        console.log(error.response);
+      }
+    };
+    getEvent();
+  }, []);
+
   const handleOpen = () => {
     setOpen(true);
   };
@@ -223,7 +254,7 @@ const DetailEvents = () => {
                 </tr>
               </thead>
               <tbody>
-                {dataEvent.map((element, index) => (
+                {tiket.map((element, index) => (
                   <tr
                     className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                     key={index}
@@ -232,12 +263,24 @@ const DetailEvents = () => {
                       scope="row"
                       className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                     >
-                      {element?.name}
+                      {element?.nama_kegiatan}
                     </th>
                     <td className="px-6 py-4">{element?.harga}</td>
                     <td className="px-6 py-4">{element?.tags}</td>
-                    <td className="px-6 py-4">{element?.tgl_pre}</td>
-                    <td className="px-6 py-4">{element?.tgl_exp}</td>
+                    <td className="px-6 py-4">{`${new Date(
+                      element?.tanggal_preorder
+                    ).getDate()} ${new Date(
+                      element?.tanggal_preorder
+                    ).toLocaleString("default", { month: "long" })} ${new Date(
+                      element?.tanggal_preorder
+                    ).getFullYear()}`}</td>
+                    <td className="px-6 py-4">{`${new Date(
+                      element?.tanggal_expired
+                    ).getDate()} ${new Date(
+                      element?.tanggal_expired
+                    ).toLocaleString("default", { month: "long" })} ${new Date(
+                      element?.tanggal_expired
+                    ).getFullYear()}`}</td>
                     <td className="flex gap-4 text-center px-6 py-4">
                       <a
                         href="#"

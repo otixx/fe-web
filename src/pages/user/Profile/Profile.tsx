@@ -57,11 +57,14 @@ const Profile = () => {
   useEffect(() => {
     const getProfile = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${import.meta.env.VITE_BE_URL}/profile`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setProfile(response.data);
       } catch (error: any) {
         console.log(error.response);
@@ -73,7 +76,7 @@ const Profile = () => {
   const updateProfile = async () => {
     await axios
       .put(
-        `${import.meta.env.VITE_URL}profile`,
+        `${import.meta.env.VITE_BE_URL}profile`,
         {
           name: username,
           email: email,

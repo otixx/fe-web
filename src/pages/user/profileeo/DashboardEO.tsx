@@ -26,6 +26,7 @@ const DashboardEO = () => {
   const [open, setOpen] = useState(false);
   const [eventUpdate, setEventUpdate] = useState(false);
   const [event, setEvent] = useState<Event[]>([]);
+  const [idEvent, setIdEvent] = useState("");
 
   useEffect(() => {
     const getEvent = async () => {
@@ -52,7 +53,8 @@ const DashboardEO = () => {
   const handleClose = () => {
     setOpen(false);
   };
-  const handleOpenUpdate = () => {
+  const handleOpenUpdate = (id: string) => {
+    setIdEvent(id);
     setEventUpdate(true);
   };
   const handleCloseUpdate = () => {
@@ -62,7 +64,7 @@ const DashboardEO = () => {
     console.log(acara, description, tanggal, lokasi, file);
     await axios
       .post(
-        `${import.meta.env.VITE_URL}event`,
+        `${import.meta.env.VITE_BE_URL}event`,
         {
           nama_acara: acara,
           description: description,
@@ -85,41 +87,58 @@ const DashboardEO = () => {
   };
   const handleUpdateEvents = async () => {
     console.log(acara, description, tanggal, lokasi, file);
-    // await axios
-    //   .post(
-    //     `${import.meta.env.VITE_URL}event`,
-    //     {
-    //       nama_acara: acara,
-    //       description: description,
-    //       tanggal_acara: tanggal,
-    //       lokasi: lokasi,
-    //       image: file,
-    //     },
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     }
-    //   )
-    //   .then((response) => {
-    //     console.log(response);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error.response.data);
-    //   });
+    const formData = new FormData();
+
+    // Append additional fields
+    formData.append("nama_acara", acara);
+    formData.append("description", description);
+
+    const dateObject = new Date(tanggal);
+
+    // Dapatkan tanggal, bulan, dan tahun dari objek Date
+    const day = dateObject.getDate();
+    const month = dateObject.getMonth() + 1; // Ingat: bulan dimulai dari 0
+    const year = dateObject.getFullYear();
+
+    // Format tanggal, bulan, dan tahun sesuai dengan "DD/MM/YYYY"
+    const formattedDate = `${day}/${month}/${year}`;
+    formData.append(
+      "tanggal_acara",
+      formattedDate === "NaN/NaN/NaN" ? "" : formattedDate
+    );
+    formData.append("lokasi", lokasi);
+
+    // Append multiple files
+    for (let i = 0; i < file.length; i++) {
+      formData.append("image", file[i]);
+    }
+    console.log(formData);
+    await axios
+      .put(`${import.meta.env.VITE_BE_URL}/event/update/${idEvent}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        handleCloseUpdate();
+      })
+      .catch((error) => {
+        console.log(error.response.data);
+      });
   };
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
-
     if (fileList) {
-      // Convert the FileList to an array
-      const imageArray = Array.from(fileList);
+      const fileArray = Array.from(fileList) as File[];
 
-      // Limit the number of selected images to a maximum of 5
-      const selectedImages = imageArray.slice(0, 5);
-
-      // Update the state with the selected images
-      setFile(selectedImages);
+      if (fileArray.length > 1) {
+        fileArray.forEach((item) => {
+          setFile((prevFiles) => [...prevFiles, item]);
+        });
+      } else {
+        setFile(fileArray);
+      }
     }
   };
   return (
@@ -208,7 +227,9 @@ const DashboardEO = () => {
                       </label>
                       <input
                         type="file"
-                        onChange={(e) => setFile(e.target.value)}
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageChange}
                         className=" border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
                       />
                     </div>
@@ -386,7 +407,7 @@ const DashboardEO = () => {
                       {element.tanggal_acara > new Date().toISOString() ? (
                         <>
                           <div
-                            onClick={() => handleOpenUpdate()}
+                            onClick={() => handleOpenUpdate(element.id)}
                             className="font-medium cursor-pointer text-blue-600 dark:text-blue-500 hover:underline"
                           >
                             Edit

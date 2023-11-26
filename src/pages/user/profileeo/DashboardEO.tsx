@@ -109,10 +109,8 @@ const DashboardEO = () => {
     formData.append("lokasi", lokasi);
 
     // Append multiple files
-    for (let i = 0; i < file.length; i++) {
-      formData.append("image", file[i]);
-    }
-    console.log(formData);
+    file.forEach((fileItem) => formData.append("image", fileItem));
+
     await axios
       .put(`${import.meta.env.VITE_BE_URL}/event/update/${idEvent}`, formData, {
         headers: {
@@ -120,7 +118,8 @@ const DashboardEO = () => {
         },
       })
       .then((response) => {
-        console.log(response);
+        console.log(formData);
+        setFile([]);
         handleCloseUpdate();
       })
       .catch((error) => {
@@ -397,9 +396,7 @@ const DashboardEO = () => {
                       </>
                     ) : (
                       <>
-                        <>
-                          <td className="px-6 py-4">tanggal sudah lewat</td>
-                        </>
+                        <td className="px-6 py-4">tanggal sudah lewat</td>
                       </>
                     )}
 

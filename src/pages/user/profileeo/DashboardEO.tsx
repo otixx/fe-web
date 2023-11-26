@@ -62,29 +62,46 @@ const DashboardEO = () => {
   };
   const handleAddEvents = async () => {
     console.log(acara, description, tanggal, lokasi, file);
+
+    const formData = new FormData();
+
+    // Append additional fields
+    formData.append("nama_acara", acara);
+    formData.append("description", description);
+
+    const dateObject = new Date(tanggal);
+
+    // Dapatkan tanggal, bulan, dan tahun dari objek Date
+    const day = dateObject.getDate();
+    const month = dateObject.getMonth() + 1; // Ingat: bulan dimulai dari 0
+    const year = dateObject.getFullYear();
+
+    // Format tanggal, bulan, dan tahun sesuai dengan "DD/MM/YYYY"
+    const formattedDate = `${day}/${month}/${year}`;
+    formData.append(
+      "tanggal_acara",
+      formattedDate === "NaN/NaN/NaN" ? "" : formattedDate
+    );
+    formData.append("lokasi", lokasi);
+
+    // Append multiple files
+    file.forEach((fileItem) => formData.append("image", fileItem));
+
     await axios
-      .post(
-        `${import.meta.env.VITE_BE_URL}event`,
-        {
-          nama_acara: acara,
-          description: description,
-          tanggal_acara: tanggal,
-          lokasi: lokasi,
-          image: file,
+      .post(`${import.meta.env.VITE_BE_URL}/event`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      })
       .then((response) => {
         console.log(response);
+        handleClose();
       })
       .catch((error) => {
         console.log(error.response.data);
       });
   };
+
   const handleUpdateEvents = async () => {
     console.log(acara, description, tanggal, lokasi, file);
     const formData = new FormData();
@@ -118,7 +135,10 @@ const DashboardEO = () => {
         },
       })
       .then((response) => {
-        console.log(formData);
+        setAcara("");
+        setDescription("");
+        setLokasi("");
+        setTanggal("");
         setFile([]);
         handleCloseUpdate();
       })
@@ -172,27 +192,24 @@ const DashboardEO = () => {
                     Tambahkan Events
                   </h3>
                   <div className="space-y-4">
-                    <div className="flex gap-3">
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          Nama Acara
-                        </label>
-                        <input
-                          type="text"
-                          onChange={(e) => setAcara(e.target.value)}
-                          className=" border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          Dekripsi
-                        </label>
-                        <input
-                          type="text"
-                          onChange={(e) => setDescription(e.target.value)}
-                          className=" border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
-                        />
-                      </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-black">
+                        Nama Acara
+                      </label>
+                      <input
+                        type="text"
+                        onChange={(e) => setAcara(e.target.value)}
+                        className=" border border-gray-300 text-black text-sm rounded-sm  block w-full h-10 p-2.5"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-black">
+                        Dekripsi
+                      </label>
+                      <textarea
+                        onChange={(e) => setDescription(e.target.value)}
+                        className=" border border-gray-300 text-black text-sm rounded-sm  block w-full h-20 p-2.5"
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-black">
@@ -205,14 +222,14 @@ const DashboardEO = () => {
                       >
                         <option selected value="">
                           {" "}
-                          Pilih Kota
+                          Lokasi
                         </option>
                         <option value={`Jember`}> Jember</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-black">
-                        Alamat
+                        Tanggal Acara
                       </label>
                       <input
                         type="date"
@@ -226,6 +243,8 @@ const DashboardEO = () => {
                       </label>
                       <input
                         type="file"
+                        id="imageUpload"
+                        name="imageUpload"
                         accept="image/*"
                         multiple
                         onChange={handleImageChange}
@@ -245,7 +264,7 @@ const DashboardEO = () => {
                         onClick={() => handleAddEvents()}
                         className=" text-white bg-mainColors focus:ring-4 focus:outline-none font-semibold rounded-full text-sm px-10 py-2 text-center"
                       >
-                        Update
+                        Create
                       </button>
                     </div>
                   </div>

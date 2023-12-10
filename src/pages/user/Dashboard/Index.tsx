@@ -8,10 +8,12 @@ const Index = () => {
   const [ticket, setTiket] = useState<Ticket[]>([]);
 
   useEffect(() => {
-    getTiket({})
+    getTiket()
       .then((res) => setTiket(res))
       .catch((err) => console.log(err));
   }, []);
+
+  console.log(ticket);
   return (
     <div>
       <Carousel />

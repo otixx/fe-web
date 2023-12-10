@@ -1,45 +1,41 @@
-import Sidebar from "@/components/common/Sidebar";
-
 const Riwayat = () => {
   return (
-    <div className="flex flex-row">
-      <Sidebar />
-      <div className="w-full px-4 py-4">
-        <div className="">
-          <h1 className="text-2xl font-bold">Tiket</h1>
-        </div>
-        <div className="py-4">
-          <div className=" bg-red-200 shadow-md sm:rounded-lg">
-            <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-              <caption className="bg-white p-5 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
-                List Tiket
-                <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
-                  Lihat Semua Data anda disini
-                </p>
-              </caption>
-              <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                  <th scope="col" className="px-6 py-3">
-                    Nama Tiket
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Harga
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Tags
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Tgl Preorder
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Tgl Exp
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              {/* <tbody>
+    <div className="w-full px-4 py-4">
+      <div className="">
+        <h1 className="text-2xl font-bold">Tiket</h1>
+      </div>
+      <div className="py-4">
+        <div className=" bg-red-200 shadow-md sm:rounded-lg">
+          <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+            <caption className="bg-white p-5 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
+              List Tiket
+              <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
+                Lihat Semua Data anda disini
+              </p>
+            </caption>
+            <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" className="px-6 py-3">
+                  Nama Tiket
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Harga
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Tags
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Tgl Preorder
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Tgl Exp
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            {/* <tbody>
                 {dataEvent.map((element, index) => (
                   <tr
                     className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
@@ -72,8 +68,7 @@ const Riwayat = () => {
                   </tr>
                 ))}
               </tbody> */}
-            </table>
-          </div>
+          </table>
         </div>
       </div>
     </div>

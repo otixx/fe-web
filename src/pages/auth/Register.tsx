@@ -1,91 +1,209 @@
-import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
-import { Alert } from 'antd'
-export const Register = () => {
-  const [email, setEmail] = useState('')
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [msg, setMsg] = useState('')
-  const navigate = useNavigate()
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Alert, Form, Input } from "antd";
+import { publicAPi } from "@/shared/axios/axios";
+import { LoadingOutlined } from "@ant-design/icons";
+import { IRegisterProps } from "@/interface/auth/register.interface";
+import toast from "react-hot-toast";
 
-  const handleRegister = async (e: any) => {
-    e.preventDefault();
+export const Register = () => {
+  const [status, setStatus] = useState(false);
+  const [msg, setMsg] = useState("");
+  const navigate = useNavigate();
+
+  const handleRegister = async (e: IRegisterProps) => {
     try {
-      await axios.post(`${import.meta.env.VITE_URL}user/register`, {
-        username: username,
-        email: email,
-        password: password,
-        confpassword: confirmPassword
-      })
-      navigate('/signin')
-    }
-    catch (error: any) {
+      await publicAPi.post(`/user/register`, {
+        username: e?.username,
+        email: e?.email,
+        password: e?.password,
+        confpassword: e?.confirmPassword,
+      });
+      toast.success("Berhasil Register Akun");
+      setTimeout(() => {
+        navigate("/signin");
+      }, 1000);
+    } catch (error: any) {
+      setStatus(false);
       setMsg(error.response.data.message);
     }
-  }
+  };
   useEffect(() => {
     if (msg) {
       setTimeout(() => {
-        setMsg('');
+        setMsg("");
       }, 2000);
-
     }
   }, [msg]);
   return (
-    <div className="container mx-auto">
-      <div className="p-4">
-        <div className="flex h-screen items-center justify-center gap-4">
-          <div className="p-5 hidden lg:block w-2/5">
-            <img src="https://www.loket.com/web/assets/img/auth/icon-login.svg" alt="" />
-          </div>
-          <div className="p-4 shadow-lg w-full lg:w-2/5 justify-start">
-            {
-              msg ? <Alert
-                showIcon
-                message={`${msg}`}
-                type="warning"
-              /> : null
-            }
-            <form onSubmit={handleRegister}>
-              <div className='flex justify-center p-2'>
-                <h1 className='font-bold text-[21px] text-mainColors'>Buat akunmu sekarang</h1>
+    <div className="w-full justify-start p-4 shadow-lg lg:w-2/5">
+      {msg ? <Alert showIcon message={`${msg}`} type="warning" /> : null}
+      {/* <form onSubmit={handleRegister}>
+              <div className="flex justify-center p-2">
+                <h1 className="text-[21px] font-bold text-mainColors">
+                  Buat akunmu sekarang
+                </h1>
               </div>
-              <div className="flex gap-2 justify-center p-2">
-                <div className="text-[#666666] text-[14px]">sudah punya akun ?</div>
+              <div className="flex justify-center gap-2 p-2">
+                <div className="text-[14px] text-[#666666]">
+                  sudah punya akun ?
+                </div>
                 <Link to="/signin">
-                  <div className="text-[14px] cursor-pointer font-bold text-mainColors">Masuk</div>
+                  <div className="cursor-pointer text-[14px] font-bold text-mainColors">
+                    Masuk
+                  </div>
                 </Link>
               </div>
               <div className="mb-6">
-                <label className="block mb-2 text-[14px] font-medium text-[#666666]">Username</label>
-                <input type="text" id="username" value={username} onChange={((e) => setUsername(e.target.value))} className="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5" required />
+                <label className="mb-2 block text-[14px] font-medium text-[#666666]">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm"
+                  required
+                />
               </div>
               <div className="mb-6">
-                <label className="block mb-2 text-[14px] font-medium text-[#666666]">Email</label>
-                <input type="email" id="email" value={email} onChange={((e) => setEmail(e.target.value))} className="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5" required />
+                <label className="mb-2 block text-[14px] font-medium text-[#666666]">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm"
+                  required
+                />
               </div>
               <div className="mb-6">
-                <div className="flex justify-between  gap-4 items-center">
-                  <label className="block mb-2 text-[14px] font-medium text-[#666666] ">Kata Sandi</label>
+                <div className="flex items-center  justify-between gap-4">
+                  <label className="mb-2 block text-[14px] font-medium text-[#666666] ">
+                    Kata Sandi
+                  </label>
                 </div>
-                <input type="password" id="password" value={password} onChange={((e) => setPassword(e.target.value))} className="bg-gray-50 border border-gray-300 text-mainColors text-[14px] rounded-lg  block w-full p-2.5" required />
+                <input
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50  p-2.5 text-[14px] text-mainColors"
+                  required
+                />
               </div>
               <div className="mb-6">
-                <div className="flex justify-between  gap-4 items-center">
-                  <label className="block mb-2 text-[14px] font-medium text-[#666666] ">Konfirmasi Kata Sandi</label>
+                <div className="flex items-center  justify-between gap-4">
+                  <label className="mb-2 block text-[14px] font-medium text-[#666666] ">
+                    Konfirmasi Kata Sandi
+                  </label>
                 </div>
-                <input type="password" id="confirmPassword" value={confirmPassword} onChange={((e) => setConfirmPassword(e.target.value))} className="bg-gray-50 border border-gray-300 text-mainColors text-[14px] rounded-lg  block w-full p-2.5" required />
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50  p-2.5 text-[14px] text-mainColors"
+                  required
+                />
               </div>
-              <button type="submit" className="text-white bg-secondColors hover:bg-hoverMainColors font-medium rounded-lg text-[14px] lg:w-full sm:w-auto px-5 py-2.5 text-center">Daftar</button>
-              <div className='py-4 text-[12px] text-[#666666] '>
-                Dengan mendaftar, saya menyetujui syarat & ketentuan serta kebijakan privasi
+              <button
+                type="submit"
+                className="w-full  rounded-lg bg-secondColors px-5 py-2.5 text-center text-[14px] font-medium text-white hover:bg-hoverMainColors lg:w-full"
+              >
+                Daftar
+              </button>
+              <div className="py-4 text-[12px] text-[#666666] ">
+                Dengan mendaftar, saya menyetujui syarat & ketentuan serta
+                kebijakan privasi
               </div>
-            </form>
-          </div>
+            </form> */}
+      <Form
+        name="basic"
+        layout="vertical"
+        labelCol={{ span: 12 }}
+        wrapperCol={{ span: 24 }}
+        initialValues={{ remember: true }}
+        onFinish={handleRegister}
+        autoComplete="off"
+      >
+        <div className="flex justify-center p-2">
+          <h1 className="text-[21px] font-bold text-mainColors">
+            Buat akunmu sekarang
+          </h1>
         </div>
-      </div>
+        <div className="flex justify-center gap-2 p-2">
+          <div className="text-[14px] text-[#666666]">sudah punya akun ?</div>
+          <Link to="/auth/signin">
+            <div className="cursor-pointer text-[14px] font-bold text-mainColors">
+              Masuk
+            </div>
+          </Link>
+        </div>
+        <Form.Item
+          label="Username"
+          name="username"
+          rules={[
+            { required: true, message: "Masukkan Username" },
+            {
+              min: 5,
+              message: "Username min 5 char",
+            },
+          ]}
+        >
+          <Input size="large" />
+        </Form.Item>
+
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[
+            { required: true, message: "Masukkan Email" },
+            {
+              type: "email",
+              message: "Harap masukkan email yang benar",
+            },
+          ]}
+        >
+          <Input size="large" />
+        </Form.Item>
+
+        <Form.Item
+          label="Kata Sandi"
+          name="password"
+          rules={[
+            { required: true, message: "Masukkan Kata Sandi" },
+            {
+              min: 8,
+              pattern: /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+              message:
+                "Kata sandi min 8 char dan kombinasi huruf, angka kapital,angka dan tanda baca",
+            },
+          ]}
+        >
+          <Input.Password size="large" />
+        </Form.Item>
+
+        <Form.Item
+          label="Konfirmasi Kata Sandi"
+          name="confirmPassword"
+          rules={[{ required: true, message: "Masukkan Ulang Kata Sandi" }]}
+        >
+          <Input.Password size="large" />
+        </Form.Item>
+
+        <button
+          type="submit"
+          disabled={status}
+          className={`w-full rounded-lg bg-secondColors py-2 text-center text-[14px] font-medium text-white hover:bg-hoverMainColors lg:w-full`}
+        >
+          {" "}
+          {status ? <LoadingOutlined spin /> : "Register"}
+        </button>
+      </Form>
     </div>
-  )
-}
+  );
+};

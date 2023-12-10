@@ -45,7 +45,7 @@ const DetailPayment = () => {
           name: string;
           method: string;
           url: string;
-        }
+        },
       ];
     };
   }
@@ -80,7 +80,7 @@ const DetailPayment = () => {
     const getTiket = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BE_URL}/tiket/${idTiket}`
+          `${import.meta.env.VITE_BE_URL}/tiket/${idTiket}`,
         );
         setTiket([response.data.data]);
       } catch (error: any) {
@@ -137,7 +137,7 @@ const DetailPayment = () => {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
         if (isDesktop === false && selectedMethod === "shopeepay") {
           setIdTransaction(responses.data.response.transaction_id);
@@ -166,15 +166,15 @@ const DetailPayment = () => {
         <div className="grid grid-cols-5 gap-4">
           {Tiket.map((item, index) => (
             <div
-              className="col-span-5 lg:col-span-3 rounded-sm p-4 gap-2 lg:order-1 order-2"
+              className="order-2 col-span-5 gap-2 rounded-sm p-4 lg:order-1 lg:col-span-3"
               key={index}
             >
               <div className="mt-2 py-4">
-                <h1 className="font-bold text-2xl">Detail Pemesanan</h1>
+                <h1 className="text-2xl font-bold">Detail Pemesanan</h1>
               </div>
 
-              <div className="flex py-4 justify-between">
-                <h1 className="font-bold text-[16px]">{item.nama_kegiatan}</h1>
+              <div className="flex justify-between py-4">
+                <h1 className="text-[16px] font-bold">{item.nama_kegiatan}</h1>
                 <h1 className="font-semibold text-[#666666]">
                   {new Intl.NumberFormat("id-ID", {
                     style: "currency",
@@ -195,7 +195,7 @@ const DetailPayment = () => {
                         id="name"
                         name="name"
                         onChange={(e) => setNama(e.target.value)}
-                        className="w-full p-2 rounded-md border-2"
+                        className="w-full rounded-md border-2 p-2"
                         placeholder="Isi Nama"
                       />
                     </div>
@@ -209,7 +209,7 @@ const DetailPayment = () => {
                         id="city"
                         name="city"
                         onChange={(e) => setKota(e.target.value)}
-                        className="w-full p-2 rounded-md border-2"
+                        className="w-full rounded-md border-2 p-2"
                         placeholder="Isi Asal Kota"
                       />
                     </div>
@@ -226,7 +226,7 @@ const DetailPayment = () => {
                         id="instagram"
                         name="instagram"
                         onChange={(e) => setInstagram(e.target.value)}
-                        className="w-full p-2 rounded-md border-2"
+                        className="w-full rounded-md border-2 p-2"
                         placeholder="Isi Instagram"
                       />
                     </div>
@@ -243,7 +243,7 @@ const DetailPayment = () => {
                         id="phoneNumber"
                         name="phoneNumber"
                         onChange={(e) => setNoHp(e.target.value)}
-                        className="w-full p-2 rounded-md border-2"
+                        className="w-full rounded-md border-2 p-2"
                         placeholder="Isi Nomor HP"
                       />
                     </div>
@@ -260,7 +260,7 @@ const DetailPayment = () => {
                           id="songTitle"
                           name="songTitle"
                           onChange={(e) => setLagu(e.target.value)}
-                          className="w-full p-2 rounded-md border-2"
+                          className="w-full rounded-md border-2 p-2"
                           placeholder="Isi Judul Lagu"
                         />
                       </div>
@@ -277,7 +277,7 @@ const DetailPayment = () => {
                           id="cosplayName"
                           name="cosplayName"
                           onChange={(e) => setCosplay(e.target.value)}
-                          className="w-full p-2 rounded-md border-2"
+                          className="w-full rounded-md border-2 p-2"
                           placeholder="Isi Cosplay Name"
                         />
                       </div>
@@ -285,15 +285,15 @@ const DetailPayment = () => {
                   </form>
                 )}
                 <form className="py-4" onSubmit={handleSubmit}>
-                  <div className="flex py-4 justify-between">
-                    <h1 className="font font-semibold text-[14px]">Qty</h1>
+                  <div className="flex justify-between py-4">
+                    <h1 className="font text-[14px] font-semibold">Qty</h1>
                     <h1 className="font-semibold text-[#666666]">
                       x {dataQtyPreviousPage}
                     </h1>
                   </div>
                   <hr />
-                  <div className="flex py-4 justify-between">
-                    <h1 className="font font-semibold text-[14px]">Total</h1>
+                  <div className="flex justify-between py-4">
+                    <h1 className="font text-[14px] font-semibold">Total</h1>
                     <h1 className="font-semibold ">
                       {new Intl.NumberFormat("id-ID", {
                         style: "currency",
@@ -304,12 +304,12 @@ const DetailPayment = () => {
                   <div className="flex flex-col py-4">
                     <button
                       type="submit"
-                      className="bg-secondColors font-semibold text-[14px] px-8 py-2.5 rounded-sm text-white"
+                      className="rounded-sm bg-secondColors px-8 py-2.5 text-[14px] font-semibold text-white"
                     >
                       {" "}
                       Buat Tagihan Pembayaran
                     </button>
-                    <p className="py-2 font-semibold text-[#666666] text-[12px]">
+                    <p className="py-2 text-[12px] font-semibold text-[#666666]">
                       Dengan checkout, Anda setuju dengan Ketentuan Penggunaan
                       kami dan mengonfirmasi bahwa Anda telah membaca Kebijakan
                       Privasi kami. Anda dapat membatalkan biaya perpanjangan
@@ -321,29 +321,29 @@ const DetailPayment = () => {
             </div>
           ))}
 
-          <div className="col-span-5 rounded-sm shadow-lg order-2 p-4 lg:col-span-2 lg:order-1 h-fit">
-            <h1 className="font-bold text-2xl p-4"> Pilih Metode Pembayaran</h1>
-            <div className="flex-col flex gap-4">
+          <div className="order-2 col-span-5 h-fit rounded-sm p-4 shadow-lg lg:order-1 lg:col-span-2">
+            <h1 className="p-4 text-2xl font-bold"> Pilih Metode Pembayaran</h1>
+            <div className="flex flex-col gap-4">
               {paymentMethods.map((method, index) => (
                 <div key={index}>
                   {isDesktop === true && method.name === "shopeepay" ? null : (
                     <div
-                      className={`flex border-2 justify-between cursor-pointer rounded-sm shadow-sm px-4`}
+                      className={`flex cursor-pointer justify-between rounded-sm border-2 px-4 shadow-sm`}
                       onClick={() => handleMethodChange(method.name)}
                     >
-                      <div className="flex gap-2 items-center">
+                      <div className="flex items-center gap-2">
                         <input
                           type="radio"
                           name="paymentMethod"
                           checked={selectedMethod === method.name}
                           onChange={() => {}}
                         />
-                        <h1 className="font-semibold text-[16px]">
+                        <h1 className="text-[16px] font-semibold">
                           {method.name}
                         </h1>
                       </div>
                       <img
-                        className="w-20 h-full right-0 bg-transparent"
+                        className="right-0 h-full w-20 bg-transparent"
                         src={method.logoSrc}
                         alt={method.name}
                       />

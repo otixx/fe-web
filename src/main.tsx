@@ -1,10 +1,15 @@
-import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
-import { Provider } from 'react-redux'
-import store from './Store.tsx'
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <Provider store={store}>
+import ReactDOM from "react-dom/client";
+import App from "./App.tsx";
+import "./index.css";
+import { ConfigProvider } from "antd";
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <ConfigProvider
+    theme={{
+      token: {
+        fontFamily: "Poppins",
+      },
+    }}
+  >
     <App />
-  </Provider>
-)
+  </ConfigProvider>,
+);

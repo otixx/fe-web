@@ -4,7 +4,7 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   darkMode: 'class',
-  theme:  {
+  theme: {
     screens: {
       'sm': '640px',
       // => @media (min-width: 640px) { ... }
@@ -27,7 +27,7 @@ module.exports = {
       },
       'colors': {
         'mainColors': '#152955',
-        'hoverMainColors' : '#0d204a',
+        'hoverMainColors': '#0d204a',
         'secondColors': '#0049cc',
         'thirdColors': '#9575DE',
         'black': '#2B2730'

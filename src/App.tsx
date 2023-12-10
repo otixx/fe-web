@@ -37,6 +37,7 @@ function App() {
 
             {/* EO Layout  */}
             <Route path="/profile/" element={<LayoutEO />}>
+              <Route path="user" element={<Profile />} />
               <Route path="eo" element={<ProfileEo />} />
               <Route path="eo/register" element={<RegisterEO />} />
               <Route path="eo/events" element={<DashboardEO />} />

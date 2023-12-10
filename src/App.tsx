@@ -14,6 +14,7 @@ import { Toaster } from "react-hot-toast";
 import RegisterEO from "./pages/user/profileeo/RegisterEO";
 import DashboardEO from "./pages/user/profileeo/DashboardEO";
 import ProfileEo from "./pages/user/profileeo/ProfileEo";
+import History from "./pages/user/Profile/History";
 function App() {
   return (
     <>
@@ -23,7 +24,6 @@ function App() {
           <Route path="/signin" element={<Login />} />
           <Route path="*" element={<Error />} />
           <Route path="/signup" element={<Register />} />
-          <Route path="/detail/payment" element={<DetailPayment />} />
           <Route path="/" element={<UserLayout />}>
             <Route index element={<Index />} />
             <Route path="/profile" element={<Profile />} />
@@ -32,6 +32,9 @@ function App() {
             <Route path="/profile/eo/events" element={<DashboardEO />} />
             <Route path="/profile/eo/events/:id" element={<DetailEvents />} />
             <Route path="/profile/eo/riwayat" element={<Riwayat />} />
+            <Route path="/detail/payment/:id" element={<DetailPayment />} />
+            <Route path="/history" element={<History />} />
+
             <Route
               path="/profile/eo/riwayat/tiket/:id"
               element={<RiwayatTiket />}

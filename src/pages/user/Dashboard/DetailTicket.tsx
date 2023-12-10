@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -14,6 +14,7 @@ const DetailTiket = () => {
     event: {
       tanggal_acara: string;
       lokasi: string;
+      description: string;
     };
     id: string;
   }
@@ -47,14 +48,14 @@ const DetailTiket = () => {
     setQuantity(Number(e.target.value));
   };
 
-  const handleCheckout = (e: any) => {
+  const handleCheckout = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
     const token = Cookies.get("token");
     if (token === undefined) {
       navigate("/signin");
     } else {
-      console.log("checkout");
+      navigate(`/detail/payment/${idTiket}`, { state: { data: quantity } });
     }
   };
   return (
@@ -81,7 +82,10 @@ const DetailTiket = () => {
               <div className="mt-4 lg:row-span-3 lg:mt-0">
                 <h2 className="sr-only">Product information</h2>
                 <p className="text-3xl tracking-tight text-gray-900">
-                  {item.harga}
+                  {new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  }).format(Number(item.harga))}
                 </p>
                 <form className="mt-10" onSubmit={handleCheckout}>
                   <div>
@@ -130,10 +134,7 @@ const DetailTiket = () => {
 
                   <div className="space-y-6">
                     <p className="text-base text-gray-900">
-                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                      Ea voluptatibus dicta minus illum eum incidunt, veritatis
-                      debitis! Similique fugiat suscipit itaque enim natus,
-                      possimus autem eius assumenda illo voluptas sint!
+                      {item.event.description}
                     </p>
                   </div>
                 </div>

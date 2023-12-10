@@ -3,7 +3,7 @@ import DetailTiket from "./pages/user/Dashboard/DetailTicket";
 import Login from "./pages/auth/Login";
 import { Register } from "./pages/auth/Register";
 import DetailPayment from "./pages/user/payment/DetailPayment";
-import UserLayout from "./layout/UserLayout";
+import UserLayout from "./pages/user/UserLayout";
 import Index from "./pages/user/Dashboard/Index";
 import Profile from "./pages/user/Profile/Profile";
 import Error from "./pages/error/Error";
@@ -14,6 +14,8 @@ import { Toaster } from "react-hot-toast";
 import RegisterEO from "./pages/user/profileeo/RegisterEO";
 import DashboardEO from "./pages/user/profileeo/DashboardEO";
 import ProfileEo from "./pages/user/profileeo/ProfileEo";
+import LayoutEO from "./pages/user/profileeo/Layout";
+import LayoutAuth from "./pages/auth/Layout";
 import History from "./pages/user/Profile/History";
 function App() {
   return (
@@ -21,20 +23,28 @@ function App() {
       <Toaster position="top-center" reverseOrder={false} />
       <Router>
         <Routes>
-          <Route path="/signin" element={<Login />} />
           <Route path="*" element={<Error />} />
-          <Route path="/signup" element={<Register />} />
+          {/* auth layout  */}
+          <Route path="/auth/" element={<LayoutAuth />}>
+            <Route path="signin" element={<Login />} />
+            <Route path="signup" element={<Register />} />
+          </Route>
+
+          {/* Root layout  */}
           <Route path="/" element={<UserLayout />}>
             <Route index element={<Index />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/profile/eo" element={<ProfileEo />} />
-            <Route path="/profile/eo/register" element={<RegisterEO />} />
-            <Route path="/profile/eo/events" element={<DashboardEO />} />
-            <Route path="/profile/eo/events/:id" element={<DetailEvents />} />
-            <Route path="/profile/eo/riwayat" element={<Riwayat />} />
-            <Route path="/detail/payment/:id" element={<DetailPayment />} />
-            <Route path="/history" element={<History />} />
 
+            {/* EO Layout  */}
+            <Route path="/profile/" element={<LayoutEO />}>
+              <Route path="eo" element={<ProfileEo />} />
+              <Route path="eo/register" element={<RegisterEO />} />
+              <Route path="eo/events" element={<DashboardEO />} />
+              <Route path="eo/events/:id" element={<DetailEvents />} />
+              <Route path="eo/riwayat" element={<Riwayat />} />
+            </Route>
+            <Route path="/history" element={<History />} />
+            <Route path="/detail/payment" element={<DetailPayment />} />
             <Route
               path="/profile/eo/riwayat/tiket/:id"
               element={<RiwayatTiket />}

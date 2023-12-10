@@ -1,9 +1,9 @@
 import { useState } from "react";
-import Sidebar from "../../../components/common/Sidebar/Sidebar";
-import Popup from "../../../components/Popup";
 import { LuMail, LuPhone, LuUser, LuXCircle } from "react-icons/lu";
-import axios from "axios";
-import Cookies from "js-cookie";
+import { privateApi } from "@/shared/axios/axios";
+import Sidebar from "@/components/common/Sidebar";
+import Popup from "@/components/user/Popup";
+
 const ProfileEo = () => {
   const [open, setOpen] = useState(false);
   const [instagram, setInstagram] = useState("");
@@ -15,27 +15,9 @@ const ProfileEo = () => {
   const handleClose = () => {
     setOpen(false);
   };
-  // const getDataEO = () => {
-  //     axios.get(`${import.meta.env.VITE_URL}/profile/eo`)
-  // }
-  const getToken: any = Cookies.get("token");
   const updateEO = () => {
-    console.log(instagram);
-    const token = JSON.parse(getToken);
-    axios
-      .put(
-        `${import.meta.env.VITE_URL}eo/update`,
-        {
-          instagram: instagram,
-          namaeo: name,
-          kota: kota,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+    privateApi
+      .put(`/eo/update`)
       .then((response) => {
         console.log(response);
       })
@@ -46,13 +28,13 @@ const ProfileEo = () => {
   return (
     <div className="flex flex-row">
       <Sidebar />
-      <div className="py-4 px-4 w-full">
-        <div className="flex justify-between items-center">
-          <h1 className="font-bold text-2xl">Profile EO</h1>
-          <div className="btnSignin bg-secondColors hover:bg-mainColors hover:border-secondColors cursor-pointer rounded-full py-3 px-8">
+      <div className="w-full px-4 py-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Profile EO</h1>
+          <div className="btnSignin cursor-pointer rounded-full bg-secondColors px-8 py-3 hover:border-secondColors hover:bg-mainColors">
             <button
               onClick={() => handleOpen()}
-              className="text-white font-semibold text-[14px]"
+              className="text-[14px] font-semibold text-white"
             >
               Edit Profile EO
             </button>
@@ -60,12 +42,12 @@ const ProfileEo = () => {
         </div>
         {open && (
           <Popup onConfirm={handleClose}>
-            <div className="relative w-full max-w-md max-h-full">
-              <div className="relative bg-white rounded-lg shadow">
+            <div className="relative max-h-full w-full max-w-md">
+              <div className="relative rounded-lg bg-white shadow">
                 <button
                   type="button"
                   onClick={() => handleClose()}
-                  className="absolute top-3 right-2.5 bg-transparent hover:bg-gray-200 rounded-full text-black w-8 h-8 inline-flex justify-center items-center"
+                  className="absolute right-2.5 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent text-black hover:bg-gray-200"
                   data-modal-hide="authentication-modal"
                 >
                   <LuXCircle />
@@ -82,7 +64,7 @@ const ProfileEo = () => {
                       <input
                         type="text"
                         onChange={(e) => setName(e.target.value)}
-                        className=" border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
+                        className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
                       />
                     </div>
                     <div>
@@ -92,7 +74,7 @@ const ProfileEo = () => {
                       <input
                         type="text"
                         onChange={(e) => setInstagram(e.target.value)}
-                        className=" border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
+                        className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
                       />
                     </div>
                     <div>
@@ -102,21 +84,21 @@ const ProfileEo = () => {
                       <input
                         type="text"
                         onChange={(e) => setKota(e.target.value)}
-                        className=" border border-gray-300 text-black text-sm rounded-sm  block w-full p-2.5"
+                        className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
                       />
                     </div>
-                    <div className="flex gap-2 py-2 justify-end">
+                    <div className="flex justify-end gap-2 py-2">
                       <button
                         type="submit"
                         onClick={() => handleClose()}
-                        className=" text-black border border-mainColors focus:ring-4 focus:outline-none font-semibold rounded-full text-sm px-10 py-2 text-center"
+                        className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
                       >
                         Cancel
                       </button>
                       <button
                         type="button"
                         onClick={() => updateEO()}
-                        className=" text-white bg-mainColors focus:ring-4 focus:outline-none font-semibold rounded-full text-sm px-10 py-2 text-center"
+                        className=" rounded-full bg-mainColors px-10 py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
                       >
                         Update
                       </button>
@@ -127,36 +109,36 @@ const ProfileEo = () => {
             </div>
           </Popup>
         )}
-        <div className="grid grid-cols-12 mt-5 gap-4 p-4">
-          <div className="justify-center col-span-12 lg:col-span-3">
-            <div className="mb-6 relative">
-              <label className="block mb-2 text-sm font-semibold text-gray-900">
+        <div className="mt-5 grid grid-cols-12 gap-4 p-4">
+          <div className="col-span-12 justify-center lg:col-span-3">
+            <div className="relative mb-6">
+              <label className="mb-2 block text-sm font-semibold text-gray-900">
                 Username
               </label>
               <div className="relative">
-                <div className="flex gap-4 items-center p-2 pointer-events-none">
+                <div className="pointer-events-none flex items-center gap-4 p-2">
                   <LuUser />
                   {/* <h1>{profile.name}</h1> */}
                 </div>
               </div>
             </div>
-            <div className="mb-6 relative">
-              <label className="block mb-2 text-sm font-semibold text-gray-900">
+            <div className="relative mb-6">
+              <label className="mb-2 block text-sm font-semibold text-gray-900">
                 Email
               </label>
               <div className="relative">
-                <div className="flex gap-4 items-center p-2 pointer-events-none">
+                <div className="pointer-events-none flex items-center gap-4 p-2">
                   <LuMail />
                   {/* <h1>{profile.email}</h1> */}
                 </div>
               </div>
             </div>
-            <div className="mb-6 relative">
-              <label className="block mb-2 text-sm font-semibold text-gray-900">
+            <div className="relative mb-6">
+              <label className="mb-2 block text-sm font-semibold text-gray-900">
                 No Hp
               </label>
               <div className="relative">
-                <div className="flex gap-4 items-center p-2 pointer-events-none">
+                <div className="pointer-events-none flex items-center gap-4 p-2">
                   <LuPhone />
                   {/* <h1>{profile.nohp}</h1> */}
                 </div>

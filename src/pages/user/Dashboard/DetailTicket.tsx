@@ -1,41 +1,17 @@
-import axios from "axios";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import Cookies from "js-cookie";
+import { Ticket } from "@/interface/ticket/ticket.interface";
+import { getTiket } from "@/service/ticket/ticket.service";
 
 const DetailTiket = () => {
-  interface Ticket {
-    nama_kegiatan: string;
-    date: string;
-    harga: string;
-    location: string;
-    image_url: string;
-    event: {
-      tanggal_acara: string;
-      lokasi: string;
-      description: string;
-    };
-    id: string;
-  }
-
   const [quantity, setQuantity] = useState(1);
   const [Tiket, setTiket] = useState<Ticket[]>([]);
-  const idTiket = useParams().id;
+  const idTiket = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const getTiket = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BE_URL}/tiket/${idTiket}`
-        );
-        setTiket([response.data.data]);
-      } catch (error: any) {
-        console.log(error.response);
-      }
-    };
-    getTiket();
+    getTiket({ id: 1 });
   }, [idTiket]);
 
   const handlePlus = () => {
@@ -48,22 +24,15 @@ const DetailTiket = () => {
     setQuantity(Number(e.target.value));
   };
 
-  const handleCheckout = (e: FormEvent<HTMLFormElement>): void => {
+  const handleCheckout = (e: any) => {
     e.preventDefault();
-
-    const token = Cookies.get("token");
-    if (token === undefined) {
-      navigate("/signin");
-    } else {
-      navigate(`/detail/payment/${idTiket}`, { state: { data: quantity } });
-    }
   };
   return (
     <div>
       <div className="bg-white">
         {Tiket.map((item, index) => (
           <div className="pt-6" key={index}>
-            <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-2 justify-between lg:gap-5 lg:px-8">
+            <div className="mx-auto mt-6 max-w-2xl justify-between sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-2 lg:gap-5 lg:px-8">
               <div className="overflow-hidden rounded-lg lg:block">
                 <img
                   src={JSON.parse(item?.image_url || '{"url": ""}').url}
@@ -82,10 +51,7 @@ const DetailTiket = () => {
               <div className="mt-4 lg:row-span-3 lg:mt-0">
                 <h2 className="sr-only">Product information</h2>
                 <p className="text-3xl tracking-tight text-gray-900">
-                  {new Intl.NumberFormat("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                  }).format(Number(item.harga))}
+                  {item.harga}
                 </p>
                 <form className="mt-10" onSubmit={handleCheckout}>
                   <div>
@@ -95,7 +61,7 @@ const DetailTiket = () => {
                       <div className="flex items-center space-x-3">
                         <button
                           type="button"
-                          className="px-2 py-1 bg-gray-200 rounded-md"
+                          className="rounded-md bg-gray-200 px-2 py-1"
                           onClick={() => handleMin()}
                           hidden={quantity === 1}
                         >
@@ -105,11 +71,11 @@ const DetailTiket = () => {
                           type="number"
                           value={quantity}
                           onChange={handleInput}
-                          className="w-16 py-1 text-center border border-gray-300 rounded-md focus:outline-none"
+                          className="w-16 rounded-md border border-gray-300 py-1 text-center focus:outline-none"
                         />
                         <button
                           type="button"
-                          className="px-2 py-1 bg-gray-200 rounded-md"
+                          className="rounded-md bg-gray-200 px-2 py-1"
                           onClick={() => handlePlus()}
                         >
                           +
@@ -134,7 +100,10 @@ const DetailTiket = () => {
 
                   <div className="space-y-6">
                     <p className="text-base text-gray-900">
-                      {item.event.description}
+                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                      Ea voluptatibus dicta minus illum eum incidunt, veritatis
+                      debitis! Similique fugiat suscipit itaque enim natus,
+                      possimus autem eius assumenda illo voluptas sint!
                     </p>
                   </div>
                 </div>
@@ -152,13 +121,13 @@ const DetailTiket = () => {
                       <li className="text-gray-400">
                         <span className="text-gray-600">
                           {`${new Date(
-                            item.event["tanggal_acara"]
+                            item.event["tanggal_acara"],
                           ).getDate()} ${new Date(
-                            item.event["tanggal_acara"]
+                            item.event["tanggal_acara"],
                           ).toLocaleString("default", {
                             month: "long",
                           })} ${new Date(
-                            item.event["tanggal_acara"]
+                            item.event["tanggal_acara"],
                           ).getFullYear()}`}
                         </span>
                       </li>

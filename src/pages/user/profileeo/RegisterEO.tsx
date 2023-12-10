@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { LoadingOutlined } from "@ant-design/icons";
 import { Alert, Spin } from "antd";
 import { toast } from "react-hot-toast";
+import { privateApi } from "@/shared/axios/axios";
 
 const RegisterEO = () => {
   const [instagram, setInstagram] = useState("");
@@ -13,26 +14,17 @@ const RegisterEO = () => {
   const [msg, setMsg] = useState("");
   const [status, setStatus] = useState(false);
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-  const getToken: any = Cookies.get("token");
-  const token = JSON.parse(getToken);
+
   const navigate = useNavigate();
   const handleLogin = async (e: any) => {
     e.preventDefault();
     setTimeout(() => {
-      axios
-        .post(
-          `${import.meta.env.VITE_URL}eo/register`,
-          {
-            instagram: instagram,
-            namaeo: namaeo,
-            kota: kota,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
+      privateApi
+        .post(`/eo/register`, {
+          instagram: instagram,
+          namaeo: namaeo,
+          kota: kota,
+        })
         .then((response) => {
           console.log(response.data.token);
           setStatus(false);
@@ -60,75 +52,72 @@ const RegisterEO = () => {
       }, 2000);
     }
   }, [msg]);
+
   return (
-    <div>
-      <div className="container mx-auto">
-        <div className="p-4">
-          <div className="flex h-screen items-center justify-center gap-4">
-            <div className="p-5 hidden lg:block w-2/5">
-              <img
-                src="https://www.loket.com/web/assets/img/auth/icon-login.svg"
-                className="object-cover"
-                alt=""
-              />
-            </div>
-            <div className="p-4 shadow-lg w-full lg:w-2/5 justify-start">
-              {msg ? (
-                <Alert showIcon message={`${msg}`} type="warning" />
-              ) : null}
-              <form onSubmit={handleLogin}>
-                <div className="flex justify-center p-2">
-                  <h1 className="font-bold text-[21px] text-mainColors">
-                    Gaweo EO Cok
-                  </h1>
+    <div className="container mx-auto">
+      <div className="p-4">
+        <div className="flex h-screen items-center justify-center gap-4">
+          <div className="hidden w-2/5 p-5 lg:block">
+            <img
+              src="https://www.loket.com/web/assets/img/auth/icon-login.svg"
+              className="object-cover"
+              alt=""
+            />
+          </div>
+          <div className="w-full justify-start p-4 shadow-lg lg:w-2/5">
+            {msg ? <Alert showIcon message={`${msg}`} type="warning" /> : null}
+            <form onSubmit={handleLogin}>
+              <div className="flex justify-center p-2">
+                <h1 className="text-[21px] font-bold text-mainColors">
+                  Gaweo EO Cok
+                </h1>
+              </div>
+              <div className="flex justify-center p-2">
+                <div className="text-[14px] text-[#666666]">
+                  Nama EO yang unik, selalu terlihat menarik
                 </div>
-                <div className="flex justify-center p-2">
-                  <div className="text-[#666666] text-[14px]">
-                    Nama EO yang unik, selalu terlihat menarik
-                  </div>
-                </div>
-                <div className="mb-6">
-                  <input
-                    type="text"
-                    id="username"
-                    value={instagram}
-                    onChange={(e) => setInstagram(e.target.value)}
-                    className="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5"
-                    placeholder="masukkan username instagram"
-                    required
-                  />
-                </div>
-                <div className="mb-6">
-                  <input
-                    type="text"
-                    id="username"
-                    value={namaeo}
-                    onChange={(e) => setNamaeo(e.target.value)}
-                    className="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5"
-                    placeholder="masukkan nama EO"
-                    required
-                  />
-                </div>
-                <div className="mb-6">
-                  <input
-                    type="text"
-                    id="username"
-                    value={kota}
-                    onChange={(e) => setKota(e.target.value)}
-                    className="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5"
-                    placeholder="masukkan kota"
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="text-white  bg-secondColors hover:bg-hoverMainColors font-medium rounded-lg text-[14px] lg:w-full sm:w-auto px-5 py-3 text-center"
-                >
-                  {" "}
-                  {status ? <Spin indicator={antIcon} /> : "Masuk"}
-                </button>
-              </form>
-            </div>
+              </div>
+              <div className="mb-6">
+                <input
+                  type="text"
+                  id="username"
+                  value={instagram}
+                  onChange={(e) => setInstagram(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm"
+                  placeholder="masukkan username instagram"
+                  required
+                />
+              </div>
+              <div className="mb-6">
+                <input
+                  type="text"
+                  id="username"
+                  value={namaeo}
+                  onChange={(e) => setNamaeo(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm"
+                  placeholder="masukkan nama EO"
+                  required
+                />
+              </div>
+              <div className="mb-6">
+                <input
+                  type="text"
+                  id="username"
+                  value={kota}
+                  onChange={(e) => setKota(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm"
+                  placeholder="masukkan kota"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                className="rounded-lg  bg-secondColors px-5 py-3 text-center text-[14px] font-medium text-white hover:bg-hoverMainColors sm:w-auto lg:w-full"
+              >
+                {" "}
+                {status ? <Spin indicator={antIcon} /> : "Masuk"}
+              </button>
+            </form>
           </div>
         </div>
       </div>

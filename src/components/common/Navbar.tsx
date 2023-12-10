@@ -1,26 +1,27 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import {
-  LuKey,
-  LuLogOut,
-  LuUser,
-  LuUserCircle,
-  LuUserCog,
-} from "react-icons/lu";
+import { LuKey, LuLogOut, LuUser, LuUserCog } from "react-icons/lu";
 import { Avatar, Dropdown } from "antd";
 import { IProfile } from "@/interface/profile/profile.interface";
 import { privateApi } from "@/shared/axios/axios";
-
+type ItemType = {
+  key: string;
+  label: React.ReactElement;
+  onClick: () => void;
+};
 const Navbar = () => {
   const [profile, setProfile] = useState<IProfile>();
   const navigate = useNavigate();
-  const getToken: any = Cookies.get("token");
+  const token: any = Cookies.get("token");
+  const isEO = profile?.status_eo;
+  const styleMenuItems = `flex cursor-pointer items-center gap-2`;
 
   const handleOut = () => {
     Cookies.remove("token");
-    navigate("/signin");
+    navigate("/auth/signin");
   };
+
   const getProfile = async () => {
     try {
       const response = await privateApi.get(`/profile`);
@@ -30,14 +31,13 @@ const Navbar = () => {
     }
   };
 
-  if (getToken !== undefined) {
+  if (token !== undefined) {
     useEffect(() => {
       getProfile();
     }, []);
   }
-  const isEO = profile?.status_eo;
-  const styleMenuItems = `flex cursor-pointer items-center gap-2`;
-  const items = [
+
+  const items: ItemType[] = [
     {
       key: "1",
       label: (
@@ -45,27 +45,31 @@ const Navbar = () => {
           <LuUser /> Profile
         </div>
       ),
-      onClick: () => navigate("/profile"),
+      onClick: () => navigate("/profile/user"),
     },
-    {
-      key: "2",
-      label: isEO && (
-        <div className={styleMenuItems}>
-          <LuUserCog /> Profile EO
-        </div>
-      ),
-      onClick: () => navigate("/profile/eo/events"),
-    },
-
-    {
-      key: "3",
-      label: !isEO && (
-        <div className={styleMenuItems}>
-          <LuKey /> Register
-        </div>
-      ),
-      onClick: () => navigate("/profile/eo/register"),
-    },
+    ...(isEO
+      ? [
+          {
+            key: "2",
+            label: (
+              <div className={styleMenuItems}>
+                <LuUserCog /> Profile EO
+              </div>
+            ),
+            onClick: () => navigate("/profile/eo/events"),
+          },
+        ]
+      : [
+          {
+            key: "3",
+            label: (
+              <div className={styleMenuItems}>
+                <LuKey /> Register EO
+              </div>
+            ),
+            onClick: () => navigate("/profile/eo/register"),
+          },
+        ]),
     {
       key: "4",
       label: (
@@ -90,7 +94,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex gap-4">
-            {getToken ? (
+            {token ? (
               <>
                 <Dropdown menu={{ items }} placement="bottomRight" arrow>
                   <div className="flex cursor-pointer items-center gap-2 font-semibold text-white">

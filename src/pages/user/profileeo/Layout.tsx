@@ -7,7 +7,8 @@ const LayoutEO = () => {
   return (
     <>
       <div className="flex flex-row">
-        {registerPath?.pathname !== "/profile/eo/register" && <Sidebar />}
+        {registerPath?.pathname !== "/profile/eo/register" &&
+          registerPath?.pathname !== "/profile/user" && <Sidebar />}
         <Outlet />
       </div>
       <Footer />

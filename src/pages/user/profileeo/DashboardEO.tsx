@@ -1,10 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LuXCircle } from "react-icons/lu";
 import { privateApi } from "@/shared/axios/axios";
-import { IEvent } from "@/interface/event/event.interface";
 import Popup from "@/components/user/Popup";
-import { getEvent } from "@/service/events/events.service";
+import { QfindEvents } from "@/service/events/events.service";
 
 const DashboardEO = () => {
   const navigate = useNavigate();
@@ -15,14 +14,9 @@ const DashboardEO = () => {
   const [file, setFile] = useState<File[]>([]);
   const [open, setOpen] = useState(false);
   const [eventUpdate, setEventUpdate] = useState(false);
-  const [event, setEvent] = useState<IEvent[]>([]);
   const [idEvent, setIdEvent] = useState("");
 
-  useEffect(() => {
-    getEvent()
-      .then((res) => setEvent(res))
-      .catch((err) => console.log(err));
-  }, []);
+  const { data: event } = QfindEvents();
 
   const handleOpen = () => {
     setOpen(true);
@@ -78,7 +72,7 @@ const DashboardEO = () => {
     const dateObject = new Date(tanggal);
 
     const day = dateObject.getDate();
-    const month = dateObject.getMonth() + 1; // Ingat: bulan dimulai dari 0
+    const month = dateObject.getMonth() + 1;
     const year = dateObject.getFullYear();
 
     const formattedDate = `${day}/${month}/${year}`;
@@ -353,69 +347,70 @@ const DashboardEO = () => {
               </tr>
             </thead>
             <tbody>
-              {event.map((element, index) => (
-                <tr
-                  className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
-                  key={index}
-                >
-                  <td
-                    scope="row"
-                    className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white"
+              {event &&
+                event.map((element: any, index: number) => (
+                  <tr
+                    className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
+                    key={index}
                   >
-                    {element?.nama_acara}
-                  </td>
-                  <td className="px-6 py-4">{element?.lokasi}</td>
-                  {element.tanggal_acara > new Date().toISOString() ? (
-                    <>
-                      <td className="px-6 py-4">tanggal masih aktif</td>
-                    </>
-                  ) : (
-                    <>
-                      <td className="px-6 py-4">tanggal sudah lewat</td>
-                    </>
-                  )}
-
-                  <td className="flex gap-4 px-6 py-4 text-center">
+                    <td
+                      scope="row"
+                      className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white"
+                    >
+                      {element?.nama_acara}
+                    </td>
+                    <td className="px-6 py-4">{element?.lokasi}</td>
                     {element.tanggal_acara > new Date().toISOString() ? (
                       <>
-                        <div
-                          onClick={() => handleOpenUpdate(element.id)}
-                          className="cursor-pointer font-medium text-blue-600 hover:underline dark:text-blue-500"
-                        >
-                          Edit
-                        </div>
-                        <div
-                          onClick={() =>
-                            navigate(`/profile/eo/events/${element.id}`)
-                          }
-                          className="cursor-pointer font-medium text-blue-600 hover:underline dark:text-blue-500 "
-                        >
-                          View
-                        </div>
+                        <td className="px-6 py-4">tanggal masih aktif</td>
                       </>
                     ) : (
                       <>
-                        <div
-                          style={{ pointerEvents: "none" }}
-                          className="cursor-pointer font-medium text-gray-600 hover:underline dark:text-blue-500"
-                        >
-                          Edit
-                        </div>
-                        <div
-                          style={{ pointerEvents: "none" }}
-                          className="cursor-pointer font-medium text-gray-600 hover:underline dark:text-blue-500 "
-                        >
-                          View
-                        </div>
+                        <td className="px-6 py-4">tanggal sudah lewat</td>
                       </>
                     )}
 
-                    <div className="cursor-pointer font-medium text-red-600 hover:underline dark:text-blue-500">
-                      Delete
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    <td className="flex gap-4 px-6 py-4 text-center">
+                      {element.tanggal_acara > new Date().toISOString() ? (
+                        <>
+                          <div
+                            onClick={() => handleOpenUpdate(element.id)}
+                            className="cursor-pointer font-medium text-blue-600 hover:underline dark:text-blue-500"
+                          >
+                            Edit
+                          </div>
+                          <div
+                            onClick={() =>
+                              navigate(`/profile/eo/events/${element.id}`)
+                            }
+                            className="cursor-pointer font-medium text-blue-600 hover:underline dark:text-blue-500 "
+                          >
+                            View
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div
+                            style={{ pointerEvents: "none" }}
+                            className="cursor-pointer font-medium text-gray-600 hover:underline dark:text-blue-500"
+                          >
+                            Edit
+                          </div>
+                          <div
+                            style={{ pointerEvents: "none" }}
+                            className="cursor-pointer font-medium text-gray-600 hover:underline dark:text-blue-500 "
+                          >
+                            View
+                          </div>
+                        </>
+                      )}
+
+                      <div className="cursor-pointer font-medium text-red-600 hover:underline dark:text-blue-500">
+                        Delete
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

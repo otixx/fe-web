@@ -16,11 +16,11 @@ const UserLayout = () => {
     }
   });
   return (
-    <>
+    <div className="max-h-screen">
       <Navbar />
       <Outlet />
       {!isProfileRoute && <Footer />}
-    </>
+    </div>
   );
 };
 

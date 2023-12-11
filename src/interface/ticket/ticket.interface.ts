@@ -1,3 +1,5 @@
+import dayjs, { Dayjs } from "dayjs";
+
 export interface Ticket {
   nama_kegiatan: string;
   date: string;
@@ -12,4 +14,20 @@ export interface Ticket {
   tanggal_preorder: Date;
   tanggal_expired: Date;
   tags: string;
+}
+
+export interface IFindTicketProps {
+  id?: string;
+}
+
+export interface ITicketDetail {
+  event: {
+    description: string;
+    lokasi: string;
+    tanggal_acara: Dayjs;
+  };
+  harga: number;
+  id: number;
+  image_url: string;
+  nama_kegiatan: string;
 }

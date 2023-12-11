@@ -168,7 +168,7 @@ const DetailEvents = () => {
                 Tambah Tiket
               </button>
             </div>
-            {isDesktop === false ? null : (
+            {isDesktop === true ? null : (
               <div className="cursor-pointer rounded-full bg-secondColors px-8 py-3 hover:border-secondColors hover:bg-mainColors">
                 <button
                   onClick={() => navigate("/scan")}

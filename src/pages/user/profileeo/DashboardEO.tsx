@@ -360,7 +360,11 @@ const DashboardEO = () => {
                       {element?.nama_acara}
                     </td>
                     <td className="px-6 py-4">{element?.lokasi}</td>
-                    {element.tanggal_acara > new Date().toISOString() ? (
+
+                    {new Date(element.tanggal_acara).setUTCHours(0, 0, 0, 0) >
+                      new Date().setUTCHours(0, 0, 0, 0) ||
+                    new Date(element.tanggal_acara).setUTCHours(0, 0, 0, 0) ===
+                      new Date().setUTCHours(0, 0, 0, 0) ? (
                       <>
                         <td className="px-6 py-4">tanggal masih aktif</td>
                       </>
@@ -371,7 +375,14 @@ const DashboardEO = () => {
                     )}
 
                     <td className="flex gap-4 px-6 py-4 text-center">
-                      {element.tanggal_acara > new Date().toISOString() ? (
+                      {new Date(element.tanggal_acara).setUTCHours(0, 0, 0, 0) >
+                        new Date().setUTCHours(0, 0, 0, 0) ||
+                      new Date(element.tanggal_acara).setUTCHours(
+                        0,
+                        0,
+                        0,
+                        0,
+                      ) === new Date().setUTCHours(0, 0, 0, 0) ? (
                         <>
                           <div
                             onClick={() => handleOpenUpdate(element.id)}

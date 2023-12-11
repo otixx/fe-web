@@ -48,7 +48,7 @@ function App() {
             </Route>
             <Route path="/history" element={<History />} />
             <Route path="/detailhistory" element={<Detailhistory />} />
-            <Route path="/detail/payment" element={<DetailPayment />} />
+            <Route path="/detail/payment/:id" element={<DetailPayment />} />
             <Route path="scan" element={<QRCodeScannerPage />} />
 
             <Route

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { LuXCircle } from "react-icons/lu";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Popup from "@/components/user/Popup";
 
 const DetailEvents = () => {
@@ -14,6 +14,7 @@ const DetailEvents = () => {
     tanggal_expired: string;
     harga: string;
   }
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [kegiatan, setKegiatan] = useState("");
   const [harga, setHarga] = useState("");
@@ -26,6 +27,15 @@ const DetailEvents = () => {
 
   const getToken: any = Cookies.get("token");
   const token = JSON.parse(getToken);
+
+  // Check Device  -------------------------------------------------------
+  let userAgent = navigator.userAgent;
+
+  // Mengekstrak informasi tambahan dari User Agent String
+  let isMobile = /Mobi/.test(userAgent);
+  let isTablet = /Tablet|iPad/.test(userAgent);
+  let isDesktop = !isMobile && !isTablet;
+  // Check Device End -------------------------------------------------------
 
   useEffect(() => {
     const getEvent = async () => {
@@ -143,19 +153,33 @@ const DetailEvents = () => {
   //         console.log(error)
   //     })
   // }
+
   return (
-    <div className="flex flex-row">
+    <div className="flex w-full flex-row">
       <div className="w-full px-4 py-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Event / Tiket</h1>
-          <div className="btnSignin cursor-pointer rounded-full bg-secondColors px-8 py-3 hover:border-secondColors hover:bg-mainColors">
-            <button
-              onClick={() => handleOpen()}
-              className="text-[14px] font-semibold text-white"
-            >
-              Tambah Tiket
-            </button>
+          <div className="flex">
+            <div className="mr-5 cursor-pointer rounded-full bg-secondColors px-8 py-3 hover:border-secondColors hover:bg-mainColors">
+              <button
+                onClick={() => handleOpen()}
+                className="text-[14px] font-semibold text-white"
+              >
+                Tambah Tiket
+              </button>
+            </div>
+            {isDesktop === false ? null : (
+              <div className="cursor-pointer rounded-full bg-secondColors px-8 py-3 hover:border-secondColors hover:bg-mainColors">
+                <button
+                  onClick={() => navigate("/scan")}
+                  className="text-[14px] font-semibold text-white"
+                >
+                  Scan
+                </button>
+              </div>
+            )}
           </div>
+
           {open && (
             <Popup onConfirm={handleClose}>
               <div className="relative max-h-full w-full max-w-md">

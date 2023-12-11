@@ -70,8 +70,17 @@ const Navbar = () => {
             onClick: () => navigate("/profile/eo/register"),
           },
         ]),
+        {
+          key: "4",
+          label: (
+            <div className={styleMenuItems}>
+              <LuLogOut /> History
+            </div>
+          ),
+          onClick: () => navigate("/history"),
+        },
     {
-      key: "4",
+      key: "5",
       label: (
         <div className={styleMenuItems}>
           <LuLogOut /> Sign Out

@@ -1,10 +1,14 @@
+import { IEvent } from "@/interface/event/event.interface";
 import { privateApi } from "@/shared/axios/axios";
+import { useQuery } from "@tanstack/react-query";
 
-export const getEvent = async () => {
-  try {
-    const response = await privateApi.get(`/event`);
-    return response.data.data;
-  } catch (error: any) {
-    return error.response;
-  }
+export const QfindEvents = () => {
+  const fether = () => privateApi.get(`/event`);
+  return useQuery({
+    queryKey: ["events"],
+    queryFn: fether,
+    select: (res): IEvent[] => {
+      return res?.data?.data;
+    },
+  });
 };

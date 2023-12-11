@@ -11,7 +11,7 @@ const publicAPi = axios.create({
 privateApi.interceptors.request.use(
   async function (config) {
     const access_token = Cookies.get("token");
-    const token = JSON.parse(access_token);
+    const token = access_token && JSON.parse(access_token);
     config.headers.Authorization = `Bearer ${token}`;
     return config;
   },

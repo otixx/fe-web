@@ -1,17 +1,12 @@
-import { useEffect, useState } from "react";
 import Card from "@/components/user/Card";
 import { Ticket } from "@/interface/ticket/ticket.interface";
 import Carousel from "@/components/user/Carousel";
-import { getTiket } from "@/service/ticket/ticket.service";
+import { QfindTicket } from "@/service/ticket/ticket.service";
 import { LuSearch } from "react-icons/lu";
+import dayjs from "dayjs";
+import { FormatDayjs } from "@/shared/dayjs/format";
 const Index = () => {
-  const [ticket, setTiket] = useState<Ticket[]>([]);
-
-  useEffect(() => {
-    getTiket({})
-      .then((res) => setTiket(res))
-      .catch((err) => console.log(err));
-  }, []);
+  const ticket = QfindTicket();
   return (
     <div>
       <Carousel />
@@ -32,24 +27,18 @@ const Index = () => {
         </div>
       </div>
       <div className="container mx-auto mb-2 grid grid-cols-2 items-center  justify-center pb-10 lg:grid-cols-5">
-        {ticket?.map((item: Ticket, index) => (
+        {ticket?.data?.map((item: Ticket, index: number) => (
           <div className="p-2" key={index}>
             <Card
-              image={JSON.parse(item.image_url)["url"]}
-              title={item.nama_kegiatan}
-              date={`${new Date(
-                item.event["tanggal_acara"],
-              ).getDate()} ${new Date(
-                item.event["tanggal_acara"],
-              ).toLocaleString("default", { month: "long" })} ${new Date(
-                item.event["tanggal_acara"],
-              ).getFullYear()}`}
+              image={JSON.parse(item?.image_url)["url"]}
+              title={item?.nama_kegiatan}
+              date={dayjs(item?.date).format(FormatDayjs)}
               price={new Intl.NumberFormat("id-ID", {
                 style: "currency",
                 currency: "IDR",
-              }).format(Number(item.harga))}
-              location={item.event["lokasi"]}
-              id={item.id}
+              }).format(Number(item?.harga))}
+              location={item?.event?.lokasi}
+              id={item?.id}
             />
           </div>
         ))}

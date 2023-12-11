@@ -35,7 +35,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto h-screen">
       <div className="grid grid-cols-12 p-4">
         <div className="col-span-6">
           <h1 className="text-[18px] font-bold">Profile</h1>

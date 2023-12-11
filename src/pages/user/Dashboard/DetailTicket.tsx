@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { QfindTicketbyId } from "@/service/ticket/ticket.service";
 import dayjs from "dayjs";
 import { FormatDayjs } from "@/shared/dayjs/format";
@@ -8,6 +8,7 @@ import { LuCalendarDays, LuMap } from "react-icons/lu";
 const DetailTiket = () => {
   const [quantity, setQuantity] = useState(1);
   const idTiket = useParams();
+  const navigate = useNavigate();
 
   const { data: ticketDetail } = QfindTicketbyId({
     id: idTiket?.id,
@@ -25,6 +26,7 @@ const DetailTiket = () => {
 
   const handleCheckout = (e: any) => {
     e.preventDefault();
+    navigate(`/detail/payment/${idTiket?.id}`, { state: { data: quantity } });
   };
 
   return (

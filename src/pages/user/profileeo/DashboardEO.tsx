@@ -348,7 +348,7 @@ const DashboardEO = () => {
             </thead>
             <tbody>
               {event &&
-                event.map((element, index: number) => (
+                event.map((element: any, index: number) => (
                   <tr
                     className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
                     key={index}

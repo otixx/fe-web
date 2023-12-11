@@ -17,6 +17,8 @@ import ProfileEo from "./pages/user/profileeo/ProfileEo";
 import LayoutEO from "./pages/user/profileeo/Layout";
 import LayoutAuth from "./pages/auth/Layout";
 import History from "./pages/user/Profile/History";
+import Detailhistory from "./pages/user/Profile/DetailHistory";
+import QRCodeScannerPage from "./pages/user/profileeo/Scan";
 function App() {
   return (
     <>
@@ -45,7 +47,10 @@ function App() {
               <Route path="eo/riwayat" element={<Riwayat />} />
             </Route>
             <Route path="/history" element={<History />} />
+            <Route path="/detailhistory" element={<Detailhistory />} />
             <Route path="/detail/payment" element={<DetailPayment />} />
+            <Route path="scan" element={<QRCodeScannerPage />} />
+
             <Route
               path="/profile/eo/riwayat/tiket/:id"
               element={<RiwayatTiket />}

@@ -6,7 +6,7 @@ const Card = ({ image, title, date, price, location, id }: ICardProps) => {
     <>
       <Link to={`/detail/${id}`}>
         <div className="flex cursor-pointer flex-col gap-2 transition duration-500 ease-in-out hover:scale-105">
-          <div className="truncate rounded-xl border-2 shadow-lg">
+          <div className="truncate rounded-xl shadow-lg">
             <div className="h-full w-full">
               <img className=" rounded-t-lg" src={image} alt="" />
             </div>

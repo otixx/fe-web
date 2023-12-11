@@ -4,6 +4,8 @@ import { Outlet, useLocation } from "react-router-dom";
 
 const LayoutEO = () => {
   const registerPath = useLocation();
+  const isProfileRoute = location.pathname === "/profile";
+
   return (
     <>
       <div className="flex flex-row">
@@ -11,7 +13,7 @@ const LayoutEO = () => {
           registerPath?.pathname !== "/profile/user" && <Sidebar />}
         <Outlet />
       </div>
-      <Footer />
+      {isProfileRoute && <Footer />}
     </>
   );
 };

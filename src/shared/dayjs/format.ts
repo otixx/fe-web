@@ -1,1 +1,1 @@
-export const FormatDayjs = "YYYY-MMMM-DD";
+export const FormatDayjs = "DD MMMM YYYY";

@@ -72,7 +72,7 @@ const DashboardEO = () => {
     const dateObject = new Date(tanggal);
 
     const day = dateObject.getDate();
-    const month = dateObject.getMonth() + 1; // Ingat: bulan dimulai dari 0
+    const month = dateObject.getMonth() + 1;
     const year = dateObject.getFullYear();
 
     const formattedDate = `${day}/${month}/${year}`;

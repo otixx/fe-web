@@ -4,6 +4,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate, useParams } from "react-router-dom";
 import Popup from "@/components/user/Popup";
+import { privateApi } from "@/shared/axios/axios";
 
 const DetailEvents = () => {
   interface Tiket {
@@ -24,10 +25,6 @@ const DetailEvents = () => {
   const [file, setFile] = useState<File[]>([]);
   const [tiket, setTiket] = useState<Tiket[]>([]);
   const idEvent = useParams().id;
-
-  const getToken: any = Cookies.get("token");
-  const token = JSON.parse(getToken);
-
   // Check Device  -------------------------------------------------------
   let userAgent = navigator.userAgent;
 
@@ -40,13 +37,8 @@ const DetailEvents = () => {
   useEffect(() => {
     const getEvent = async () => {
       try {
-        const response = await axios.get(
+        const response = await privateApi.get(
           `${import.meta.env.VITE_BE_URL}/tiket/event/${idEvent}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
         );
         setTiket(response.data.data);
       } catch (error: any) {
@@ -109,29 +101,27 @@ const DetailEvents = () => {
 
     // Append multiple files
     file.forEach((fileItem) => formData.append("image", fileItem));
-    // await axios
-    //   .post(
-    //     `${import.meta.env.VITE_BE_URL}/tiket/${idEvent}`,
-    //     {
-    //       nama_kegiatan: kegiatan,
-    //       harga: harga,
-    //       tags: tags,
-    //       tanggal_preorder: preorder,
-    //       tanggal_expired: expired,
-    //       image: file,
-    //     },
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     }
-    //   )
-    //   .then((response) => {
-    //     console.log(response);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
+    console.log(kegiatan);
+    console.log(harga);
+    console.log(tags);
+    console.log(preorder);
+    console.log(expired);
+    console.log(file);
+    await privateApi
+      .post(`/tiket/${idEvent}`, {
+        nama_kegiatan: kegiatan,
+        harga: harga,
+        tags: tags,
+        tanggal_preorder: preorder,
+        tanggal_expired: expired,
+        image: file,
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     console.log(formData);
   };
 

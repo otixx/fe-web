@@ -1,10 +1,10 @@
 import { LuMail, LuMapPin, LuPhone, LuTarget, LuUser } from "react-icons/lu";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { IProfile } from "@/interface/profile/profile.interface";
 import { privateApi } from "@/shared/axios/axios";
 import { Button, Drawer, Form, Input } from "antd";
 import { useProfile } from "@/service/user/user.service";
+import { IProfile } from "@/interface/profile.interface";
 
 const Profile = () => {
   const [open, setOpen] = useState(false);

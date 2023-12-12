@@ -1,4 +1,4 @@
-import { IProfile } from "@/interface/profile/profile.interface";
+import { IProfile } from "@/interface/profile.interface";
 import { privateApi } from "@/shared/axios/axios";
 import { create } from "zustand";
 
@@ -13,7 +13,7 @@ export const useProfile = create<IProfileState>((set) => ({
       const response = await privateApi.get(`/profile`);
       set({ profile: response.data });
     } catch (error: any) {
-      console.log(error.response);
+      set({ profile: error.response });
     }
   },
 }));

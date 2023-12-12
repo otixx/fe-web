@@ -9,7 +9,6 @@ import { publicAPi } from "@/shared/axios/axios";
 const Login = () => {
   const [status, setStatus] = useState(false);
   const [msg, setMsg] = useState("");
-  const token = Cookies.get("token");
   const navigate = useNavigate();
 
   const handleLogin = (e: any) => {
@@ -19,16 +18,13 @@ const Login = () => {
         password: e?.password,
       })
       .then((response) => {
-        Cookies.set("token", JSON.stringify(response.data.token));
+        Cookies.set("token", JSON.stringify(response?.data?.data));
         setStatus(false);
         toast.success("Login Berhasil!");
-        if (token === undefined) {
-          navigate(-1);
-        } else {
-          navigate("/");
-        }
+        navigate("/");
       })
       .catch((error: any) => {
+        console.log(error);
         if (error.response.status == 404) {
           setMsg(error.response.data.message);
           setStatus(false);

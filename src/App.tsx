@@ -40,21 +40,21 @@ function App() {
             {/* EO Layout  */}
             <Route path="/profile/" element={<LayoutEO />}>
               <Route path="user" element={<Profile />} />
-              <Route path="eo" element={<ProfileEo />} />
+              <Route path="usereo" element={<ProfileEo />} />
               <Route path="eo/register" element={<RegisterEO />} />
               <Route path="eo/events" element={<DashboardEO />} />
               <Route path="eo/events/:id" element={<DetailEvents />} />
               <Route path="eo/riwayat" element={<Riwayat />} />
             </Route>
-            <Route path="/history" element={<History />} />
-            <Route path="/detailhistory" element={<Detailhistory />} />
-            <Route path="/detail/payment/:id" element={<DetailPayment />} />
-            <Route path="scan" element={<QRCodeScannerPage />} />
 
+            <Route path="/history" element={<History />} />
             <Route
               path="/profile/eo/riwayat/tiket/:id"
               element={<RiwayatTiket />}
             />
+            <Route path="/detailhistory" element={<Detailhistory />} />
+            <Route path="/detail/payment/:id" element={<DetailPayment />} />
+            <Route path="scan" element={<QRCodeScannerPage />} />
             <Route path="/detail/:id" element={<DetailTiket />} />
           </Route>
         </Routes>

@@ -1,7 +1,4 @@
-import {
-  IFindTicketProps,
-  ITicketDetail,
-} from "@/interface/ticket/ticket.interface";
+import { IFindTicketProps, ITicketDetail } from "@/interface/ticket.interface";
 import { privateApi } from "@/shared/axios/axios";
 import { useQuery } from "@tanstack/react-query";
 

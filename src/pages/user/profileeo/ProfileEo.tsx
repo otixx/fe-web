@@ -28,7 +28,7 @@ const ProfileEo = () => {
     <div className="w-full px-4 py-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Profile EO</h1>
-        <div className="btnSignin cursor-pointer rounded-full bg-secondColors px-8 py-3 hover:border-secondColors hover:bg-mainColors">
+        <div className="btnSignin w-32 cursor-pointer rounded-full bg-secondColors px-3 py-2 text-sm shadow-lg hover:border-secondColors hover:bg-mainColors lg:w-44 lg:px-8 lg:py-3">
           <button
             onClick={() => handleOpen()}
             className="text-[14px] font-semibold text-white"

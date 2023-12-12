@@ -1,11 +1,11 @@
-import { ICardProps } from "@/interface/card/card.interface";
+import { ICardProps } from "@/interface/card.interface";
 import { Link } from "react-router-dom";
 
 const Card = ({ image, title, date, price, location, id }: ICardProps) => {
   return (
     <>
       <Link to={`/detail/${id}`}>
-        <div className="flex cursor-pointer flex-col gap-2 transition duration-500 ease-in-out hover:scale-105">
+        <div className="flex cursor-pointer flex-col">
           <div className="truncate rounded-xl shadow-lg">
             <div className="h-full w-full">
               <img className=" rounded-t-lg" src={image} alt="" />

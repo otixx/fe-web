@@ -1,4 +1,4 @@
-import { TDataSlide } from "@/types/carousel/carousel.types";
+import { TDataSlide } from "@/types/carousel.types";
 import { Carousel as CarouselAntd } from "antd";
 
 const dataSlide: TDataSlide[] = [

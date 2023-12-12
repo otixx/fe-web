@@ -1,5 +1,5 @@
-import Footer from "@/components/common/Footer";
-import Sidebar from "@/components/common/Sidebar";
+import Footer from "@/components/Footer";
+import Sidebar from "@/components/Sidebar";
 import { Outlet, useLocation } from "react-router-dom";
 
 const LayoutEO = () => {

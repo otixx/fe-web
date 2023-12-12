@@ -1,11 +1,11 @@
-import Card from "@/components/user/Card";
-import Carousel from "@/components/user/Carousel";
 import { QfindTicket } from "@/service/ticket/ticket.service";
 import { LuSearch } from "react-icons/lu";
 import dayjs from "dayjs";
 import { FormatDayjs } from "@/shared/dayjs/format";
 import { Ticket } from "@/interface/ticket.interface";
-import SkeletonCard from "@/components/common/Skeleton";
+import SkeletonCard from "@/components/Skeleton";
+import Carousel from "@/components/Carousel";
+import Card from "@/components/Card";
 const Index = () => {
   const { data: ticket, status } = QfindTicket();
 

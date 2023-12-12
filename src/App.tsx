@@ -19,6 +19,8 @@ import LayoutAuth from "./pages/auth/Layout";
 import History from "./pages/user/Profile/History";
 import Detailhistory from "./pages/user/Profile/DetailHistory";
 import QRCodeScannerPage from "./pages/user/profileeo/Scan";
+import ResetPasswordForm from "./pages/auth/ResetPasswordForm";
+import ResetPassword from "./pages/auth/ResetPassword";
 function App() {
   return (
     <>
@@ -26,9 +28,14 @@ function App() {
       <Router>
         <Routes>
           <Route path="*" element={<Error />} />
+          <Route
+            path="/reset-password/:username"
+            element={<ResetPasswordForm />}
+          />
           {/* auth layout  */}
           <Route path="/auth/" element={<LayoutAuth />}>
             <Route path="signin" element={<Login />} />
+            <Route path="forgot-password" element={<ResetPassword />} />
             <Route path="signup" element={<Register />} />
           </Route>
 

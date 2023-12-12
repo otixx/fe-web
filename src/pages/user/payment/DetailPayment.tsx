@@ -1,8 +1,8 @@
 import { useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import BarcodePopup from "./pay";
-import { Ticket } from "@/interface/ticket/ticket.interface";
 import { privateApi } from "@/shared/axios/axios";
+import { Ticket } from "@/interface/ticket.interface";
 
 const DetailPayment = () => {
   const [Tiket, setTiket] = useState<Ticket[]>([]);

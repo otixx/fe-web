@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import Navbar from "@/components/common/Navbar";
-import Footer from "@/components/common/Footer";
+import Footer from "@/components/Footer";
 import { useProfile } from "@/service/user/user.service";
 import toast from "react-hot-toast";
+import Navbar from "@/components/Navbar";
 const UserLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();

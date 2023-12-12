@@ -3,8 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Alert, Form, Input } from "antd";
 import { publicAPi } from "@/shared/axios/axios";
 import { LoadingOutlined } from "@ant-design/icons";
-import { IRegisterProps } from "@/interface/auth/register.interface";
 import toast from "react-hot-toast";
+import { IRegisterProps } from "@/interface/register.interface";
 
 export const Register = () => {
   const [status, setStatus] = useState(false);
@@ -21,7 +21,7 @@ export const Register = () => {
       });
       toast.success("Berhasil Register Akun");
       setTimeout(() => {
-        navigate("/signin");
+        navigate("/auth/signin");
       }, 1000);
     } catch (error: any) {
       setStatus(false);

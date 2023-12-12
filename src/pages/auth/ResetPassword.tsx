@@ -1,27 +1,26 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Alert, Form, Input } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { toast } from "react-hot-toast";
 import { publicAPi } from "@/shared/axios/axios";
 
-const Login = () => {
+const ResetPassword = () => {
   const [status, setStatus] = useState(false);
   const [msg, setMsg] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = (e: any) => {
     publicAPi
-      .post(`/user/login`, {
-        username: e?.username,
-        password: e?.password,
+      .post(`/user/forgot-password`, {
+        email: e?.email,
       })
       .then((response) => {
-        Cookies.set("token", JSON.stringify(response?.data?.data));
         setStatus(false);
-        toast.success("Login Berhasil!");
-        navigate("/");
+        toast.success(response?.data?.message);
+        setTimeout(() => {
+          navigate("/auth/signin");
+        }, 1000);
       })
       .catch((error: any) => {
         if (error.response.status == 404) {
@@ -34,14 +33,6 @@ const Login = () => {
       });
     setStatus(true);
   };
-
-  useEffect(() => {
-    if (msg) {
-      setTimeout(() => {
-        setMsg("");
-      }, 2000);
-    }
-  }, [msg]);
 
   return (
     <div className="w-full justify-start rounded-lg p-4 shadow-lg lg:w-2/5">
@@ -57,31 +48,27 @@ const Login = () => {
       >
         <div className="flex justify-center p-2">
           <h1 className="text-[21px] font-bold text-mainColors">
-            Masuk ke akunmu
+            Lupa Kata Sandi
           </h1>
         </div>
         <div className="flex justify-center gap-2 p-2">
-          <div className="text-sm text-[#666666]">Tidak punya akun ?</div>
-          <Link to="/auth/signup">
-            <div className="cursor-pointer text-[14px] font-bold text-mainColors">
-              Daftar
-            </div>
-          </Link>
+          <div className="text-center text-[14px] text-[#666666]">
+            masukkan email kamu untuk verifikasi lebih lanjut, dan link akan
+            dikirimkan ke email kamu
+          </div>
         </div>
         <Form.Item
-          label="Username"
-          name="username"
-          rules={[{ required: true, message: "Masukkan Username" }]}
+          label="email"
+          name="email"
+          rules={[
+            { required: true, message: "Masukkan Email" },
+            {
+              type: "email",
+              message: "Masukkan Email yang valid",
+            },
+          ]}
         >
           <Input size="large" />
-        </Form.Item>
-
-        <Form.Item
-          label="Password"
-          name="password"
-          rules={[{ required: true, message: "Masukkan Password" }]}
-        >
-          <Input.Password size="large" />
         </Form.Item>
 
         <button
@@ -89,19 +76,11 @@ const Login = () => {
           className=" w-full rounded-lg bg-secondColors px-5 py-3 text-center text-[14px] font-medium text-white transition duration-700 hover:bg-hoverMainColors lg:w-full"
         >
           {" "}
-          {status ? <LoadingOutlined spin /> : "Masuk"}
+          {status ? <LoadingOutlined spin /> : "Submit"}
         </button>
       </Form>
-      <div className="flex justify-center pt-4">
-        <h1
-          onClick={() => navigate("/auth/forgot-password")}
-          className="cursor-pointer text-sm text-secondColors"
-        >
-          Lupa Password ?
-        </h1>
-      </div>
     </div>
   );
 };
 
-export default Login;
+export default ResetPassword;

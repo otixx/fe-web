@@ -1,4 +1,4 @@
-import Sidebar from "../../../components/common/Sidebar";
+import Sidebar from "../../../components/Sidebar";
 import dataEvent from "../../../api/dummy.json";
 
 const RiwayatTiket = () => {

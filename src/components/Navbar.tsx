@@ -1,19 +1,14 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { LuKey, LuLogOut, LuUser, LuUserCog } from "react-icons/lu";
 import { Avatar, Dropdown } from "antd";
-import { IProfile } from "@/interface/profile/profile.interface";
-import { privateApi } from "@/shared/axios/axios";
-type ItemType = {
-  key: string;
-  label: React.ReactElement;
-  onClick: () => void;
-};
+import { useProfile } from "@/service/user/user.service";
+import { ItemType } from "@/interface/navbar.interface";
+import { IProfile } from "@/interface/profile.interface";
+
 const Navbar = () => {
-  const [profile, setProfile] = useState<IProfile>();
   const navigate = useNavigate();
-  const token: any = Cookies.get("token");
+  const profile: IProfile = useProfile((state) => state?.profile);
   const isEO = profile?.status_eo;
   const styleMenuItems = `flex cursor-pointer items-center gap-2`;
 
@@ -21,21 +16,6 @@ const Navbar = () => {
     Cookies.remove("token");
     navigate("/auth/signin");
   };
-
-  const getProfile = async () => {
-    try {
-      const response = await privateApi.get(`/profile`);
-      setProfile(response.data);
-    } catch (error: any) {
-      console.log(error.response);
-    }
-  };
-
-  if (token !== undefined) {
-    useEffect(() => {
-      getProfile();
-    }, []);
-  }
 
   const items: ItemType[] = [
     {
@@ -70,15 +50,15 @@ const Navbar = () => {
             onClick: () => navigate("/profile/eo/register"),
           },
         ]),
-        {
-          key: "4",
-          label: (
-            <div className={styleMenuItems}>
-              <LuLogOut /> History
-            </div>
-          ),
-          onClick: () => navigate("/history"),
-        },
+    {
+      key: "4",
+      label: (
+        <div className={styleMenuItems}>
+          <LuLogOut /> History
+        </div>
+      ),
+      onClick: () => navigate("/history"),
+    },
     {
       key: "5",
       label: (
@@ -103,7 +83,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex gap-4">
-            {token ? (
+            {profile ? (
               <>
                 <Dropdown menu={{ items }} placement="bottomRight" arrow>
                   <div className="flex cursor-pointer items-center gap-2 font-semibold text-white">

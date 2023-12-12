@@ -19,6 +19,8 @@ import LayoutAuth from "./pages/auth/Layout";
 import History from "./pages/user/Profile/History";
 import Detailhistory from "./pages/user/Profile/DetailHistory";
 import QRCodeScannerPage from "./pages/user/profileeo/Scan";
+import ResetPasswordForm from "./pages/auth/ResetPasswordForm";
+import ResetPassword from "./pages/auth/ResetPassword";
 function App() {
   return (
     <>
@@ -26,9 +28,14 @@ function App() {
       <Router>
         <Routes>
           <Route path="*" element={<Error />} />
+          <Route
+            path="/reset-password/:username"
+            element={<ResetPasswordForm />}
+          />
           {/* auth layout  */}
           <Route path="/auth/" element={<LayoutAuth />}>
             <Route path="signin" element={<Login />} />
+            <Route path="forgot-password" element={<ResetPassword />} />
             <Route path="signup" element={<Register />} />
           </Route>
 
@@ -40,21 +47,21 @@ function App() {
             {/* EO Layout  */}
             <Route path="/profile/" element={<LayoutEO />}>
               <Route path="user" element={<Profile />} />
-              <Route path="eo" element={<ProfileEo />} />
+              <Route path="usereo" element={<ProfileEo />} />
               <Route path="eo/register" element={<RegisterEO />} />
               <Route path="eo/events" element={<DashboardEO />} />
               <Route path="eo/events/:id" element={<DetailEvents />} />
               <Route path="eo/riwayat" element={<Riwayat />} />
             </Route>
-            <Route path="/history" element={<History />} />
-            <Route path="/detailhistory" element={<Detailhistory />} />
-            <Route path="/detail/payment/:id" element={<DetailPayment />} />
-            <Route path="scan" element={<QRCodeScannerPage />} />
 
+            <Route path="/history" element={<History />} />
             <Route
               path="/profile/eo/riwayat/tiket/:id"
               element={<RiwayatTiket />}
             />
+            <Route path="/detailhistory" element={<Detailhistory />} />
+            <Route path="/detail/payment/:id" element={<DetailPayment />} />
+            <Route path="scan" element={<QRCodeScannerPage />} />
             <Route path="/detail/:id" element={<DetailTiket />} />
           </Route>
         </Routes>

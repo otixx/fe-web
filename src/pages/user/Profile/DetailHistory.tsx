@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useHistory } from "@/service/transaction/history.service";
 import { useEffect } from "react";
-import { dataTransaction } from "@/interface/profile/history.interface";
 import QRCode from "qrcode.react";
+import { dataTransaction } from "@/interface/history.interface";
 
 const Detailhistory = () => {
   const navigate = useNavigate();

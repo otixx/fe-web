@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { LuMail, LuPhone, LuUser, LuXCircle } from "react-icons/lu";
 import { privateApi } from "@/shared/axios/axios";
-import Popup from "@/components/user/Popup";
+import Popup from "@/components/Popup";
 
 const ProfileEo = () => {
   const [open, setOpen] = useState(false);

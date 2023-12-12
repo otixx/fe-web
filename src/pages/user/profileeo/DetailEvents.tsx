@@ -1,20 +1,11 @@
 import { useState, useEffect } from "react";
 import { LuXCircle } from "react-icons/lu";
-import axios from "axios";
-import Cookies from "js-cookie";
 import { useNavigate, useParams } from "react-router-dom";
-import Popup from "@/components/user/Popup";
 import { privateApi } from "@/shared/axios/axios";
+import { Ticket } from "@/interface/ticket.interface";
+import Popup from "@/components/Popup";
 
 const DetailEvents = () => {
-  interface Tiket {
-    id: string;
-    nama_kegiatan: string;
-    tags: string;
-    tanggal_preorder: string;
-    tanggal_expired: string;
-    harga: string;
-  }
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [kegiatan, setKegiatan] = useState("");
@@ -23,7 +14,7 @@ const DetailEvents = () => {
   const [preorder, setPreorder] = useState("");
   const [expired, setExpired] = useState("");
   const [file, setFile] = useState<File[]>([]);
-  const [tiket, setTiket] = useState<Tiket[]>([]);
+  const [tiket, setTiket] = useState<Ticket[]>([]);
   const idEvent = useParams().id;
   // Check Device  -------------------------------------------------------
   let userAgent = navigator.userAgent;

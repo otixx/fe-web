@@ -1,10 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { LuUpload, LuXCircle } from "react-icons/lu";
-import { privateApi } from "@/shared/axios/axios";
-import Popup from "@/components/user/Popup";
 import { QfindEvents } from "@/service/events/events.service";
 import { Button, DatePicker, Form, Input, Modal, Select, Upload } from "antd";
+import Popup from "@/components/Popup";
 
 const DashboardEO = () => {
   const navigate = useNavigate();
@@ -482,7 +481,7 @@ const DashboardEO = () => {
                       name="imageUpload"
                       accept="image/*"
                       multiple
-                      onChange={handleImageChange}
+                      // onChange={handleImageChange}
                       className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
                     />
                   </div>
@@ -496,7 +495,7 @@ const DashboardEO = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleUpdateEvents()}
+                      // onClick={() => handleUpdateEvents()}
                       className=" rounded-full bg-mainColors px-10 py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
                     >
                       Update

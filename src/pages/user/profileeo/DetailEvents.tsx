@@ -60,55 +60,44 @@ const DetailEvents = () => {
     }
   };
 
+  // Format Tiket------------------------------------------------------------
+  const formData = new FormData();
+
+  // Append additional fields
+  formData.append("nama_kegiatan", kegiatan);
+  formData.append("harga", harga);
+  formData.append("tags", tags);
+
+  function formatTanggal(tanggal: any) {
+    const dateObject = new Date(tanggal);
+
+    // Dapatkan tanggal, bulan, dan tahun dari objek Date
+    const day = dateObject.getDate();
+    const month = dateObject.getMonth() + 1; // Ingat: bulan dimulai dari 0
+    const year = dateObject.getFullYear();
+
+    // Format tanggal, bulan, dan tahun sesuai dengan "DD/MM/YYYY"
+    const formattedDate = `${day}/${month}/${year}`;
+    return formattedDate;
+  }
+
+  formData.append(
+    "tanggal_preorder",
+    formatTanggal(preorder) === "NaN/NaN/NaN" ? "" : formatTanggal(preorder),
+  );
+  formData.append(
+    "tanggal_expired",
+    formatTanggal(expired) === "NaN/NaN/NaN" ? "" : formatTanggal(expired),
+  );
+  // format tiket end -------------------------------------------------------------
   const handleAddTiket = async () => {
-    const formData = new FormData();
-
-    // Append additional fields
-    formData.append("nama_kegiatan", kegiatan);
-    formData.append("harga", harga);
-    formData.append("tags", tags);
-
-    function formatTanggal(tanggal: any) {
-      const dateObject = new Date(tanggal);
-
-      // Dapatkan tanggal, bulan, dan tahun dari objek Date
-      const day = dateObject.getDate();
-      const month = dateObject.getMonth() + 1; // Ingat: bulan dimulai dari 0
-      const year = dateObject.getFullYear();
-
-      // Format tanggal, bulan, dan tahun sesuai dengan "DD/MM/YYYY"
-      const formattedDate = `${day}/${month}/${year}`;
-      return formattedDate;
-    }
-
-    formData.append(
-      "tanggal_preorder",
-      formatTanggal(preorder) === "NaN/NaN/NaN" ? "" : formatTanggal(preorder),
-    );
-    formData.append(
-      "tanggal_expired",
-      formatTanggal(expired) === "NaN/NaN/NaN" ? "" : formatTanggal(expired),
-    );
-
     // Append multiple files
     file.forEach((fileItem) => formData.append("image", fileItem));
-    console.log(kegiatan);
-    console.log(harga);
-    console.log(tags);
-    console.log(preorder);
-    console.log(expired);
-    console.log(file);
     await privateApi
-      .post(`/tiket/${idEvent}`, {
-        nama_kegiatan: kegiatan,
-        harga: harga,
-        tags: tags,
-        tanggal_preorder: preorder,
-        tanggal_expired: expired,
-        image: file,
-      })
+      .post(`/tiket/${idEvent}`, formData)
       .then((response) => {
         console.log(response);
+        handleClose();
       })
       .catch((error) => {
         console.log(error);
@@ -116,24 +105,31 @@ const DetailEvents = () => {
     console.log(formData);
   };
 
-  // const handleUpdateTiket = async () => {
-  //     await axios.put(`${import.meta.env.VITE_URL}tiket/${id}`, {
-  //         nama_kegiatan: kegiatan,
-  //         harga: harga,
-  //         tags: tags,
-  //         tanggal_preorder: preorder,
-  //         tanggal_expired: expired,
-  //         image: file
-  //     }, {
-  //         headers: {
-  //             Authorization: `Bearer ${token}`
-  //         }
-  //     }).then((response) => {
-  //         console.log(response)
-  //     }).catch((error) => {
-  //         console.log(error)
-  //     })
-  // }
+  const handleUpdateTiket = async (id: any) => {
+    await privateApi
+      .put(
+        `/tiket/${id}`,
+        {
+          nama_kegiatan: kegiatan,
+          harga: harga,
+          tags: tags,
+          tanggal_preorder: preorder,
+          tanggal_expired: expired,
+          image: file,
+        },
+        // {
+        //   headers: {
+        //     Authorization: `Bearer ${token}`,
+        //   },
+        // },
+      )
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return (
     <div className="flex w-full flex-row">
@@ -214,8 +210,8 @@ const DetailEvents = () => {
                             {" "}
                             Pilih Tags
                           </option>
-                          <option value={`Music`}> Music</option>
-                          <option value={`Cosplay`}> Cosplayer</option>
+                          <option value={`music`}> Music</option>
+                          <option value={`cosplay`}> Cosplayer</option>
                         </select>
                       </div>
                       <div>
@@ -333,7 +329,9 @@ const DetailEvents = () => {
                     ).getFullYear()}`}</td>
                     <td className="flex gap-4 px-6 py-4 text-center">
                       <a
-                        href="#"
+                        onClick={() => {
+                          handleUpdateTiket(element.id);
+                        }}
                         className="font-medium text-blue-600 hover:underline dark:text-blue-500"
                       >
                         Edit

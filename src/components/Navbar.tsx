@@ -9,7 +9,7 @@ import { IProfile } from "@/interface/profile.interface";
 const Navbar = () => {
   const navigate = useNavigate();
   const profile: IProfile = useProfile((state) => state?.profile);
-  const isEO = profile?.status_eo;
+  const isEO = profile?.profile?.status_eo;
   const styleMenuItems = `flex cursor-pointer items-center gap-2`;
 
   const handleOut = () => {
@@ -25,7 +25,7 @@ const Navbar = () => {
           <LuUser /> Profile
         </div>
       ),
-      onClick: () => navigate("/profile/user"),
+      onClick: () => navigate("/profile"),
     },
     ...(isEO
       ? [
@@ -91,7 +91,11 @@ const Navbar = () => {
                       size={35}
                       src={`https://api.dicebear.com/7.x/adventurer/svg?seed=Sassy`}
                     />
-                    Hi,<span className="font-medium"> {profile?.name}</span>
+                    Hi,
+                    <span className="font-medium">
+                      {" "}
+                      {profile?.profile?.name}
+                    </span>
                   </div>
                 </Dropdown>
               </>

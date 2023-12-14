@@ -11,9 +11,9 @@ export const useProfile = create<IProfileState>((set) => ({
   getProfile: async () => {
     try {
       const response = await privateApi.get(`/profile`);
-      set({ profile: response.data });
+      set({ profile: response?.data?.data });
     } catch (error: any) {
-      set({ profile: error.response });
+      set({ profile: error?.data });
     }
   },
 }));

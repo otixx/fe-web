@@ -12,7 +12,6 @@ const History = () => {
     getHistory();
   }, []);
 
-  console.log(transactions);
   return (
     <div className="container mx-auto p-8">
       <h1 className="mb-8 text-3xl font-bold">Transaction History</h1>

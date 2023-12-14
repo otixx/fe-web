@@ -1,114 +1,81 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { LuUpload, LuXCircle } from "react-icons/lu";
+import { LuUpload } from "react-icons/lu";
 import { QfindEvents } from "@/service/events/events.service";
 import { Button, DatePicker, Form, Input, Modal, Select, Upload } from "antd";
-import Popup from "@/components/Popup";
+import { ICreateEventsProps, IEvent } from "@/interface/event.interface";
+import { LoadingOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
+import { FormatDayjsInput } from "@/shared/dayjs/format";
+import { privateApi } from "@/shared/axios/axios";
+import toast from "react-hot-toast";
 
 const DashboardEO = () => {
   const navigate = useNavigate();
-  const [acara, setAcara] = useState("");
-  const [description, setDescription] = useState("");
-  const [tanggal, setTanggal] = useState("");
-  const [lokasi, setLokasi] = useState("");
-  const [file, setFile] = useState();
-  const [open, setOpen] = useState(false);
-  const [eventUpdate, setEventUpdate] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [idEvent, setIdEvent] = useState("");
+  const [openEdit, setOpenEdit] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [file, setFile] = useState("");
+  const [valueEdit, setValueEdit] = useState({} as IEvent);
 
   const { data: event } = QfindEvents();
 
-  const handleOpenUpdate = (id: string) => {
-    setIdEvent(id);
-    setEventUpdate(true);
-  };
-  const handleCloseUpdate = () => {
-    setEventUpdate(false);
+  const handleOpenUpdate = (value: IEvent) => {
+    setIdEvent(value?.id);
+    setOpenEdit(true);
+    setValueEdit(value);
   };
 
-  // const handleAddEvents = async () => {
-  //   const formData = new FormData();
-  // formData.append("nama_acara", acara);
-  // formData.append("description", description);
+  const handleAddEvents = async (value: ICreateEventsProps) => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("nama_acara", value?.nama_acara);
+    formData.append("description", value?.description);
+    formData.append(
+      "tanggal_acara",
+      dayjs(value?.tanggal_acara).format(FormatDayjsInput),
+    );
+    formData.append("lokasi", value?.lokasi);
+    formData.append("file", file);
 
-  // const dateObject = new Date(tanggal);
-  // const day = dateObject.getDate();
-  // const month = dateObject.getMonth() + 1;
-  // const year = dateObject.getFullYear();
-
-  // const formattedDate = `${day}/${month}/${year}`;
-  // formData.append(
-  //   "tanggal_acara",
-  //   formattedDate === "NaN/NaN/NaN" ? "" : formattedDate,
-  // );
-  // formData.append("lokasi", lokasi);
-
-  // await privateApi
-  //   .post(`/event`, formData)
-  //   .then((response) => {
-  //     console.log(response);
-  //   })
-  //   .catch((error) => {
-  //     console.log(error.response.data, "sd");
-  //   });
-  // };
-
-  const handleAddEvents = (value: any) => {
-    console.log(value);
-    console.log(file);
+    await privateApi
+      .post(`/event`, formData)
+      .then((response) => {
+        setLoading(false);
+        toast.success(response?.data?.message);
+      })
+      .catch((error) => {
+        setLoading(false);
+        toast(error.response.data);
+      });
   };
 
-  // const handleUpdateEvents = async () => {
-  //   console.log(acara, description, tanggal, lokasi, file);
-  //   const formData = new FormData();
+  const handleUpdateEvents = async () => {
+    // const formData = new FormData();
+    // formData.append("nama_acara", acara);
+    // formData.append("description", description);
+    // const dateObject = new Date(tanggal);
+    // const day = dateObject.getDate();
+    // const month = dateObject.getMonth() + 1;
+    // const year = dateObject.getFullYear();
+    // const formattedDate = `${day}/${month}/${year}`;
+    // formData.append(
+    //   "tanggal_acara",
+    //   formattedDate === "NaN/NaN/NaN" ? "" : formattedDate,
+    // );
+    // formData.append("lokasi", lokasi);
+    // file.forEach((fileItem) => formData.append("image", fileItem));
+    // await privateApi
+    //   .put(`/event/update/${idEvent}`, formData)
+    //   .then(() => {
+    //     QfindEvents().refetch();
+    //   })
+    //   .catch((error) => {
+    //     console.log(error.response.data);
+    //   });
+  };
 
-  //   formData.append("nama_acara", acara);
-  //   formData.append("description", description);
-
-  //   const dateObject = new Date(tanggal);
-
-  //   const day = dateObject.getDate();
-  //   const month = dateObject.getMonth() + 1;
-  //   const year = dateObject.getFullYear();
-
-  //   const formattedDate = `${day}/${month}/${year}`;
-  //   formData.append(
-  //     "tanggal_acara",
-  //     formattedDate === "NaN/NaN/NaN" ? "" : formattedDate,
-  //   );
-  //   formData.append("lokasi", lokasi);
-
-  //   file.forEach((fileItem) => formData.append("image", fileItem));
-
-  //   await privateApi
-  //     .put(`/event/update/${idEvent}`, formData)
-  //     .then(() => {
-  //       setAcara("");
-  //       setDescription("");
-  //       setLokasi("");
-  //       setTanggal("");
-  //       setFile([]);
-  //       handleCloseUpdate();
-  //     })
-  //     .catch((error) => {
-  //       console.log(error.response.data);
-  //     });
-  // };
-  // const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const fileList = e.target.files;
-  //   if (fileList) {
-  //     const fileArray = Array.from(fileList) as File[];
-
-  //     if (fileArray.length > 1) {
-  //       fileArray.forEach((item) => {
-  //         setFile((prevFiles) => [...prevFiles, item]);
-  //       });
-  //     } else {
-  //       setFile(fileArray);
-  //     }
-  //   }
-  // };
-  const [form] = Form.useForm();
   const { Item } = Form;
   const filterOption = (
     input: string,
@@ -190,7 +157,7 @@ const DashboardEO = () => {
                         </>
                       ) : (
                         <>
-                          <td className="px-6 py-4">tanggal sudah lewat</td>
+                          <td className="px-6 py-4">Event Sudah Selesai</td>
                         </>
                       )}
 
@@ -209,7 +176,7 @@ const DashboardEO = () => {
                         ) === new Date().setUTCHours(0, 0, 0, 0) ? (
                           <>
                             <div
-                              onClick={() => handleOpenUpdate(element.id)}
+                              onClick={() => handleOpenUpdate(element)}
                               className="cursor-pointer font-medium text-blue-600 hover:underline dark:text-blue-500"
                             >
                               Edit
@@ -259,18 +226,42 @@ const DashboardEO = () => {
           open={open}
           onCancel={() => setOpen(false)}
         >
-          <Form form={form} layout="vertical" onFinish={handleAddEvents}>
-            <Item name="acara" label="Nama Acara">
-              <Input />
+          <Form name="basic" layout="vertical" onFinish={handleAddEvents}>
+            <Item
+              rules={[{ required: true, message: "Nama Event Wajib Diisi" }]}
+              name="nama_acara"
+              label="Nama Acara"
+            >
+              <Input size="large" disabled={loading} />
             </Item>
-            <Item name="deskripsi" label="Deskripsi">
-              <Input />
+            <Item
+              rules={[
+                { required: true, message: "Deskripsi Event Wajib Diisi" },
+              ]}
+              name="description"
+              label="Deskripsi"
+            >
+              <Input size="large" disabled={loading} />
             </Item>
-            <Item name="dateStart" label="Tanggal Acara">
-              <DatePicker />
+            <Item
+              rules={[{ required: true, message: "Tanggal Event Wajib" }]}
+              name="tanggal_acara"
+              label="Tanggal Acara"
+            >
+              <DatePicker
+                format={FormatDayjsInput}
+                size="large"
+                disabled={loading}
+              />
             </Item>
-            <Item name="kota" label="Nama Acara">
+            <Item
+              rules={[{ required: true, message: "Lokasi Event Wajib" }]}
+              name="lokasi"
+              label="Nama Acara"
+            >
               <Select
+                size="large"
+                disabled={loading}
                 showSearch
                 placeholder="Pilih Kota"
                 optionFilterProp="children"
@@ -283,10 +274,11 @@ const DashboardEO = () => {
                 ]}
               />
             </Item>
-            <Item name="file">
-              <label className="block text-sm font-semibold text-black">
-                Nama Acara
-              </label>
+            <Item
+              // rules={[{ required: true, message: "Lokasi Event Wajib" }]}
+              label="Upload Gambar Event"
+              name="file"
+            >
               <Upload
                 onChange={handleFile}
                 accept=".png,.jpg,.jpeg"
@@ -304,208 +296,123 @@ const DashboardEO = () => {
                 Cancel
               </button>
               <button
+                disabled={loading}
                 type="submit"
-                className=" rounded-full bg-mainColors px-10 py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
+                className="flex w-32 items-center justify-center rounded-full bg-mainColors py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
               >
-                Create
+                {loading ? <LoadingOutlined /> : "Create"}
               </button>
             </div>
           </Form>
         </Modal>
       )}
-      {/* {open && (
-        <Popup onConfirm={handleClose}>
-          <div className="relative max-h-full w-full max-w-md">
-            <div className="relative rounded-lg bg-white shadow">
-              <button
-                type="button"
-                className="absolute right-2.5 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent text-black hover:bg-gray-200"
-                data-modal-hide="authentication-modal"
+
+      {openEdit && (
+        <Modal
+          footer={false}
+          width={768}
+          title="Edit Event"
+          open={openEdit}
+          onCancel={() => setOpenEdit(false)}
+        >
+          <Form
+            fields={[
+              {
+                name: "nama_acara",
+                value: valueEdit?.nama_acara,
+              },
+              {
+                name: "description",
+                value: valueEdit?.description,
+              },
+              {
+                name: "lokasi",
+                value: valueEdit?.lokasi,
+              },
+            ]}
+            name="basic"
+            layout="vertical"
+            onFinish={handleUpdateEvents}
+          >
+            <Item
+              rules={[{ required: true, message: "Nama Event Wajib Diisi" }]}
+              name="nama_acara"
+              label="Nama Acara"
+            >
+              <Input size="large" disabled={loading} />
+            </Item>
+            <Item
+              rules={[
+                { required: true, message: "Deskripsi Event Wajib Diisi" },
+              ]}
+              name="description"
+              label="Deskripsi"
+            >
+              <Input size="large" disabled={loading} />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Tanggal Event Wajib" }]}
+              name="tanggal_acara"
+              label="Tanggal Acara"
+            >
+              <DatePicker
+                defaultValue={dayjs(valueEdit?.tanggal_acara)}
+                format={FormatDayjsInput}
+                size="large"
+                disabled={loading}
+              />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Lokasi Event Wajib" }]}
+              name="lokasi"
+              label="Nama Acara"
+            >
+              <Select
+                size="large"
+                disabled={loading}
+                showSearch
+                placeholder="Pilih Kota"
+                optionFilterProp="children"
+                filterOption={filterOption}
+                options={[
+                  {
+                    value: "jember",
+                    label: "Jember",
+                  },
+                ]}
+              />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Lokasi Event Wajib" }]}
+              label="Upload Gambar Event"
+              name="file"
+            >
+              <Upload
+                onChange={handleFile}
+                accept=".png,.jpg,.jpeg"
+                maxCount={1}
               >
-                <LuXCircle />
-              </button>
-              <div className="px-6 py-6 lg:px-8">
-                <h3 className="mb-4 text-2xl font-semibold text-black">
-                  Tambahkan Events
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Nama Acara
-                    </label>
-                    <input
-                      type="text"
-                      onChange={(e) => setAcara(e.target.value)}
-                      className=" block h-10 w-full rounded-sm border  border-gray-300 p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Dekripsi
-                    </label>
-                    <textarea
-                      onChange={(e) => setDescription(e.target.value)}
-                      className=" block h-20 w-full rounded-sm border  border-gray-300 p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Lokasi
-                    </label>
-                    <select
-                      value={lokasi}
-                      className="block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                      onChange={(e) => setLokasi(e.target.value)}
-                    >
-                      <option selected value={""}>
-                        {" "}
-                        Lokasi
-                      </option>
-                      <option value={`Jember`}> Jember</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Tanggal Acara
-                    </label>
-                    <input
-                      type="date"
-                      onChange={(e) => setTanggal(e.target.value)}
-                      className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Gambar Event
-                    </label>
-                    <input
-                      type="file"
-                      id="imageUpload"
-                      name="imageUpload"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageChange}
-                      className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2 py-2">
-                    <button
-                      type="submit"
-                      className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleAddEvents()}
-                      className=" rounded-full bg-mainColors px-10 py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
-                    >
-                      Create
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Popup>
-      )} */}
-      {eventUpdate && (
-        <Popup onConfirm={handleCloseUpdate}>
-          <div className="relative max-h-full w-full max-w-md">
-            <div className="relative rounded-lg bg-white shadow">
+                <Button icon={<LuUpload />}>Upload</Button>
+              </Upload>
+            </Item>
+            <div className="flex justify-end gap-2 py-2">
               <button
-                type="button"
-                onClick={() => handleCloseUpdate()}
-                className="absolute right-2.5 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent text-black hover:bg-gray-200"
-                data-modal-hide="authentication-modal"
+                type="submit"
+                onClick={() => setOpen(false)}
+                className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
               >
-                <LuXCircle />
+                Cancel
               </button>
-              <div className="px-6 py-6 lg:px-8">
-                <h3 className="mb-4 text-2xl font-semibold text-black">
-                  Update Events
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Nama Acara
-                    </label>
-                    <input
-                      type="text"
-                      onChange={(e) => setAcara(e.target.value)}
-                      className=" block h-10 w-full rounded-sm border  border-gray-300 p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Dekripsi
-                    </label>
-                    <textarea
-                      onChange={(e) => setDescription(e.target.value)}
-                      className=" block h-20 w-full rounded-sm border  border-gray-300 p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Lokasi
-                    </label>
-                    <select
-                      value={lokasi}
-                      className="block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                      onChange={(e) => setLokasi(e.target.value)}
-                    >
-                      <option selected value="">
-                        {" "}
-                        Lokasi
-                      </option>
-                      <option value={`Jember`}> Jember</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Tanggal Acara
-                    </label>
-                    <input
-                      type="date"
-                      onChange={(e) => setTanggal(e.target.value)}
-                      className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Gambar Event
-                    </label>
-                    <input
-                      type="file"
-                      id="imageUpload"
-                      name="imageUpload"
-                      accept="image/*"
-                      multiple
-                      // onChange={handleImageChange}
-                      className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2 py-2">
-                    <button
-                      type="submit"
-                      onClick={() => handleCloseUpdate()}
-                      className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      // onClick={() => handleUpdateEvents()}
-                      className=" rounded-full bg-mainColors px-10 py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
-                    >
-                      Update
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <button
+                disabled={loading}
+                type="submit"
+                className="flex w-32 items-center justify-center rounded-full bg-mainColors py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
+              >
+                {loading ? <LoadingOutlined /> : "Update"}
+              </button>
             </div>
-          </div>
-        </Popup>
+          </Form>
+        </Modal>
       )}
     </div>
   );

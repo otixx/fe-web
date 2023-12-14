@@ -31,7 +31,7 @@ const Index = () => {
       <div className="container mx-auto mb-2 grid grid-cols-2 items-center justify-center gap-5 pb-10 lg:grid-cols-5">
         {status === "pending" ? (
           <SkeletonCard total={5} />
-        ) : (
+        ) : ticket.length > 0 ? (
           ticket?.map((item: Ticket, index: number) => (
             <div key={index}>
               <Card
@@ -47,6 +47,8 @@ const Index = () => {
               />
             </div>
           ))
+        ) : (
+          <p>sd</p>
         )}
       </div>
     </div>

@@ -4,35 +4,34 @@ import Cookies from "js-cookie";
 import { Alert, Form, Input } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { toast } from "react-hot-toast";
-import { publicAPi } from "@/shared/axios/axios";
+import { createLogin } from "@/service/auth/auth.service";
 
 const Login = () => {
   const [status, setStatus] = useState(false);
   const [msg, setMsg] = useState("");
   const navigate = useNavigate();
+  const loginval = createLogin();
 
-  const handleLogin = (e: any) => {
-    publicAPi
-      .post(`/user/login`, {
+  const handleLogin = async (e: any) => {
+    setStatus(true);
+    try {
+      const res = await loginval.mutateAsync({
         username: e?.username,
         password: e?.password,
-      })
-      .then((response) => {
-        Cookies.set("token", JSON.stringify(response?.data?.data));
-        setStatus(false);
-        toast.success("Login Berhasil!");
-        navigate("/");
-      })
-      .catch((error: any) => {
-        if (error.response.status == 404) {
-          setMsg(error.response.data.message);
-          setStatus(false);
-        } else {
-          setStatus(false);
-          setMsg(error.response.data.message);
-        }
       });
-    setStatus(true);
+      Cookies.set("token", JSON.stringify(res?.data?.data));
+      setStatus(false);
+      toast.success("Login Berhasil!");
+      navigate("/");
+    } catch (error: any) {
+      setStatus(false);
+      if (error?.response?.status === 400) {
+        setMsg(error?.response?.data?.message);
+        setStatus(false);
+      } else {
+        setMsg(error?.response?.data?.message);
+      }
+    }
   };
 
   useEffect(() => {

@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { LoadingOutlined } from "@ant-design/icons";
 import { Alert, Spin } from "antd";
 import { toast } from "react-hot-toast";
 import { privateApi } from "@/shared/axios/axios";
+import { useProfile } from "@/service/user/user.service";
 
 const RegisterEO = () => {
   const [instagram, setInstagram] = useState("");
@@ -14,8 +13,8 @@ const RegisterEO = () => {
   const [msg, setMsg] = useState("");
   const [status, setStatus] = useState(false);
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-
   const navigate = useNavigate();
+
   const handleLogin = async (e: any) => {
     e.preventDefault();
     setTimeout(() => {

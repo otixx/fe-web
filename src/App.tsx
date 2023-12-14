@@ -42,27 +42,23 @@ function App() {
           {/* Root layout  */}
           <Route path="/" element={<UserLayout />}>
             <Route index element={<Index />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/detail/:id" element={<DetailTiket />} />
 
             {/* EO Layout  */}
             <Route path="/profile/" element={<LayoutEO />}>
-              <Route path="user" element={<Profile />} />
+              <Route path="" element={<Profile />} />
               <Route path="usereo" element={<ProfileEo />} />
-              <Route path="eo/register" element={<RegisterEO />} />
               <Route path="eo/events" element={<DashboardEO />} />
               <Route path="eo/events/:id" element={<DetailEvents />} />
               <Route path="eo/riwayat" element={<Riwayat />} />
+              <Route path="eo/riwayat/tiket/:id" element={<RiwayatTiket />} />
+              <Route path="eo/register" element={<RegisterEO />} />
             </Route>
 
             <Route path="/history" element={<History />} />
-            <Route
-              path="/profile/eo/riwayat/tiket/:id"
-              element={<RiwayatTiket />}
-            />
             <Route path="/detailhistory" element={<Detailhistory />} />
             <Route path="/detail/payment/:id" element={<DetailPayment />} />
-            <Route path="scan" element={<QRCodeScannerPage />} />
-            <Route path="/detail/:id" element={<DetailTiket />} />
+            <Route path="/scan" element={<QRCodeScannerPage />} />
           </Route>
         </Routes>
       </Router>

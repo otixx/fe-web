@@ -15,7 +15,6 @@ const LayoutEO = () => {
   }, []);
 
   const protectRouteEO = () => {
-    console.log(!profile?.profile?.status_eo);
     if (token && !profile?.profile?.status_eo) {
       navigate("/profile/eo/register");
     }

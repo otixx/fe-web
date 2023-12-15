@@ -5,9 +5,6 @@ import Popup from "@/components/Popup";
 
 const ProfileEo = () => {
   const [open, setOpen] = useState(false);
-  const [instagram, setInstagram] = useState("");
-  const [kota, setKota] = useState("");
-  const [name, setName] = useState("");
   const handleOpen = () => {
     setOpen(true);
   };
@@ -60,7 +57,7 @@ const ProfileEo = () => {
                     </label>
                     <input
                       type="text"
-                      onChange={(e) => setName(e.target.value)}
+                      // onChange={(e) => setName(e.target.value)}
                       className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
                     />
                   </div>
@@ -70,7 +67,7 @@ const ProfileEo = () => {
                     </label>
                     <input
                       type="text"
-                      onChange={(e) => setInstagram(e.target.value)}
+                      // onChange={(e) => setInstagram(e.target.value)}
                       className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
                     />
                   </div>
@@ -80,7 +77,7 @@ const ProfileEo = () => {
                     </label>
                     <input
                       type="text"
-                      onChange={(e) => setKota(e.target.value)}
+                      // onChange={(e) => setKota(e.target.value)}
                       className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
                     />
                   </div>

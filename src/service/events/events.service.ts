@@ -1,4 +1,4 @@
-import { ICreateEventsProps, IEvent } from "@/interface/event.interface";
+import { IEvent } from "@/interface/event.interface";
 import { privateApi } from "@/shared/axios/axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -14,8 +14,7 @@ export const QfindEvents = () => {
 };
 
 export const createEventsMutation = () => {
-  const fetcher = async (value: any) => {
-    console.log("kontol");
+  const fetcher = async () => {
     const response = await privateApi.post(`/event`, {
       nama_acara: "geo kuntul",
       description: "ebebebebebe",

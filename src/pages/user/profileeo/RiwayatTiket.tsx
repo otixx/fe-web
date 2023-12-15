@@ -1,5 +1,4 @@
 import Sidebar from "../../../components/Sidebar";
-import dataEvent from "../../../api/dummy.json";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";

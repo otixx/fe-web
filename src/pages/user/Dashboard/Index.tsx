@@ -31,24 +31,28 @@ const Index = () => {
       <div className="container mx-auto mb-2 grid grid-cols-2 items-center justify-center gap-5 pb-10 lg:grid-cols-5">
         {status === "pending" ? (
           <SkeletonCard total={5} />
-        ) : ticket.length > 0 ? (
-          ticket?.map((item: Ticket, index: number) => (
-            <div key={index}>
-              <Card
-                image={JSON.parse(item?.image_url)["url"]}
-                title={item?.nama_kegiatan}
-                date={dayjs(item?.date).format(FormatDayjs)}
-                price={new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                }).format(Number(item?.harga))}
-                location={item?.event?.lokasi}
-                id={item?.id}
-              />
-            </div>
-          ))
+        ) : ticket ? (
+          ticket.length > 0 ? (
+            ticket?.map((item: Ticket, index: number) => (
+              <div key={index}>
+                <Card
+                  image={JSON.parse(item?.image_url)["url"]}
+                  title={item?.nama_kegiatan}
+                  date={dayjs(item?.date).format(FormatDayjs)}
+                  price={new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  }).format(Number(item?.harga))}
+                  location={item?.event?.lokasi}
+                  id={item?.id}
+                />
+              </div>
+            ))
+          ) : (
+            <p>sd</p>
+          )
         ) : (
-          <p>sd</p>
+          <p>Loading</p>
         )}
       </div>
     </div>

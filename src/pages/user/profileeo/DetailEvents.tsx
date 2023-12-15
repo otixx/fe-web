@@ -1,298 +1,158 @@
-import { useState, useEffect } from "react";
-import { LuXCircle } from "react-icons/lu";
+import { useState } from "react";
+import { LuScan, LuTicket, LuUpload } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import { privateApi } from "@/shared/axios/axios";
 import { Ticket } from "@/interface/ticket.interface";
-import Popup from "@/components/Popup";
+import { Button, DatePicker, Form, Input, Modal, Select, Upload } from "antd";
+import { FormatDayjs, FormatDayjsInput } from "@/shared/dayjs/format";
+import { LoadingOutlined } from "@ant-design/icons";
+import { QfindTicketbyEvent } from "@/service/ticket/ticket.service";
+import dayjs from "dayjs";
+import toast from "react-hot-toast";
 
 const DetailEvents = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [kegiatan, setKegiatan] = useState("");
-  const [harga, setHarga] = useState("");
-  const [tags, setTags] = useState("");
-  const [preorder, setPreorder] = useState("");
-  const [expired, setExpired] = useState("");
-  const [file, setFile] = useState<File[]>([]);
-  const [tiket, setTiket] = useState<Ticket[]>([]);
-  const idEvent = useParams().id;
-  // Check Device  -------------------------------------------------------
-  let userAgent = navigator.userAgent;
+  const [openEdit, setOpenEdit] = useState(false);
+  const [detailData, setDetailData] = useState({} as Ticket);
 
-  // Mengekstrak informasi tambahan dari User Agent String
+  const idEvent: any = useParams().id;
+  const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState("");
+
+  // Check Device
+  let userAgent = navigator.userAgent;
   let isMobile = /Mobi/.test(userAgent);
   let isTablet = /Tablet|iPad/.test(userAgent);
   let isDesktop = !isMobile && !isTablet;
-  // Check Device End -------------------------------------------------------
 
-  useEffect(() => {
-    const getEvent = async () => {
-      try {
-        const response = await privateApi.get(
-          `${import.meta.env.VITE_BE_URL}/tiket/event/${idEvent}`,
-        );
-        setTiket(response.data.data);
-      } catch (error: any) {
-        console.log(error.response);
-      }
-    };
-    getEvent();
-  }, []);
+  const { data: tiket } = QfindTicketbyEvent(idEvent);
+  const { Item } = Form;
 
-  const handleOpen = () => {
-    setOpen(true);
+  const handleOpenUpdate = (element: Ticket) => {
+    setOpenEdit(true);
+    setDetailData(element);
   };
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileList = e.target.files;
-    if (fileList) {
-      const fileArray = Array.from(fileList) as File[];
 
-      if (fileArray.length > 1) {
-        fileArray.forEach((item) => {
-          setFile((prevFiles) => [...prevFiles, item]);
-        });
-      } else {
-        setFile(fileArray);
-      }
+  const handleAddTiket = async (value: any) => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("nama_kegiatan", value?.nama_kegiatan);
+    formData.append("harga", value?.harga);
+    formData.append("tags", value?.tags);
+    formData.append(
+      "tanggal_preorder",
+      value?.tanggal_preorder.format(FormatDayjsInput),
+    );
+    formData.append(
+      "tanggal_expired",
+      value?.tanggal_expired.format(FormatDayjsInput),
+    );
+    formData.append("file", file);
+
+    try {
+      const res = await privateApi.post(`/tiket/${idEvent}`, formData);
+      toast.success(res?.data?.message);
+      setLoading(false);
+      setOpenEdit(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
+  };
+  const handleUpdateTiket = async (value: any) => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("nama_kegiatan", value?.nama_acara);
+    formData.append("harga", value?.harga);
+    formData.append("tags", value?.tags);
+    formData.append(
+      "tanggal_preorder",
+      value?.tanggal_pre.format(FormatDayjsInput),
+    );
+    formData.append(
+      "tanggal_expired",
+      value?.tanggal_exp.format(FormatDayjsInput),
+    );
+    formData.append("file", file);
+
+    try {
+      const res = await privateApi.put(`/tiket/${detailData?.id}`, formData);
+      toast.success(res?.data?.message);
+      setLoading(false);
+      setOpenEdit(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
     }
   };
 
-  // Format Tiket------------------------------------------------------------
-  const formData = new FormData();
-
-  // Append additional fields
-  formData.append("nama_kegiatan", kegiatan);
-  formData.append("harga", harga);
-  formData.append("tags", tags);
-
-  function formatTanggal(tanggal: any) {
-    const dateObject = new Date(tanggal);
-
-    // Dapatkan tanggal, bulan, dan tahun dari objek Date
-    const day = dateObject.getDate();
-    const month = dateObject.getMonth() + 1; // Ingat: bulan dimulai dari 0
-    const year = dateObject.getFullYear();
-
-    // Format tanggal, bulan, dan tahun sesuai dengan "DD/MM/YYYY"
-    const formattedDate = `${day}/${month}/${year}`;
-    return formattedDate;
-  }
-
-  formData.append(
-    "tanggal_preorder",
-    formatTanggal(preorder) === "NaN/NaN/NaN" ? "" : formatTanggal(preorder),
-  );
-  formData.append(
-    "tanggal_expired",
-    formatTanggal(expired) === "NaN/NaN/NaN" ? "" : formatTanggal(expired),
-  );
-  // format tiket end -------------------------------------------------------------
-  const handleAddTiket = async () => {
-    // Append multiple files
-    file.forEach((fileItem) => formData.append("image", fileItem));
-    await privateApi
-      .post(`/tiket/${idEvent}`, formData)
-      .then((response) => {
-        console.log(response);
-        handleClose();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    console.log(formData);
-  };
-
-  const handleUpdateTiket = async (id: any) => {
-    await privateApi
-      .put(
-        `/tiket/${id}`,
-        {
-          nama_kegiatan: kegiatan,
-          harga: harga,
-          tags: tags,
-          tanggal_preorder: preorder,
-          tanggal_expired: expired,
-          image: file,
-        },
-        // {
-        //   headers: {
-        //     Authorization: `Bearer ${token}`,
-        //   },
-        // },
-      )
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const filterOption = (
+    input: string,
+    option?: { label: string; value: string },
+  ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+  const handleFile = (info: any) => {
+    setFile(info?.file);
   };
 
   return (
-    <div className="flex w-full flex-row">
-      <div className="w-full px-4 py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Event / Tiket</h1>
-          <div className="flex">
-            <div className="mr-5 cursor-pointer rounded-full bg-secondColors px-8 py-3 hover:border-secondColors hover:bg-mainColors">
-              <button
-                onClick={() => handleOpen()}
-                className="text-[14px] font-semibold text-white"
-              >
-                Tambah Tiket
-              </button>
-            </div>
-            {isDesktop === true ? null : (
-              <div className="cursor-pointer rounded-full bg-secondColors px-8 py-3 hover:border-secondColors hover:bg-mainColors">
-                <button
-                  onClick={() => navigate("/scan")}
-                  className="text-[14px] font-semibold text-white"
-                >
-                  Scan
-                </button>
-              </div>
-            )}
-          </div>
-
-          {open && (
-            <Popup onConfirm={handleClose}>
-              <div className="relative max-h-full w-full max-w-md">
-                <div className="relative rounded-lg bg-white shadow">
-                  <button
-                    type="button"
-                    onClick={() => handleClose()}
-                    className="absolute right-2.5 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent text-black hover:bg-gray-200"
-                    data-modal-hide="authentication-modal"
-                  >
-                    <LuXCircle />
-                  </button>
-                  <div className="px-6 py-6 lg:px-8">
-                    <h3 className="mb-4 text-2xl font-semibold text-black">
-                      Tambahkan Tiket
-                    </h3>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          Nama Tiket
-                        </label>
-                        <input
-                          type="text"
-                          onChange={(e) => setKegiatan(e.target.value)}
-                          className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          harga
-                        </label>
-                        <input
-                          type="number"
-                          min="10000"
-                          step="100"
-                          required
-                          onChange={(e) => setHarga(e.target.value)}
-                          className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          Tags
-                        </label>
-                        <select
-                          value={tags}
-                          className="block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                          onChange={(e) => setTags(e.target.value)}
-                        >
-                          <option selected value="">
-                            {" "}
-                            Pilih Tags
-                          </option>
-                          <option value={`music`}> Music</option>
-                          <option value={`cosplay`}> Cosplayer</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          Tanggal Preorder
-                        </label>
-                        <input
-                          type="date"
-                          onChange={(e) => setPreorder(e.target.value)}
-                          className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          Tanggal Expired
-                        </label>
-                        <input
-                          type="date"
-                          onChange={(e) => setExpired(e.target.value)}
-                          className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          Gambar Tiket
-                        </label>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                        />
-                      </div>
-                      <div className="flex justify-end gap-2 py-2">
-                        <button
-                          type="submit"
-                          onClick={() => handleClose()}
-                          className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleAddTiket()}
-                          className=" rounded-full bg-mainColors px-10 py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
-                        >
-                          Submit
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Popup>
-          )}
+    <div className="w-full">
+      <div className="grid h-28 grid-cols-12 items-center px-2">
+        <div className="col-span-6">
+          <h1 className="text-2xl font-bold">Event</h1>
         </div>
-        <div className="py-4">
-          <div className=" bg-red-200 shadow-md sm:rounded-lg">
+        <div className="col-span-6 flex justify-end">
+          <div className="btnSignin w-32 cursor-pointer rounded-full bg-secondColors px-3 py-2 text-sm shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3">
+            <button
+              onClick={() => setOpen(true)}
+              className="flex items-center justify-center gap-2 text-[14px] font-semibold text-white"
+            >
+              <LuTicket />
+              Tambah Tiket
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-end">
+        {isDesktop === true ? null : (
+          <div className="cursor-pointer rounded-full bg-secondColors px-8 py-3 hover:border-secondColors hover:bg-mainColors">
+            <button
+              onClick={() => navigate("/scan")}
+              className="flex items-center justify-center gap-2 text-[14px] font-semibold text-white"
+            >
+              <LuScan />
+              Scan
+            </button>
+          </div>
+        )}
+      </div>
+      <div className="grid grid-cols-12 px-2">
+        <div className="col-span-12">
+          <div className=" relative overflow-x-auto shadow-md sm:rounded-lg ">
             <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
               <caption className="bg-white p-5 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
                 List Tiket
                 <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
-                  Lihat Semua Data anda disini
+                  Lihat Semua Tiket Event disini
                 </p>
               </caption>
+
               <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th scope="col" className="px-6 py-3">
                     Nama Tiket
                   </th>
                   <th scope="col" className="px-6 py-3">
-                    Harga
+                    harga
                   </th>
                   <th scope="col" className="px-6 py-3">
                     Tags
                   </th>
                   <th scope="col" className="px-6 py-3">
-                    Tgl Preorder
+                    Tanggal Pre Order
                   </th>
                   <th scope="col" className="px-6 py-3">
-                    Tgl Exp
+                    Tanggal Expired
                   </th>
                   <th scope="col" className="px-6 py-3">
                     Action
@@ -300,56 +160,258 @@ const DetailEvents = () => {
                 </tr>
               </thead>
               <tbody>
-                {tiket.map((element, index) => (
-                  <tr
-                    className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
-                    key={index}
-                  >
-                    <th
-                      scope="row"
-                      className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white"
-                    >
-                      {element?.nama_kegiatan}
-                    </th>
-                    <td className="px-6 py-4">{element?.harga}</td>
-                    <td className="px-6 py-4">{element?.tags}</td>
-                    <td className="px-6 py-4">{`${new Date(
-                      element?.tanggal_preorder,
-                    ).getDate()} ${new Date(
-                      element?.tanggal_preorder,
-                    ).toLocaleString("default", { month: "long" })} ${new Date(
-                      element?.tanggal_preorder,
-                    ).getFullYear()}`}</td>
-                    <td className="px-6 py-4">{`${new Date(
-                      element?.tanggal_expired,
-                    ).getDate()} ${new Date(
-                      element?.tanggal_expired,
-                    ).toLocaleString("default", { month: "long" })} ${new Date(
-                      element?.tanggal_expired,
-                    ).getFullYear()}`}</td>
-                    <td className="flex gap-4 px-6 py-4 text-center">
-                      <a
-                        onClick={() => {
-                          handleUpdateTiket(element.id);
-                        }}
-                        className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                {tiket &&
+                  tiket.map((element, index: number) => {
+                    return (
+                      <tr
+                        className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
+                        key={index}
                       >
-                        Edit
-                      </a>
-                      <a
-                        href="#"
-                        className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-                      >
-                        Delete
-                      </a>
-                    </td>
-                  </tr>
-                ))}
+                        <td
+                          scope="row"
+                          className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white"
+                        >
+                          {element?.nama_kegiatan}
+                        </td>
+                        <td className="px-6 py-4">{element?.harga}</td>
+                        <td className="px-6 py-4">{element?.tags}</td>
+                        <td className="px-6 py-4">
+                          {dayjs(element?.tanggal_preorder).format(FormatDayjs)}
+                        </td>
+                        <td className="px-6 py-4">
+                          {dayjs(element?.tanggal_expired).format(FormatDayjs)}
+                        </td>
+                        <td className="flex items-center gap-4 px-6 py-4 text-center">
+                          <Button
+                            onClick={() => handleOpenUpdate(element)}
+                            type="default"
+                          >
+                            Edit
+                          </Button>
+                          <Button type="primary" danger>
+                            Delete
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+      {open && (
+        <Modal
+          footer={false}
+          width={768}
+          title="Tambahkan Tiket"
+          open={open}
+          onCancel={() => setOpen(false)}
+        >
+          <Form name="basic" layout="vertical" onFinish={handleAddTiket}>
+            <Item
+              rules={[{ required: true, message: "Nama Tiket Wajib Diisi" }]}
+              name="nama_kegiatan"
+              label="Nama Tiket"
+            >
+              <Input size="large" disabled={loading} />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Harga Wajib Diisi" }]}
+              name="harga"
+              label="Harga"
+            >
+              <Input size="large" type="number" disabled={loading} />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Lokasi Event Wajib" }]}
+              name="tags"
+              label="Tags"
+            >
+              <Select
+                size="large"
+                disabled={loading}
+                showSearch
+                placeholder="Pilih Tags"
+                optionFilterProp="children"
+                filterOption={filterOption}
+                options={[
+                  {
+                    value: "music",
+                    label: "Music",
+                  },
+                  {
+                    value: "cosplay",
+                    label: "Cosplay",
+                  },
+                ]}
+              />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Tanggal Pre Order Wajib" }]}
+              name="tanggal_preorder"
+              label="Tanggal Pre Order"
+            >
+              <DatePicker
+                format={FormatDayjsInput}
+                size="large"
+                disabled={loading}
+              />
+            </Item>
+            <Item
+              rules={[
+                { required: true, message: "Tanggal Expired Tiket Wajib" },
+              ]}
+              name="tanggal_expired"
+              label="Tanggal Expired"
+            >
+              <DatePicker
+                format={FormatDayjsInput}
+                size="large"
+                disabled={loading}
+              />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Gambar Tiket Event Wajib" }]}
+              label="Upload Gambar Tiket"
+              name="file"
+            >
+              <Upload
+                onChange={handleFile}
+                accept=".png,.jpg,.jpeg"
+                maxCount={1}
+              >
+                <Button icon={<LuUpload />}>Upload</Button>
+              </Upload>
+            </Item>
+            <div className="flex justify-end gap-2 py-2">
+              <button
+                onClick={() => setOpen(false)}
+                className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={loading}
+                type="submit"
+                className="flex w-32 items-center justify-center rounded-full bg-mainColors py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
+              >
+                {loading ? <LoadingOutlined /> : "Create"}
+              </button>
+            </div>
+          </Form>
+        </Modal>
+      )}
+
+      {openEdit && (
+        <Modal
+          footer={false}
+          width={768}
+          title="Edit Event"
+          open={openEdit}
+          onCancel={() => setOpenEdit(false)}
+        >
+          <Form
+            fields={[
+              {
+                name: "nama_acara",
+                value: detailData?.nama_kegiatan,
+              },
+              {
+                name: "harga",
+                value: detailData?.harga,
+              },
+              {
+                name: "tags",
+                value: detailData?.tags,
+              },
+              {
+                name: "tanggal_pre",
+                value: dayjs(detailData?.tanggal_preorder),
+              },
+              {
+                name: "tanggal_exp",
+                value: dayjs(detailData?.tanggal_expired),
+              },
+            ]}
+            name="basic"
+            layout="vertical"
+            onFinish={handleUpdateTiket}
+          >
+            <Item name="nama_acara" label="Nama Acara">
+              <Input size="large" disabled={loading} />
+            </Item>
+            <Item name="harga" label="Deskripsi">
+              <Input type="number" size="large" disabled={loading} />
+            </Item>
+
+            <Item name="tags" label="Nama Acara">
+              <Select
+                size="large"
+                disabled={loading}
+                showSearch
+                placeholder="Pilih Kota"
+                optionFilterProp="children"
+                filterOption={filterOption}
+                options={[
+                  {
+                    value: "music",
+                    label: "Music",
+                  },
+                  {
+                    value: "cosplay",
+                    label: "Cosplay",
+                  },
+                ]}
+              />
+            </Item>
+            <Item name="tanggal_pre" label="Tanggal Pre Order">
+              <DatePicker
+                format={FormatDayjsInput}
+                size="large"
+                disabled={loading}
+              />
+            </Item>
+            <Item name="tanggal_exp" label="Tanggal Expired">
+              <DatePicker
+                format={FormatDayjsInput}
+                size="large"
+                disabled={loading}
+              />
+            </Item>
+            <Item label="Upload Gambar Event" name="file">
+              <Upload
+                fileList={[
+                  {
+                    uid: "1",
+                    name: "file.png",
+                  },
+                ]}
+                onChange={handleFile}
+                accept=".png,.jpg,.jpeg"
+                maxCount={1}
+              >
+                <Button icon={<LuUpload />}>Upload</Button>
+              </Upload>
+            </Item>
+            <div className="flex justify-end gap-2 py-2">
+              <button
+                onClick={() => setOpenEdit(false)}
+                className="bg-red flex w-32 items-center justify-center rounded-full border-2 border-mainColors bg-white py-2 text-center text-sm font-semibold text-mainColors transition duration-500 hover:border-secondColors hover:bg-secondColors hover:text-white focus:outline-none focus:ring-4"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-red flex w-32 items-center justify-center rounded-full bg-mainColors py-2 text-center text-sm font-semibold text-white transition duration-500 hover:bg-secondColors focus:outline-none focus:ring-4"
+              >
+                {loading ? <LoadingOutlined /> : "Update"}
+              </button>
+            </div>
+          </Form>
+        </Modal>
+      )}
     </div>
   );
 };

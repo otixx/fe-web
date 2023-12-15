@@ -1,17 +1,21 @@
-import Sidebar from "@/components/common/Sidebar";
+import { QfindTicket } from "@/service/ticket/ticket.service";
+import { useNavigate } from "react-router-dom";
 
 const Riwayat = () => {
+  const { data: ticket } = QfindTicket();
+  const navigate = useNavigate();
   return (
-    <div className="flex flex-row">
-      <Sidebar />
-      <div className="w-full px-4 py-4">
-        <div className="">
+    <div className="w-full">
+      <div className="grid h-28 grid-cols-12 items-center px-2">
+        <div className="col-span-12 items-center">
           <h1 className="text-2xl font-bold">Tiket</h1>
         </div>
-        <div className="py-4">
-          <div className=" bg-red-200 shadow-md sm:rounded-lg">
+      </div>
+      <div className="grid h-28 grid-cols-12 items-center px-2">
+        <div className="col-span-12 p-2">
+          <div className=" relative overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-              <caption className="bg-white p-5 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
+              <caption className="bg-white p-2 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
                 List Tiket
                 <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
                   Lihat Semua Data anda disini
@@ -39,39 +43,35 @@ const Riwayat = () => {
                   </th>
                 </tr>
               </thead>
-              {/* <tbody>
-                {dataEvent.map((element, index) => (
+              <tbody>
+                {ticket?.map((element: any) => (
                   <tr
                     className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
-                    key={index}
+                    key={element.id}
                   >
                     <th
                       scope="row"
                       className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white"
                     >
-                      {element?.name}
+                      {element?.nama_kegiatan}
                     </th>
                     <td className="px-6 py-4">{element?.harga}</td>
                     <td className="px-6 py-4">{element?.tags}</td>
-                    <td className="px-6 py-4">{element?.tgl_pre}</td>
-                    <td className="px-6 py-4">{element?.tgl_exp}</td>
+                    <td className="px-6 py-4">{element?.tanggal_preorder}</td>
+                    <td className="px-6 py-4">{element?.tanggal_expired}</td>
                     <td className="flex gap-4 px-6 py-4 text-center">
                       <a
-                        href="#"
+                        onClick={() =>
+                          navigate(`/profile/eo/riwayat/tiket/${element.id}`)
+                        }
                         className="font-medium text-blue-600 hover:underline dark:text-blue-500"
                       >
-                        Edit
-                      </a>
-                      <a
-                        href="#"
-                        className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-                      >
-                        Delete
+                        View
                       </a>
                     </td>
                   </tr>
                 ))}
-              </tbody> */}
+              </tbody>
             </table>
           </div>
         </div>

@@ -1,10 +1,10 @@
 import { LuMail, LuMapPin, LuPhone, LuTarget, LuUser } from "react-icons/lu";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { IProfile } from "@/interface/profile/profile.interface";
 import { privateApi } from "@/shared/axios/axios";
 import { Button, Drawer, Form, Input } from "antd";
 import { useProfile } from "@/service/user/user.service";
+import { IProfile } from "@/interface/profile.interface";
 
 const Profile = () => {
   const [open, setOpen] = useState(false);
@@ -19,10 +19,10 @@ const Profile = () => {
   const updateProfile = (values: IProfile) => {
     privateApi
       .put(`/profile`, {
-        name: values?.name,
-        email: values?.email,
-        nohp: values?.noHp,
-        alamat: values?.alamat,
+        name: values?.profile?.name,
+        email: values?.profile?.email,
+        nohp: values?.profile?.noHp,
+        alamat: values?.profile?.alamat,
       })
       .then(() => {
         toast.success("Berhasil Update Profile");
@@ -35,7 +35,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto h-screen">
       <div className="grid grid-cols-12 p-4">
         <div className="col-span-6">
           <h1 className="text-[18px] font-bold">Profile</h1>
@@ -126,7 +126,9 @@ const Profile = () => {
               <div className="pointer-events-none flex items-center gap-4 p-2">
                 <LuUser />
                 <h1>
-                  {profile?.name ? profile?.name : "Username anda tidak valid"}
+                  {profile?.profile?.name
+                    ? profile?.profile?.name
+                    : "Username anda tidak valid"}
                 </h1>
               </div>
             </div>
@@ -139,7 +141,9 @@ const Profile = () => {
               <div className="pointer-events-none flex items-center gap-4 p-2">
                 <LuMail />
                 <h1>
-                  {profile?.email ? profile?.email : "Email anda Tidak Valid"}
+                  {profile?.profile?.email
+                    ? profile?.profile?.email
+                    : "Email anda Tidak Valid"}
                 </h1>
               </div>
             </div>
@@ -152,7 +156,9 @@ const Profile = () => {
               <div className="pointer-events-none flex items-center gap-4 p-2">
                 <LuPhone />
                 <h1>
-                  {profile?.noHp ? profile?.noHp : "No Hp Belum Dimasukkan"}
+                  {profile?.profile?.noHp
+                    ? profile?.profile?.noHp
+                    : "No Hp Belum Dimasukkan"}
                 </h1>
               </div>
             </div>
@@ -165,8 +171,8 @@ const Profile = () => {
               <div className="pointer-events-none flex items-center gap-4 p-2">
                 <LuMapPin />
                 <h1>
-                  {profile?.alamat
-                    ? profile?.alamat
+                  {profile?.profile?.alamat
+                    ? profile?.profile?.alamat
                     : "Alamat Belum Dimasukkan"}
                 </h1>
               </div>
@@ -180,7 +186,7 @@ const Profile = () => {
               <div className="pointer-events-none flex items-center gap-4 p-2">
                 <LuTarget />
                 <h1>{`${
-                  profile?.status_eo === true
+                  profile?.profile?.status_eo
                     ? "Akun anda adalah EO"
                     : "Belum Menjadi EO"
                 }`}</h1>

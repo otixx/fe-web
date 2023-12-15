@@ -1,17 +1,32 @@
-import Footer from "@/components/common/Footer";
-import Sidebar from "@/components/common/Sidebar";
-import { Outlet, useLocation } from "react-router-dom";
-
+import Footer from "@/components/Footer";
+import Sidebar from "@/components/Sidebar";
+import { useProfile } from "@/service/user/user.service";
+import { useEffect } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 const LayoutEO = () => {
   const registerPath = useLocation();
+  const isProfileRoute = location.pathname === "/profile";
+  const profile = useProfile((state) => state?.profile);
+  const token = Cookies.get("token");
+  const navigate = useNavigate();
+  useEffect(() => {
+    protectRouteEO();
+  }, []);
+
+  const protectRouteEO = () => {
+    if (token && !profile?.profile?.status_eo) {
+      navigate("/profile/eo/register");
+    }
+  };
   return (
     <>
       <div className="flex flex-row">
         {registerPath?.pathname !== "/profile/eo/register" &&
-          registerPath?.pathname !== "/profile/user" && <Sidebar />}
+          registerPath?.pathname !== "/profile" && <Sidebar />}
         <Outlet />
       </div>
-      <Footer />
+      {isProfileRoute && <Footer />}
     </>
   );
 };

@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { LoadingOutlined } from "@ant-design/icons";
 import { Alert, Spin } from "antd";
@@ -14,8 +12,8 @@ const RegisterEO = () => {
   const [msg, setMsg] = useState("");
   const [status, setStatus] = useState(false);
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-
   const navigate = useNavigate();
+
   const handleLogin = async (e: any) => {
     e.preventDefault();
     setTimeout(() => {

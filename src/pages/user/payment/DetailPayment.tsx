@@ -1,55 +1,10 @@
 import { useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios, { AxiosResponse } from "axios";
-import Cookies from "js-cookie";
 import BarcodePopup from "./pay";
+import { privateApi } from "@/shared/axios/axios";
+import { Ticket } from "@/interface/ticket.interface";
 
 const DetailPayment = () => {
-  interface Ticket {
-    nama_kegiatan: string;
-    date: string;
-    harga: string;
-    location: string;
-    image_url: string;
-    event: {
-      tanggal_acara: string;
-      lokasi: string;
-      description: string;
-    };
-    id: string;
-    tags: string;
-  }
-  interface BarcodeResponse {
-    message: string;
-    response: {
-      status_code: string;
-      status_message: string;
-      transaction_id: string;
-      actions: [
-        {
-          name: string;
-          method: string;
-          url: string;
-        },
-        {
-          name: string;
-          method: string;
-          url: string;
-        },
-        {
-          name: string;
-          method: string;
-          url: string;
-        },
-        {
-          name: string;
-          method: string;
-          url: string;
-        },
-      ];
-    };
-  }
-
   const [Tiket, setTiket] = useState<Ticket[]>([]);
   const idTiket = useParams().id;
   const location = useLocation();
@@ -61,8 +16,7 @@ const DetailPayment = () => {
   const [noHp, setNoHp] = useState("");
   const [lagu, setLagu] = useState("");
   const [cosplay, setCosplay] = useState("");
-  const getToken: any = Cookies.get("token");
-  const token = JSON.parse(getToken);
+
   const [showPopup, setShowPopup] = useState(false);
   const [barcodeData, setBarcodeData] = useState("");
   const [idTransaction, setIdTransaction] = useState("");
@@ -79,9 +33,7 @@ const DetailPayment = () => {
   useEffect(() => {
     const getTiket = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BE_URL}/tiket/${idTiket}`,
-        );
+        const response = await privateApi.get(`/tiket/${idTiket}`);
         setTiket([response.data.data]);
       } catch (error: any) {
         console.log(error.response);
@@ -130,14 +82,9 @@ const DetailPayment = () => {
 
     const pushSubmit = async () => {
       try {
-        const responses: AxiosResponse<BarcodeResponse> = await axios.post(
-          `${import.meta.env.VITE_BE_URL}/transaction/${idTiket}`,
+        const responses = await privateApi.post(
+          `/transaction/${idTiket}`,
           data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
         );
         if (isDesktop === false && selectedMethod === "shopeepay") {
           setIdTransaction(responses.data.response.transaction_id);

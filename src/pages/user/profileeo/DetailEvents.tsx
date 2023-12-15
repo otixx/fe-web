@@ -1,297 +1,164 @@
-import { useState, useEffect } from "react";
-import { LuXCircle } from "react-icons/lu";
-import axios from "axios";
-import Cookies from "js-cookie";
-import { useParams } from "react-router-dom";
-import Popup from "@/components/user/Popup";
+import { useState } from "react";
+import { LuScan, LuTicket } from "react-icons/lu";
+import { useNavigate, useParams } from "react-router-dom";
+import { privateApi } from "@/shared/axios/axios";
+import { Ticket } from "@/interface/ticket.interface";
+import { Button, DatePicker, Form, Input, Modal, Select } from "antd";
+import { FormatDayjs, FormatDayjsInput } from "@/shared/dayjs/format";
+import { LoadingOutlined } from "@ant-design/icons";
+import { QfindTicketbyEvent } from "@/service/ticket/ticket.service";
+import dayjs from "dayjs";
+import toast from "react-hot-toast";
 
 const DetailEvents = () => {
-  interface Tiket {
-    id: string;
-    nama_kegiatan: string;
-    tags: string;
-    tanggal_preorder: string;
-    tanggal_expired: string;
-    harga: string;
-  }
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [kegiatan, setKegiatan] = useState("");
-  const [harga, setHarga] = useState("");
-  const [tags, setTags] = useState("");
-  const [preorder, setPreorder] = useState("");
-  const [expired, setExpired] = useState("");
-  const [file, setFile] = useState<File[]>([]);
-  const [tiket, setTiket] = useState<Tiket[]>([]);
-  const idEvent = useParams().id;
+  const [openEdit, setOpenEdit] = useState(false);
+  const [detailData, setDetailData] = useState({} as Ticket);
 
-  const getToken: any = Cookies.get("token");
-  const token = JSON.parse(getToken);
+  const idEvent: any = useParams().id;
+  const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState<any>();
 
-  useEffect(() => {
-    const getEvent = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BE_URL}/tiket/event/${idEvent}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-        setTiket(response.data.data);
-      } catch (error: any) {
-        console.log(error.response);
-      }
-    };
-    getEvent();
-  }, []);
+  // Check Device
+  let userAgent = navigator.userAgent;
+  let isMobile = /Mobi/.test(userAgent);
+  let isTablet = /Tablet|iPad/.test(userAgent);
+  let isDesktop = !isMobile && !isTablet;
 
-  const handleOpen = () => {
-    setOpen(true);
+  const { data: tiket } = QfindTicketbyEvent(idEvent);
+  const { Item } = Form;
+
+  const handleOpenUpdate = (element: Ticket) => {
+    setOpenEdit(true);
+    setDetailData(element);
   };
-  const handleClose = () => {
-    setOpen(false);
-  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
+    console.log(fileList);
     if (fileList) {
       const fileArray = Array.from(fileList) as File[];
-
-      if (fileArray.length > 1) {
-        fileArray.forEach((item) => {
-          setFile((prevFiles) => [...prevFiles, item]);
-        });
-      } else {
-        setFile(fileArray);
-      }
+      console.log(fileArray);
+      setFile(fileArray[0]);
     }
   };
 
-  const handleAddTiket = async () => {
+  const handleAddTiket = async (value: any) => {
+    setLoading(true);
     const formData = new FormData();
-
-    // Append additional fields
-    formData.append("nama_kegiatan", kegiatan);
-    formData.append("harga", harga);
-    formData.append("tags", tags);
-
-    function formatTanggal(tanggal: any) {
-      const dateObject = new Date(tanggal);
-
-      // Dapatkan tanggal, bulan, dan tahun dari objek Date
-      const day = dateObject.getDate();
-      const month = dateObject.getMonth() + 1; // Ingat: bulan dimulai dari 0
-      const year = dateObject.getFullYear();
-
-      // Format tanggal, bulan, dan tahun sesuai dengan "DD/MM/YYYY"
-      const formattedDate = `${day}/${month}/${year}`;
-      return formattedDate;
-    }
-
+    formData.append("nama_kegiatan", value?.nama_kegiatan);
+    formData.append("harga", value?.harga);
+    formData.append("tags", value?.tags);
     formData.append(
       "tanggal_preorder",
-      formatTanggal(preorder) === "NaN/NaN/NaN" ? "" : formatTanggal(preorder),
+      value?.tanggal_preorder.format(FormatDayjsInput),
     );
     formData.append(
       "tanggal_expired",
-      formatTanggal(expired) === "NaN/NaN/NaN" ? "" : formatTanggal(expired),
+      value?.tanggal_expired.format(FormatDayjsInput),
     );
+    formData.append("image", file);
+    try {
+      const res = await privateApi.post(`/tiket/${idEvent}`, formData);
+      toast.success(res?.data?.message);
+      setLoading(false);
+      setOpen(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
+  };
+  const handleUpdateTiket = async (value: any) => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("nama_kegiatan", value?.nama_acara);
+    formData.append("harga", value?.harga);
+    formData.append("tags", value?.tags);
+    formData.append(
+      "tanggal_preorder",
+      value?.tanggal_pre.format(FormatDayjsInput),
+    );
+    formData.append(
+      "tanggal_expired",
+      value?.tanggal_exp.format(FormatDayjsInput),
+    );
+    formData.append("file", file);
+    console.log(file);
 
-    // Append multiple files
-    file.forEach((fileItem) => formData.append("image", fileItem));
-    // await axios
-    //   .post(
-    //     `${import.meta.env.VITE_BE_URL}/tiket/${idEvent}`,
-    //     {
-    //       nama_kegiatan: kegiatan,
-    //       harga: harga,
-    //       tags: tags,
-    //       tanggal_preorder: preorder,
-    //       tanggal_expired: expired,
-    //       image: file,
-    //     },
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     }
-    //   )
-    //   .then((response) => {
-    //     console.log(response);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-    console.log(formData);
+    try {
+      const res = await privateApi.put(`/tiket/${detailData?.id}`, formData);
+      toast.success(res?.data?.message);
+      setLoading(false);
+      setOpenEdit(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
+    setLoading(false);
   };
 
-  // const handleUpdateTiket = async () => {
-  //     await axios.put(`${import.meta.env.VITE_URL}tiket/${id}`, {
-  //         nama_kegiatan: kegiatan,
-  //         harga: harga,
-  //         tags: tags,
-  //         tanggal_preorder: preorder,
-  //         tanggal_expired: expired,
-  //         image: file
-  //     }, {
-  //         headers: {
-  //             Authorization: `Bearer ${token}`
-  //         }
-  //     }).then((response) => {
-  //         console.log(response)
-  //     }).catch((error) => {
-  //         console.log(error)
-  //     })
-  // }
+  const filterOption = (
+    input: string,
+    option?: { label: string; value: string },
+  ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+
   return (
-    <div className="flex flex-row">
-      <div className="w-full px-4 py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Event / Tiket</h1>
-          <div className="btnSignin cursor-pointer rounded-full bg-secondColors px-8 py-3 hover:border-secondColors hover:bg-mainColors">
+    <div className="w-full">
+      <div className="grid h-28 grid-cols-12 items-center px-2">
+        <div className="col-span-6">
+          <h1 className="text-2xl font-bold">Event</h1>
+        </div>
+        <div className="col-span-6 flex justify-end">
+          <button
+            onClick={() => setOpen(true)}
+            className="btnSignin my-2 flex w-32 cursor-pointer items-center justify-center gap-2 rounded-full bg-secondColors px-3 text-[14px] text-sm font-semibold text-white shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3"
+          >
+            <LuTicket />
+            Tambah Tiket
+          </button>
+        </div>
+      </div>
+      <div className="flex justify-end">
+        {isDesktop === true ? null : (
+          <div className="cursor-pointer rounded-full bg-secondColors px-8 py-3 hover:border-secondColors hover:bg-mainColors">
             <button
-              onClick={() => handleOpen()}
-              className="text-[14px] font-semibold text-white"
+              onClick={() => navigate("/scan")}
+              className="flex items-center justify-center gap-2 text-[14px] font-semibold text-white"
             >
-              Tambah Tiket
+              <LuScan />
+              Scan
             </button>
           </div>
-          {open && (
-            <Popup onConfirm={handleClose}>
-              <div className="relative max-h-full w-full max-w-md">
-                <div className="relative rounded-lg bg-white shadow">
-                  <button
-                    type="button"
-                    onClick={() => handleClose()}
-                    className="absolute right-2.5 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent text-black hover:bg-gray-200"
-                    data-modal-hide="authentication-modal"
-                  >
-                    <LuXCircle />
-                  </button>
-                  <div className="px-6 py-6 lg:px-8">
-                    <h3 className="mb-4 text-2xl font-semibold text-black">
-                      Tambahkan Tiket
-                    </h3>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          Nama Tiket
-                        </label>
-                        <input
-                          type="text"
-                          onChange={(e) => setKegiatan(e.target.value)}
-                          className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          harga
-                        </label>
-                        <input
-                          type="number"
-                          min="10000"
-                          step="100"
-                          required
-                          onChange={(e) => setHarga(e.target.value)}
-                          className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          Tags
-                        </label>
-                        <select
-                          value={tags}
-                          className="block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                          onChange={(e) => setTags(e.target.value)}
-                        >
-                          <option selected value="">
-                            {" "}
-                            Pilih Tags
-                          </option>
-                          <option value={`Music`}> Music</option>
-                          <option value={`Cosplay`}> Cosplayer</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          Tanggal Preorder
-                        </label>
-                        <input
-                          type="date"
-                          onChange={(e) => setPreorder(e.target.value)}
-                          className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          Tanggal Expired
-                        </label>
-                        <input
-                          type="date"
-                          onChange={(e) => setExpired(e.target.value)}
-                          className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-black">
-                          Gambar Tiket
-                        </label>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                        />
-                      </div>
-                      <div className="flex justify-end gap-2 py-2">
-                        <button
-                          type="submit"
-                          onClick={() => handleClose()}
-                          className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleAddTiket()}
-                          className=" rounded-full bg-mainColors px-10 py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
-                        >
-                          Submit
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Popup>
-          )}
-        </div>
-        <div className="py-4">
-          <div className=" bg-red-200 shadow-md sm:rounded-lg">
+        )}
+      </div>
+      <div className="grid grid-cols-12 px-2">
+        <div className="col-span-12">
+          <div className=" relative overflow-x-auto shadow-md sm:rounded-lg ">
             <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
               <caption className="bg-white p-5 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
                 List Tiket
                 <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
-                  Lihat Semua Data anda disini
+                  Lihat Semua Tiket Event disini
                 </p>
               </caption>
+
               <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th scope="col" className="px-6 py-3">
                     Nama Tiket
                   </th>
                   <th scope="col" className="px-6 py-3">
-                    Harga
+                    harga
                   </th>
                   <th scope="col" className="px-6 py-3">
                     Tags
                   </th>
                   <th scope="col" className="px-6 py-3">
-                    Tgl Preorder
+                    Tanggal Pre Order
                   </th>
                   <th scope="col" className="px-6 py-3">
-                    Tgl Exp
+                    Tanggal Expired
                   </th>
                   <th scope="col" className="px-6 py-3">
                     Action
@@ -299,54 +166,258 @@ const DetailEvents = () => {
                 </tr>
               </thead>
               <tbody>
-                {tiket.map((element, index) => (
-                  <tr
-                    className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
-                    key={index}
-                  >
-                    <th
-                      scope="row"
-                      className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white"
-                    >
-                      {element?.nama_kegiatan}
-                    </th>
-                    <td className="px-6 py-4">{element?.harga}</td>
-                    <td className="px-6 py-4">{element?.tags}</td>
-                    <td className="px-6 py-4">{`${new Date(
-                      element?.tanggal_preorder,
-                    ).getDate()} ${new Date(
-                      element?.tanggal_preorder,
-                    ).toLocaleString("default", { month: "long" })} ${new Date(
-                      element?.tanggal_preorder,
-                    ).getFullYear()}`}</td>
-                    <td className="px-6 py-4">{`${new Date(
-                      element?.tanggal_expired,
-                    ).getDate()} ${new Date(
-                      element?.tanggal_expired,
-                    ).toLocaleString("default", { month: "long" })} ${new Date(
-                      element?.tanggal_expired,
-                    ).getFullYear()}`}</td>
-                    <td className="flex gap-4 px-6 py-4 text-center">
-                      <a
-                        href="#"
-                        className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                {tiket &&
+                  tiket.map((element, index: number) => {
+                    return (
+                      <tr
+                        className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
+                        key={index}
                       >
-                        Edit
-                      </a>
-                      <a
-                        href="#"
-                        className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-                      >
-                        Delete
-                      </a>
-                    </td>
-                  </tr>
-                ))}
+                        <td
+                          scope="row"
+                          className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white"
+                        >
+                          {element?.nama_kegiatan}
+                        </td>
+                        <td className="px-6 py-4">{element?.harga}</td>
+                        <td className="px-6 py-4">{element?.tags}</td>
+                        <td className="px-6 py-4">
+                          {dayjs(element?.tanggal_preorder).format(FormatDayjs)}
+                        </td>
+                        <td className="px-6 py-4">
+                          {dayjs(element?.tanggal_expired).format(FormatDayjs)}
+                        </td>
+                        <td className="flex items-center gap-4 px-6 py-4 text-center">
+                          <Button
+                            onClick={() => handleOpenUpdate(element)}
+                            type="default"
+                          >
+                            Edit
+                          </Button>
+                          <Button type="primary" danger>
+                            Delete
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+      {open && (
+        <Modal
+          footer={false}
+          width={768}
+          title="Tambahkan Tiket"
+          open={open}
+          onCancel={() => setOpen(false)}
+        >
+          <Form name="basic" layout="vertical" onFinish={handleAddTiket}>
+            <Item
+              rules={[{ required: true, message: "Nama Tiket Wajib Diisi" }]}
+              name="nama_kegiatan"
+              label="Nama Tiket"
+            >
+              <Input size="large" disabled={loading} />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Harga Wajib Diisi" }]}
+              name="harga"
+              label="Harga"
+            >
+              <Input size="large" type="number" disabled={loading} />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Lokasi Event Wajib" }]}
+              name="tags"
+              label="Tags"
+            >
+              <Select
+                size="large"
+                disabled={loading}
+                showSearch
+                placeholder="Pilih Tags"
+                optionFilterProp="children"
+                filterOption={filterOption}
+                options={[
+                  {
+                    value: "music",
+                    label: "Music",
+                  },
+                  {
+                    value: "cosplay",
+                    label: "Cosplay",
+                  },
+                ]}
+              />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Tanggal Pre Order Wajib" }]}
+              name="tanggal_preorder"
+              label="Tanggal Pre Order"
+            >
+              <DatePicker
+                format={FormatDayjsInput}
+                size="large"
+                disabled={loading}
+              />
+            </Item>
+            <Item
+              rules={[
+                { required: true, message: "Tanggal Expired Tiket Wajib" },
+              ]}
+              name="tanggal_expired"
+              label="Tanggal Expired"
+            >
+              <DatePicker
+                format={FormatDayjsInput}
+                size="large"
+                disabled={loading}
+              />
+            </Item>
+            <Item
+              rules={[
+                { required: true, message: "Tanggal Expired Tiket Wajib" },
+              ]}
+              label="Gambar Tiket"
+            >
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
+              />
+            </Item>
+            <div className="flex justify-end gap-2 py-2">
+              <button
+                onClick={() => setOpen(false)}
+                className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={loading}
+                type="submit"
+                className="flex w-32 items-center justify-center rounded-full bg-mainColors py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
+              >
+                {loading ? <LoadingOutlined /> : "Create"}
+              </button>
+            </div>
+          </Form>
+        </Modal>
+      )}
+
+      {openEdit && (
+        <Modal
+          footer={false}
+          width={768}
+          title="Edit Event"
+          open={openEdit}
+          onCancel={() => setOpenEdit(false)}
+        >
+          <Form
+            fields={[
+              {
+                name: "nama_acara",
+                value: detailData?.nama_kegiatan,
+              },
+              {
+                name: "harga",
+                value: detailData?.harga,
+              },
+              {
+                name: "tags",
+                value: detailData?.tags,
+              },
+              {
+                name: "tanggal_pre",
+                value: dayjs(detailData?.tanggal_preorder),
+              },
+              {
+                name: "tanggal_exp",
+                value: dayjs(detailData?.tanggal_expired),
+              },
+            ]}
+            name="basic"
+            layout="vertical"
+            onFinish={handleUpdateTiket}
+          >
+            <Item name="nama_acara" label="Nama Acara">
+              <Input size="large" disabled={loading} />
+            </Item>
+            <Item name="harga" label="Deskripsi">
+              <Input type="number" size="large" disabled={loading} />
+            </Item>
+
+            <Item name="tags" label="Nama Acara">
+              <Select
+                size="large"
+                disabled={loading}
+                showSearch
+                placeholder="Pilih Kota"
+                optionFilterProp="children"
+                filterOption={filterOption}
+                options={[
+                  {
+                    value: "music",
+                    label: "Music",
+                  },
+                  {
+                    value: "cosplay",
+                    label: "Cosplay",
+                  },
+                ]}
+              />
+            </Item>
+            <Item name="tanggal_pre" label="Tanggal Pre Order">
+              <DatePicker
+                format={FormatDayjsInput}
+                size="large"
+                disabled={loading}
+              />
+            </Item>
+            <Item name="tanggal_exp" label="Tanggal Expired">
+              <DatePicker
+                format={FormatDayjsInput}
+                size="large"
+                disabled={loading}
+              />
+            </Item>
+            {/* <Item label="Upload Gambar Event" name="file">
+              <Upload
+                fileList={[
+                  {
+                    uid: "1",
+                    name: "file.png",
+                  },
+                ]}
+                onChange={handleFile}
+                accept=".png,.jpg,.jpeg"
+                maxCount={1}
+              >
+                <Button icon={<LuUpload />}>Upload</Button>
+              </Upload>
+            </Item> */}
+            <div className="flex justify-end gap-2 py-2">
+              <button
+                onClick={() => setOpenEdit(false)}
+                className="bg-red flex w-32 items-center justify-center rounded-full border-2 border-mainColors bg-white py-2 text-center text-sm font-semibold text-mainColors transition duration-500 hover:border-secondColors hover:bg-secondColors hover:text-white focus:outline-none focus:ring-4"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-red flex w-32 items-center justify-center rounded-full bg-mainColors py-2 text-center text-sm font-semibold text-white transition duration-500 hover:bg-secondColors focus:outline-none focus:ring-4"
+              >
+                {loading ? <LoadingOutlined /> : "Update"}
+              </button>
+            </div>
+          </Form>
+        </Modal>
+      )}
     </div>
   );
 };

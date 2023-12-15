@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // components/BarcodePopup.js
@@ -16,13 +16,13 @@ const BarcodePopup: React.FC<BarcodePopupProps> = ({
 }) => {
   const navigate = useNavigate();
   const [paymentStatus, setPaymentStatus] = useState<"pending" | "success">(
-    "pending"
+    "pending",
   );
 
   const handlePay = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BE_URL}/transaction/${idTransaction}`
+        `${import.meta.env.VITE_BE_URL}/transaction/${idTransaction}`,
       );
       if (response.data.status_payment === "settlement") {
         setPaymentStatus("success");
@@ -38,25 +38,25 @@ const BarcodePopup: React.FC<BarcodePopupProps> = ({
       <div className="popup">
         {paymentStatus === "success" ? (
           <>
-            <div className="p-8  rounded-md shadow-md text-center">
+            <div className="rounded-md  p-8 text-center shadow-md">
               <img
                 src="https://logowik.com/content/uploads/images/wallet8302.logowik.com.webp"
                 alt="Success Logo"
                 className="mx-auto mb-4"
               />
 
-              <h2 className="text-2xl font-bold mb-4">Pembelian Berhasil</h2>
+              <h2 className="mb-4 text-2xl font-bold">Pembelian Berhasil</h2>
 
-              <p className="text-gray-600 mb-4">
+              <p className="mb-4 text-gray-600">
                 Terima kasih! Pembelian tiket telah berhasil.
               </p>
 
               <button
-                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+                className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                 onClick={() => {
                   console.log("direct ke halaman tiket yang sudah di beli");
                   onClose();
-                  navigate("/profile/eo");
+                  navigate("/history");
                 }}
               >
                 Selesai
@@ -65,22 +65,22 @@ const BarcodePopup: React.FC<BarcodePopupProps> = ({
           </>
         ) : (
           <>
-            <div className="p-4 bg-gray-100 rounded-md shadow-md">
-              <h2 className="text-2xl font-bold mb-4">Barcode</h2>
+            <div className="rounded-md bg-gray-100 p-4 shadow-md">
+              <h2 className="mb-4 text-2xl font-bold">Barcode</h2>
 
               {/* Tampilkan barcode di sini */}
               <img src={barcodeData} alt="Barcode" className="mb-4" />
 
               <div className="flex justify-end space-x-4">
                 <button
-                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded-md"
+                  className="rounded-md bg-gray-300 px-4 py-2 hover:bg-gray-400"
                   onClick={onClose}
                 >
                   Tutup
                 </button>
 
                 <button
-                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+                  className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                   onClick={handlePay}
                 >
                   Selesaikan Pembayaran

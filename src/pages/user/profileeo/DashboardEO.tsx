@@ -1,425 +1,363 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { LuXCircle } from "react-icons/lu";
+import { useState } from "react";
+import { LuCalendarPlus, LuUpload } from "react-icons/lu";
+import { QfindEvents } from "@/service/events/events.service";
+import { Button, DatePicker, Form, Input, Modal, Select, Upload } from "antd";
+import { ICreateEventsProps, IEvent } from "@/interface/event.interface";
+import { LoadingOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
+import { FormatDayjs, FormatDayjsInput } from "@/shared/dayjs/format";
 import { privateApi } from "@/shared/axios/axios";
-import { IEvent } from "@/interface/event/event.interface";
-import Popup from "@/components/user/Popup";
-import { getEvent } from "@/service/events/events.service";
+import toast from "react-hot-toast";
 
 const DashboardEO = () => {
   const navigate = useNavigate();
-  const [acara, setAcara] = useState("");
-  const [description, setDescription] = useState("");
-  const [tanggal, setTanggal] = useState("");
-  const [lokasi, setLokasi] = useState("");
-  const [file, setFile] = useState<File[]>([]);
-  const [open, setOpen] = useState(false);
-  const [eventUpdate, setEventUpdate] = useState(false);
-  const [event, setEvent] = useState<IEvent[]>([]);
+  const [loading, setLoading] = useState(false);
   const [idEvent, setIdEvent] = useState("");
+  const [openEdit, setOpenEdit] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [file, setFile] = useState("");
+  const [valueEdit, setValueEdit] = useState({} as IEvent);
 
-  useEffect(() => {
-    getEvent()
-      .then((res) => setEvent(res))
-      .catch((err) => console.log(err));
-  }, []);
+  const { Item } = Form;
+  const { data: event } = QfindEvents();
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const handleOpenUpdate = (id: string) => {
-    setIdEvent(id);
-    setEventUpdate(true);
-  };
-  const handleCloseUpdate = () => {
-    setEventUpdate(false);
+  const handleOpenUpdate = (value: IEvent) => {
+    setIdEvent(value?.id);
+    setOpenEdit(true);
+    setValueEdit(value);
   };
 
-  const handleAddEvents = async () => {
+  const handleAddEvents = async (value: ICreateEventsProps) => {
+    setLoading(true);
     const formData = new FormData();
-    formData.append("nama_acara", acara);
-    formData.append("description", description);
-
-    const dateObject = new Date(tanggal);
-    const day = dateObject.getDate();
-    const month = dateObject.getMonth() + 1;
-    const year = dateObject.getFullYear();
-
-    const formattedDate = `${day}/${month}/${year}`;
+    formData.append("nama_acara", value?.nama_acara);
+    formData.append("description", value?.description);
     formData.append(
       "tanggal_acara",
-      formattedDate === "NaN/NaN/NaN" ? "" : formattedDate,
+      dayjs(value?.tanggal_acara).format(FormatDayjsInput),
     );
-    formData.append("lokasi", lokasi);
-
-    file.forEach((fileItem) => formData.append("image", fileItem));
+    formData.append("lokasi", value?.lokasi);
+    formData.append("file", file);
 
     await privateApi
       .post(`/event`, formData)
       .then((response) => {
-        console.log(response);
-        handleClose();
+        setLoading(false);
+        setOpen(false);
+        toast.success(response?.data?.message);
       })
       .catch((error) => {
-        console.log(error.response.data, "sd");
+        setLoading(false);
+        console.log(error);
+        toast.error(error?.response?.data?.message);
       });
   };
 
-  const handleUpdateEvents = async () => {
-    console.log(acara, description, tanggal, lokasi, file);
+  const handleUpdateEvents = async (value: ICreateEventsProps) => {
     const formData = new FormData();
-
-    formData.append("nama_acara", acara);
-    formData.append("description", description);
-
-    const dateObject = new Date(tanggal);
-
-    const day = dateObject.getDate();
-    const month = dateObject.getMonth() + 1; // Ingat: bulan dimulai dari 0
-    const year = dateObject.getFullYear();
-
-    const formattedDate = `${day}/${month}/${year}`;
+    formData.append("nama_acara", value?.nama_acara);
+    formData.append("description", value?.description);
     formData.append(
       "tanggal_acara",
-      formattedDate === "NaN/NaN/NaN" ? "" : formattedDate,
+      dayjs(value?.tanggal_acara).format(FormatDayjsInput),
     );
-    formData.append("lokasi", lokasi);
-
-    file.forEach((fileItem) => formData.append("image", fileItem));
-
-    await privateApi
-      .put(`/event/update/${idEvent}`, formData)
-      .then(() => {
-        setAcara("");
-        setDescription("");
-        setLokasi("");
-        setTanggal("");
-        setFile([]);
-        handleCloseUpdate();
-      })
-      .catch((error) => {
-        console.log(error.response.data);
-      });
-  };
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileList = e.target.files;
-    if (fileList) {
-      const fileArray = Array.from(fileList) as File[];
-
-      if (fileArray.length > 1) {
-        fileArray.forEach((item) => {
-          setFile((prevFiles) => [...prevFiles, item]);
-        });
-      } else {
-        setFile(fileArray);
-      }
+    formData.append("lokasi", value?.lokasi);
+    formData.append("file", file);
+    try {
+      const res = await privateApi.put(`/event/update/${idEvent}`, formData);
+      setOpenEdit(false);
+      toast.success(res?.data?.message);
+    } catch (error) {
+      console.log(error);
     }
   };
+
+  const filterOption = (
+    input: string,
+    option?: { label: string; value: string },
+  ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+
+  const handleFile = (info: any) => {
+    setFile(info?.file);
+  };
+
   return (
-    <div className="w-full px-4 py-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Event</h1>
-        <div className="btnSignin cursor-pointer rounded-full bg-secondColors px-8 py-3 hover:border-secondColors hover:bg-mainColors">
+    <div className="w-full">
+      <div className="grid h-28 grid-cols-12 items-center px-2">
+        <div className="col-span-6">
+          <h1 className="text-2xl font-bold">Event</h1>
+        </div>
+        <div className="col-span-6 flex justify-end">
           <button
-            onClick={() => handleOpen()}
-            className="text-[14px] font-semibold text-white"
+            onClick={() => setOpen(true)}
+            className="btnSignin my-2 flex w-32 cursor-pointer items-center justify-center gap-2 rounded-full bg-secondColors px-3 text-[14px] text-sm font-semibold text-white shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3"
           >
+            <LuCalendarPlus />
             Tambah Event
           </button>
         </div>
       </div>
-      {open && (
-        <Popup onConfirm={handleClose}>
-          <div className="relative max-h-full w-full max-w-md">
-            <div className="relative rounded-lg bg-white shadow">
-              <button
-                type="button"
-                onClick={() => handleClose()}
-                className="absolute right-2.5 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent text-black hover:bg-gray-200"
-                data-modal-hide="authentication-modal"
-              >
-                <LuXCircle />
-              </button>
-              <div className="px-6 py-6 lg:px-8">
-                <h3 className="mb-4 text-2xl font-semibold text-black">
-                  Tambahkan Events
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Nama Acara
-                    </label>
-                    <input
-                      type="text"
-                      onChange={(e) => setAcara(e.target.value)}
-                      className=" block h-10 w-full rounded-sm border  border-gray-300 p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Dekripsi
-                    </label>
-                    <textarea
-                      onChange={(e) => setDescription(e.target.value)}
-                      className=" block h-20 w-full rounded-sm border  border-gray-300 p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Lokasi
-                    </label>
-                    <select
-                      value={lokasi}
-                      className="block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                      onChange={(e) => setLokasi(e.target.value)}
-                    >
-                      <option selected value={""}>
-                        {" "}
-                        Lokasi
-                      </option>
-                      <option value={`Jember`}> Jember</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Tanggal Acara
-                    </label>
-                    <input
-                      type="date"
-                      onChange={(e) => setTanggal(e.target.value)}
-                      className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Gambar Event
-                    </label>
-                    <input
-                      type="file"
-                      id="imageUpload"
-                      name="imageUpload"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageChange}
-                      className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2 py-2">
-                    <button
-                      type="submit"
-                      onClick={() => handleClose()}
-                      className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleAddEvents()}
-                      className=" rounded-full bg-mainColors px-10 py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
-                    >
-                      Create
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Popup>
-      )}
-      {eventUpdate && (
-        <Popup onConfirm={handleCloseUpdate}>
-          <div className="relative max-h-full w-full max-w-md">
-            <div className="relative rounded-lg bg-white shadow">
-              <button
-                type="button"
-                onClick={() => handleCloseUpdate()}
-                className="absolute right-2.5 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent text-black hover:bg-gray-200"
-                data-modal-hide="authentication-modal"
-              >
-                <LuXCircle />
-              </button>
-              <div className="px-6 py-6 lg:px-8">
-                <h3 className="mb-4 text-2xl font-semibold text-black">
-                  Update Events
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Nama Acara
-                    </label>
-                    <input
-                      type="text"
-                      onChange={(e) => setAcara(e.target.value)}
-                      className=" block h-10 w-full rounded-sm border  border-gray-300 p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Dekripsi
-                    </label>
-                    <textarea
-                      onChange={(e) => setDescription(e.target.value)}
-                      className=" block h-20 w-full rounded-sm border  border-gray-300 p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Lokasi
-                    </label>
-                    <select
-                      value={lokasi}
-                      className="block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                      onChange={(e) => setLokasi(e.target.value)}
-                    >
-                      <option selected value="">
-                        {" "}
-                        Lokasi
-                      </option>
-                      <option value={`Jember`}> Jember</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Tanggal Acara
-                    </label>
-                    <input
-                      type="date"
-                      onChange={(e) => setTanggal(e.target.value)}
-                      className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Gambar Event
-                    </label>
-                    <input
-                      type="file"
-                      id="imageUpload"
-                      name="imageUpload"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageChange}
-                      className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2 py-2">
-                    <button
-                      type="submit"
-                      onClick={() => handleCloseUpdate()}
-                      className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleUpdateEvents()}
-                      className=" rounded-full bg-mainColors px-10 py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
-                    >
-                      Update
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Popup>
-      )}
-      <div className="py-4">
-        <div className=" bg-red-200 shadow-md sm:rounded-lg">
-          <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-            <caption className="bg-white p-5 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
-              List Event
-              <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
-                Lihat Semua Data anda disini
-              </p>
-            </caption>
-            <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                  Nama Acara
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Lokasi
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Status
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {event.map((element, index) => (
-                <tr
-                  className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
-                  key={index}
-                >
-                  <td
-                    scope="row"
-                    className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white"
-                  >
-                    {element?.nama_acara}
-                  </td>
-                  <td className="px-6 py-4">{element?.lokasi}</td>
-                  {element.tanggal_acara > new Date().toISOString() ? (
-                    <>
-                      <td className="px-6 py-4">tanggal masih aktif</td>
-                    </>
-                  ) : (
-                    <>
-                      <td className="px-6 py-4">tanggal sudah lewat</td>
-                    </>
-                  )}
-
-                  <td className="flex gap-4 px-6 py-4 text-center">
-                    {element.tanggal_acara > new Date().toISOString() ? (
-                      <>
-                        <div
-                          onClick={() => handleOpenUpdate(element.id)}
-                          className="cursor-pointer font-medium text-blue-600 hover:underline dark:text-blue-500"
-                        >
-                          Edit
-                        </div>
-                        <div
-                          onClick={() =>
-                            navigate(`/profile/eo/events/${element.id}`)
-                          }
-                          className="cursor-pointer font-medium text-blue-600 hover:underline dark:text-blue-500 "
-                        >
-                          View
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div
-                          style={{ pointerEvents: "none" }}
-                          className="cursor-pointer font-medium text-gray-600 hover:underline dark:text-blue-500"
-                        >
-                          Edit
-                        </div>
-                        <div
-                          style={{ pointerEvents: "none" }}
-                          className="cursor-pointer font-medium text-gray-600 hover:underline dark:text-blue-500 "
-                        >
-                          View
-                        </div>
-                      </>
-                    )}
-
-                    <div className="cursor-pointer font-medium text-red-600 hover:underline dark:text-blue-500">
-                      Delete
-                    </div>
-                  </td>
+      <div className="grid grid-cols-12 px-2">
+        <div className="col-span-12">
+          <div className=" relative overflow-x-auto shadow-md sm:rounded-lg ">
+            <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+              <caption className="bg-white p-5 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
+                List Event
+                <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
+                  Lihat Semua Data anda disini
+                </p>
+              </caption>
+              <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                  <th scope="col" className="px-6 py-3">
+                    Nama Acara
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Lokasi
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Action
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {event &&
+                  event.map((element: IEvent, index: number) => {
+                    const dateEvent =
+                      dayjs(element.tanggal_acara).format(FormatDayjs) >
+                        dayjs().format(FormatDayjs) ||
+                      dayjs(element.tanggal_acara).format(FormatDayjs) ==
+                        dayjs().format(FormatDayjs);
+                    return (
+                      <tr
+                        className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
+                        key={index}
+                      >
+                        <td
+                          scope="row"
+                          className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white"
+                        >
+                          {element?.nama_acara}
+                        </td>
+                        <td className="px-6 py-4">{element?.lokasi}</td>
+                        <td className="px-6 py-4">
+                          {dateEvent
+                            ? `tanggal masih aktif`
+                            : `Event Sudah Selesai`}
+                        </td>
+                        <td className="flex items-center gap-4 px-6 py-4 text-center">
+                          <Button
+                            onClick={() =>
+                              navigate(`/profile/eo/events/${element.id}`)
+                            }
+                            type="primary"
+                            style={{ backgroundColor: "#0049cc" }}
+                          >
+                            View
+                          </Button>
+                          <Button
+                            onClick={() => handleOpenUpdate(element)}
+                            disabled={!dateEvent}
+                            type="default"
+                          >
+                            Edit
+                          </Button>
+                          <Button type="primary" danger>
+                            Delete
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+      {open && (
+        <Modal
+          footer={false}
+          width={768}
+          title="Tambahkan Event"
+          open={open}
+          onCancel={() => setOpen(false)}
+        >
+          <Form name="basic" layout="vertical" onFinish={handleAddEvents}>
+            <Item
+              rules={[{ required: true, message: "Nama Event Wajib Diisi" }]}
+              name="nama_acara"
+              label="Nama Acara"
+            >
+              <Input size="large" disabled={loading} />
+            </Item>
+            <Item
+              rules={[
+                { required: true, message: "Deskripsi Event Wajib Diisi" },
+              ]}
+              name="description"
+              label="Deskripsi"
+            >
+              <Input size="large" disabled={loading} />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Tanggal Event Wajib" }]}
+              name="tanggal_acara"
+              label="Tanggal Acara"
+            >
+              <DatePicker
+                format={FormatDayjsInput}
+                size="large"
+                disabled={loading}
+              />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Lokasi Event Wajib" }]}
+              name="lokasi"
+              label="Nama Acara"
+            >
+              <Select
+                size="large"
+                disabled={loading}
+                showSearch
+                placeholder="Pilih Kota"
+                optionFilterProp="children"
+                filterOption={filterOption}
+                options={[
+                  {
+                    value: "jember",
+                    label: "Jember",
+                  },
+                ]}
+              />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Lokasi Event Wajib" }]}
+              label="Upload Gambar Event"
+              name="file"
+            >
+              <Upload
+                onChange={handleFile}
+                accept=".png,.jpg,.jpeg"
+                maxCount={1}
+              >
+                <Button icon={<LuUpload />}>Upload</Button>
+              </Upload>
+            </Item>
+            <div className="flex justify-end gap-2 py-2">
+              <button
+                onClick={() => setOpen(false)}
+                className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={loading}
+                type="submit"
+                className="flex w-32 items-center justify-center rounded-full bg-mainColors py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
+              >
+                {loading ? <LoadingOutlined /> : "Create"}
+              </button>
+            </div>
+          </Form>
+        </Modal>
+      )}
+
+      {openEdit && (
+        <Modal
+          footer={false}
+          width={768}
+          title="Edit Event"
+          open={openEdit}
+          onCancel={() => setOpenEdit(false)}
+        >
+          <Form
+            fields={[
+              {
+                name: "nama_acara",
+                value: valueEdit?.nama_acara,
+              },
+              {
+                name: "description",
+                value: valueEdit?.description,
+              },
+              {
+                name: "lokasi",
+                value: valueEdit?.lokasi,
+              },
+              {
+                name: "tanggal_acara",
+                value: dayjs(valueEdit?.tanggal_acara),
+              },
+            ]}
+            name="basic"
+            layout="vertical"
+            onFinish={handleUpdateEvents}
+          >
+            <Item name="nama_acara" label="Nama Acara">
+              <Input size="large" disabled={loading} />
+            </Item>
+            <Item name="description" label="Deskripsi">
+              <Input size="large" disabled={loading} />
+            </Item>
+            <Item name="tanggal_acara" label="Tanggal Acara">
+              <DatePicker
+                format={FormatDayjsInput}
+                size="large"
+                disabled={loading}
+              />
+            </Item>
+            <Item name="lokasi" label="Nama Acara">
+              <Select
+                size="large"
+                disabled={loading}
+                showSearch
+                placeholder="Pilih Kota"
+                optionFilterProp="children"
+                filterOption={filterOption}
+                options={[
+                  {
+                    value: "jember",
+                    label: "Jember",
+                  },
+                ]}
+              />
+            </Item>
+            <Item label="Upload Gambar Event" name="file">
+              <Upload
+                fileList={[
+                  {
+                    uid: "1",
+                    name: "file.png",
+                  },
+                ]}
+                onChange={handleFile}
+                accept=".png,.jpg,.jpeg"
+                maxCount={1}
+              >
+                <Button icon={<LuUpload />}>Upload</Button>
+              </Upload>
+            </Item>
+            <div className="flex justify-end gap-2 py-2">
+              <button
+                onClick={() => setOpenEdit(false)}
+                className="bg-red flex w-32 items-center justify-center rounded-full border-2 border-mainColors bg-white py-2 text-center text-sm font-semibold text-mainColors transition duration-500 hover:border-secondColors hover:bg-secondColors hover:text-white focus:outline-none focus:ring-4"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={loading}
+                className="bg-red flex w-32 items-center justify-center rounded-full bg-mainColors py-2 text-center text-sm font-semibold text-white transition duration-500 hover:bg-secondColors focus:outline-none focus:ring-4"
+              >
+                {loading ? <LoadingOutlined /> : "Update"}
+              </button>
+            </div>
+          </Form>
+        </Modal>
+      )}
     </div>
   );
 };

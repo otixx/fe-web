@@ -24,7 +24,7 @@ const QRCodeScannerPage = () => {
         console.log(`Scan result: ${decodedText}`, decodedResult);
 
         // Example: Call an API using Axios
-        const response = await axios
+        await axios
           .put(
             `${import.meta.env.VITE_BE_URL}/transaction/checkin`,
             {
@@ -36,7 +36,7 @@ const QRCodeScannerPage = () => {
               },
             },
           )
-          .then((response) => {
+          .then(() => {
             toast.success("Berhasil scan!");
           })
           .catch((err) => {

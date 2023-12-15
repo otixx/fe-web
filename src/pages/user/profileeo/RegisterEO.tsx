@@ -4,7 +4,6 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { Alert, Spin } from "antd";
 import { toast } from "react-hot-toast";
 import { privateApi } from "@/shared/axios/axios";
-import { useProfile } from "@/service/user/user.service";
 
 const RegisterEO = () => {
   const [instagram, setInstagram] = useState("");

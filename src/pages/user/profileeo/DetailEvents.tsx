@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { LuScan, LuTicket, LuUpload } from "react-icons/lu";
+import { LuScan, LuTicket } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import { privateApi } from "@/shared/axios/axios";
 import { Ticket } from "@/interface/ticket.interface";
-import { Button, DatePicker, Form, Input, Modal, Select, Upload } from "antd";
+import { Button, DatePicker, Form, Input, Modal, Select } from "antd";
 import { FormatDayjs, FormatDayjsInput } from "@/shared/dayjs/format";
 import { LoadingOutlined } from "@ant-design/icons";
 import { QfindTicketbyEvent } from "@/service/ticket/ticket.service";
@@ -18,7 +18,7 @@ const DetailEvents = () => {
 
   const idEvent: any = useParams().id;
   const [loading, setLoading] = useState(false);
-  const [file, setFile] = useState("");
+  const [file, setFile] = useState<any>();
 
   // Check Device
   let userAgent = navigator.userAgent;
@@ -32,6 +32,16 @@ const DetailEvents = () => {
   const handleOpenUpdate = (element: Ticket) => {
     setOpenEdit(true);
     setDetailData(element);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+    console.log(fileList);
+    if (fileList) {
+      const fileArray = Array.from(fileList) as File[];
+      console.log(fileArray);
+      setFile(fileArray[0]);
+    }
   };
 
   const handleAddTiket = async (value: any) => {
@@ -48,13 +58,12 @@ const DetailEvents = () => {
       "tanggal_expired",
       value?.tanggal_expired.format(FormatDayjsInput),
     );
-    formData.append("file", file);
-
+    formData.append("image", file);
     try {
       const res = await privateApi.post(`/tiket/${idEvent}`, formData);
       toast.success(res?.data?.message);
       setLoading(false);
-      setOpenEdit(false);
+      setOpen(false);
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -75,6 +84,7 @@ const DetailEvents = () => {
       value?.tanggal_exp.format(FormatDayjsInput),
     );
     formData.append("file", file);
+    console.log(file);
 
     try {
       const res = await privateApi.put(`/tiket/${detailData?.id}`, formData);
@@ -85,15 +95,13 @@ const DetailEvents = () => {
       setLoading(false);
       console.log(error);
     }
+    setLoading(false);
   };
 
   const filterOption = (
     input: string,
     option?: { label: string; value: string },
   ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
-  const handleFile = (info: any) => {
-    setFile(info?.file);
-  };
 
   return (
     <div className="w-full">
@@ -102,15 +110,13 @@ const DetailEvents = () => {
           <h1 className="text-2xl font-bold">Event</h1>
         </div>
         <div className="col-span-6 flex justify-end">
-          <div className="btnSignin w-32 cursor-pointer rounded-full bg-secondColors px-3 py-2 text-sm shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3">
-            <button
-              onClick={() => setOpen(true)}
-              className="flex items-center justify-center gap-2 text-[14px] font-semibold text-white"
-            >
-              <LuTicket />
-              Tambah Tiket
-            </button>
-          </div>
+          <button
+            onClick={() => setOpen(true)}
+            className="btnSignin my-2 flex w-32 cursor-pointer items-center justify-center gap-2 rounded-full bg-secondColors px-3 text-[14px] text-sm font-semibold text-white shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3"
+          >
+            <LuTicket />
+            Tambah Tiket
+          </button>
         </div>
       </div>
       <div className="flex justify-end">
@@ -272,17 +278,17 @@ const DetailEvents = () => {
               />
             </Item>
             <Item
-              rules={[{ required: true, message: "Gambar Tiket Event Wajib" }]}
-              label="Upload Gambar Tiket"
-              name="file"
+              rules={[
+                { required: true, message: "Tanggal Expired Tiket Wajib" },
+              ]}
+              label="Gambar Tiket"
             >
-              <Upload
-                onChange={handleFile}
-                accept=".png,.jpg,.jpeg"
-                maxCount={1}
-              >
-                <Button icon={<LuUpload />}>Upload</Button>
-              </Upload>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
+              />
             </Item>
             <div className="flex justify-end gap-2 py-2">
               <button
@@ -379,7 +385,7 @@ const DetailEvents = () => {
                 disabled={loading}
               />
             </Item>
-            <Item label="Upload Gambar Event" name="file">
+            {/* <Item label="Upload Gambar Event" name="file">
               <Upload
                 fileList={[
                   {
@@ -393,7 +399,7 @@ const DetailEvents = () => {
               >
                 <Button icon={<LuUpload />}>Upload</Button>
               </Upload>
-            </Item>
+            </Item> */}
             <div className="flex justify-end gap-2 py-2">
               <button
                 onClick={() => setOpenEdit(false)}

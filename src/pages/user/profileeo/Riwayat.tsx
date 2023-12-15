@@ -2,7 +2,7 @@ import { QfindTicket } from "@/service/ticket/ticket.service";
 import { useNavigate } from "react-router-dom";
 
 const Riwayat = () => {
-  const { data: ticket, status } = QfindTicket();
+  const { data: ticket } = QfindTicket();
   const navigate = useNavigate();
   return (
     <div className="w-full">

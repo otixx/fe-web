@@ -82,8 +82,8 @@ const DetailTiket = () => {
               </div>
             </div>
           </div>
-          <div className="col-span-3 lg:col-span-1">
-            <h2>Product information</h2>
+          <div className="col-span-3 px-4 lg:col-span-1">
+            <h2 className="font-semibold text-mainColors">Harga</h2>
             <p className="truncate px-2 text-lg tracking-tight text-gray-900 lg:px-0 lg:text-3xl">
               {new Intl.NumberFormat("id-ID", {
                 style: "currency",

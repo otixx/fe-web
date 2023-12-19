@@ -13,7 +13,7 @@ const Index = () => {
     <div>
       <Carousel />
       <div className="container mx-auto py-5">
-        <div className="flex w-full justify-end">
+        <div className="flex w-full justify-end px-4 lg:px-0">
           <form>
             <div className="relative">
               <div className="black pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[20px]">
@@ -28,7 +28,7 @@ const Index = () => {
           </form>
         </div>
       </div>
-      <div className="container mx-auto mb-2 grid grid-cols-2 items-center justify-center gap-5 pb-10 lg:grid-cols-5">
+      <div className="container mx-auto mb-2 grid grid-cols-2 items-center justify-center gap-5  px-4 pb-10 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
         {status === "pending" ? (
           <SkeletonCard total={5} />
         ) : ticket ? (

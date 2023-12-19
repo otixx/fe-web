@@ -19,10 +19,10 @@ const Profile = () => {
   const updateProfile = (values: IProfile) => {
     privateApi
       .put(`/profile`, {
-        name: values?.profile?.name,
-        email: values?.profile?.email,
-        nohp: values?.profile?.noHp,
-        alamat: values?.profile?.alamat,
+        name: values?.name,
+        email: values?.email,
+        nohp: values?.nohp,
+        alamat: values?.alamat,
       })
       .then(() => {
         toast.success("Berhasil Update Profile");
@@ -57,7 +57,28 @@ const Profile = () => {
           onClose={() => setOpen(false)}
           open={open}
         >
-          <Form onFinish={updateProfile} layout="vertical">
+          <Form
+            fields={[
+              {
+                name: "username",
+                value: profile?.name,
+              },
+              {
+                name: "email",
+                value: profile?.email,
+              },
+              {
+                name: "phone",
+                value: profile?.nohp,
+              },
+              {
+                name: "alamat",
+                value: profile?.alamat,
+              },
+            ]}
+            onFinish={updateProfile}
+            layout="vertical"
+          >
             <Item
               label="name"
               name="username"
@@ -126,9 +147,7 @@ const Profile = () => {
               <div className="pointer-events-none flex items-center gap-4 p-2">
                 <LuUser />
                 <h1>
-                  {profile?.profile?.name
-                    ? profile?.profile?.name
-                    : "Username anda tidak valid"}
+                  {profile?.name ? profile?.name : "Username anda tidak valid"}
                 </h1>
               </div>
             </div>
@@ -141,9 +160,7 @@ const Profile = () => {
               <div className="pointer-events-none flex items-center gap-4 p-2">
                 <LuMail />
                 <h1>
-                  {profile?.profile?.email
-                    ? profile?.profile?.email
-                    : "Email anda Tidak Valid"}
+                  {profile?.email ? profile?.email : "Email anda Tidak Valid"}
                 </h1>
               </div>
             </div>
@@ -156,9 +173,7 @@ const Profile = () => {
               <div className="pointer-events-none flex items-center gap-4 p-2">
                 <LuPhone />
                 <h1>
-                  {profile?.profile?.noHp
-                    ? profile?.profile?.noHp
-                    : "No Hp Belum Dimasukkan"}
+                  {profile?.nohp ? profile?.nohp : "No Hp Belum Dimasukkan"}
                 </h1>
               </div>
             </div>
@@ -171,8 +186,8 @@ const Profile = () => {
               <div className="pointer-events-none flex items-center gap-4 p-2">
                 <LuMapPin />
                 <h1>
-                  {profile?.profile?.alamat
-                    ? profile?.profile?.alamat
+                  {profile?.alamat
+                    ? profile?.alamat
                     : "Alamat Belum Dimasukkan"}
                 </h1>
               </div>
@@ -186,7 +201,7 @@ const Profile = () => {
               <div className="pointer-events-none flex items-center gap-4 p-2">
                 <LuTarget />
                 <h1>{`${
-                  profile?.profile?.status_eo
+                  profile?.status_eo
                     ? "Akun anda adalah EO"
                     : "Belum Menjadi EO"
                 }`}</h1>

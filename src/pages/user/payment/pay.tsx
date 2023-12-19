@@ -1,10 +1,9 @@
-import axios from "axios";
+import { privateApi } from "@/shared/axios/axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// components/BarcodePopup.js
 interface BarcodePopupProps {
-  barcodeData: string; // Make barcodeData optional
+  barcodeData: string;
   onClose: () => void;
   idTransaction: string | undefined;
 }
@@ -21,9 +20,7 @@ const BarcodePopup: React.FC<BarcodePopupProps> = ({
 
   const handlePay = async () => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BE_URL}/transaction/${idTransaction}`,
-      );
+      const response = await privateApi.get(`/transaction/${idTransaction}`);
       if (response.data.status_payment === "settlement") {
         setPaymentStatus("success");
       } else {
@@ -68,7 +65,6 @@ const BarcodePopup: React.FC<BarcodePopupProps> = ({
             <div className="rounded-md bg-gray-100 p-4 shadow-md">
               <h2 className="mb-4 text-2xl font-bold">Barcode</h2>
 
-              {/* Tampilkan barcode di sini */}
               <img src={barcodeData} alt="Barcode" className="mb-4" />
 
               <div className="flex justify-end space-x-4">

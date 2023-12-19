@@ -27,12 +27,24 @@ export const QfindTicket = () => {
     },
   });
 };
+
 export const QfindTicketbyEvent = (id: number) => {
   const fetcher = () => privateApi.get(`/tiket/event/${id}`);
   return useQuery({
     queryKey: ["ticketbyevent"],
     queryFn: fetcher,
     select(res): Ticket[] {
+      return res?.data?.data;
+    },
+  });
+};
+
+export const QHistoryTicketId = (id: string | undefined) => {
+  const fetcher = () => privateApi.get(`/transaction/tiket/${id}`);
+  return useQuery({
+    queryKey: ["historyticketid"],
+    queryFn: fetcher,
+    select(res) {
       return res?.data?.data;
     },
   });

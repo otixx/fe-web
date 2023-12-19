@@ -30,4 +30,5 @@ export interface ITicketDetail {
   id: number;
   image_url: string;
   nama_kegiatan: string;
+  tags: string;
 }

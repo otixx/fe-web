@@ -36,7 +36,6 @@ const DetailEvents = () => {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
-    console.log(fileList);
     if (fileList) {
       const fileArray = Array.from(fileList) as File[];
       console.log(fileArray);
@@ -165,6 +164,7 @@ const DetailEvents = () => {
                   </th>
                 </tr>
               </thead>
+
               <tbody>
                 {tiket &&
                   tiket.map((element, index: number) => {
@@ -179,7 +179,12 @@ const DetailEvents = () => {
                         >
                           {element?.nama_kegiatan}
                         </td>
-                        <td className="px-6 py-4">{element?.harga}</td>
+                        <td className="px-6 py-4">
+                          {new Intl.NumberFormat("id-ID", {
+                            style: "currency",
+                            currency: "IDR",
+                          }).format(Number(element?.harga))}
+                        </td>
                         <td className="px-6 py-4">{element?.tags}</td>
                         <td className="px-6 py-4">
                           {dayjs(element?.tanggal_preorder).format(FormatDayjs)}
@@ -223,7 +228,13 @@ const DetailEvents = () => {
               <Input size="large" disabled={loading} />
             </Item>
             <Item
-              rules={[{ required: true, message: "Harga Wajib Diisi" }]}
+              rules={[
+                { required: true, message: "Harga Wajib Diisi" },
+                {
+                  min: 5,
+                  message: "Minimal Harga Tiket Rp. 10.000,00",
+                },
+              ]}
               name="harga"
               label="Harga"
             >
@@ -247,6 +258,14 @@ const DetailEvents = () => {
                     label: "Music",
                   },
                   {
+                    value: "stand",
+                    label: "Stand",
+                  },
+                  {
+                    value: "visitor",
+                    label: "Visitor",
+                  },
+                  {
                     value: "cosplay",
                     label: "Cosplay",
                   },
@@ -259,6 +278,7 @@ const DetailEvents = () => {
               label="Tanggal Pre Order"
             >
               <DatePicker
+                showTime
                 format={FormatDayjsInput}
                 size="large"
                 disabled={loading}
@@ -272,6 +292,7 @@ const DetailEvents = () => {
               label="Tanggal Expired"
             >
               <DatePicker
+                showTime
                 format={FormatDayjsInput}
                 size="large"
                 disabled={loading}

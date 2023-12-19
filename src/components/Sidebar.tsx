@@ -1,6 +1,14 @@
-import { LuHome, LuUser, LuUsers } from "react-icons/lu";
+import { useState } from "react";
+import {
+  LuArrowLeft,
+  LuArrowRight,
+  LuHome,
+  LuUser,
+  LuUsers,
+} from "react-icons/lu";
 import { Link, useLocation } from "react-router-dom";
 const Sidebar = () => {
+  const [expand, setExpand] = useState(false);
   const location = useLocation();
   const sideLink = [
     {
@@ -27,8 +35,12 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="h-screen py-5">
-      <div className="space-y-4 bg-white">
+    <div
+      className={`relative h-screen  py-5 transition-all duration-500 ${
+        expand ? "w-56" : "w-16"
+      }`}
+    >
+      <div className="space-y-4 bg-white pt-10">
         {sideLink.map((element, index) => {
           return (
             <div key={index}>
@@ -45,7 +57,7 @@ const Sidebar = () => {
                   >
                     <span>{element.url}</span>
                     <h1 className="hidden px-4 text-sm font-semibold md:block lg:block">
-                      {element.name}
+                      {expand && element.name}
                     </h1>
                   </div>
                 </Link>
@@ -53,6 +65,12 @@ const Sidebar = () => {
             </div>
           );
         })}
+        <div
+          onClick={() => setExpand(!expand)}
+          className="absolute -right-5 -top-3 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-mainColors text-white transition duration-200 hover:bg-secondColors"
+        >
+          {expand ? <LuArrowLeft /> : <LuArrowRight />}
+        </div>
       </div>
     </div>
   );

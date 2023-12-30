@@ -1,15 +1,18 @@
-export interface dataTransaction {
+import { Dayjs } from "dayjs";
+
+export interface IDataTransaction extends IHistoryTicketDetail {
+  data: IHistoryTicketDetail[];
+}
+
+export interface IHistoryTicketDetail {
   id: string;
-  quantity: number;
-  total_harga: string;
   barcode: string;
-  status_payment: string;
-  detail_form: string;
-  status: string;
-  response_payment: string;
-  profile_id: string;
-  createdAt: string;
+  createdAt: Dayjs;
   isDeleted: boolean;
+  quantity: 1;
+  detail_form: string;
+  response_payment: string;
+  status: string;
   tiket: {
     id: string;
     nama_kegiatan: string;
@@ -31,8 +34,10 @@ export interface dataTransaction {
       createdAt: string;
     };
   };
+  status_payment: string;
+  total_harga: string;
+  updatedAt: Dayjs;
 }
-
 export interface IHistoryTicket {
   id: string;
   quantity: number;
@@ -58,4 +63,25 @@ export interface IHistoryTicket {
     createdAt: string;
     updatedAt: string;
   };
+}
+
+export interface IAction {
+  method: string;
+  name: string;
+  url: string;
+}
+export interface IDetailFormHistory extends IAction {
+  acquirer: string;
+  actions: IAction[];
+  currency: string;
+  expiry_time: Dayjs;
+  fraud_status: string;
+  gross_amount: string;
+  merchant_id: string;
+  order_id: string;
+  payment_type: string;
+  qr_string: string;
+  transaction_id: string;
+  transaction_status: string;
+  transaction_time: Dayjs;
 }

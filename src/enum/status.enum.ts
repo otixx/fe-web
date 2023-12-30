@@ -3,3 +3,5 @@ export enum Status {
   waiting = "Waiting",
   nocheckin = "No Checkin",
 }
+
+export enum EStatusPay {}

@@ -6,6 +6,7 @@ import { useProfile } from "@/service/user/user.service";
 import toast from "react-hot-toast";
 import Navbar from "@/components/Navbar";
 import Loading from "@/components/Loading";
+import { useDevice } from "@/service/device/device.service";
 const UserLayout = () => {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
@@ -18,6 +19,8 @@ const UserLayout = () => {
   const pathname = location.pathname;
   const profile: any = useProfile((state) => state?.profile);
   const getProfile = useProfile((state) => state?.getProfile);
+  const getDevice = useDevice((state) => state?.getDevice);
+
   const componentLoad = async () => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setLoading(false);
@@ -26,6 +29,7 @@ const UserLayout = () => {
     componentLoad();
     protectRoute();
     getProfile();
+    getDevice();
   }, [token, landing, pathname]);
 
   const protectRoute = () => {

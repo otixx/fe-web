@@ -1,81 +1,87 @@
-import { useLocation, useParams } from "react-router-dom";
-import { useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import BarcodePopup from "./pay";
 import { privateApi } from "@/shared/axios/axios";
 import { QfindTicketbyId } from "@/service/ticket/ticket.service";
 import { Form, Input, Select } from "antd";
 import toast from "react-hot-toast";
+import { LoadingOutlined } from "@ant-design/icons";
+import { paymentMethods } from "@/shared/tempData";
+import { useDevice } from "@/service/device/device.service";
+import { EPayment } from "@/enum/payment.enum";
 
 const DetailPayment = () => {
   const idTiket = useParams().id;
   const location = useLocation();
   const [selectedMethod, setSelectedMethod] = useState("");
   const [showPopup, setShowPopup] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [barcodeData, setBarcodeData] = useState("");
   const [idTransaction, setIdTransaction] = useState("");
+  const device = useDevice((state) => state?.device);
 
   const qty = location?.state?.data;
-
-  let userAgent = navigator.userAgent;
-  let isMobile = /Mobi/.test(userAgent);
-  let isTablet = /Tablet|iPad/.test(userAgent);
-  let isDesktop = !isMobile && !isTablet;
+  const navigate = useNavigate();
+  const { Item } = Form;
 
   const { data: tiket } = QfindTicketbyId({ id: idTiket });
 
-  const paymentMethods = [
-    {
-      name: "qris",
-      logoSrc:
-        "https://logowik.com/content/uploads/images/qris-qris-quick-response-code-indonesian-standard8461.logowik.com.webp",
-    },
-    {
-      name: "gopay",
-      logoSrc: "https://logowik.com/content/uploads/images/gopay7196.jpg",
-    },
-    {
-      name: "shopeepay",
-      logoSrc: "https://logowik.com/content/uploads/images/shopeepay4268.jpg",
-    },
-  ];
-
   const handleSubmit = async (value: any) => {
     if (selectedMethod) {
+      setLoading(true);
       try {
-        const response = await privateApi.post(`/transaction/${idTiket}`, {
-          quantity: qty,
-          nama: value?.name,
-          asal_kota: value?.lokasi,
-          judul_lagu: value?.cosplay,
-          instagram: value?.instagram,
-          nohp: value?.noHp,
-          cosplay_name: value?.cosplay,
-          payment:
-            isDesktop && selectedMethod === "shopeepay" ? "" : selectedMethod,
-        });
-        if (!isDesktop && selectedMethod === "shopeepay") {
-          setIdTransaction(response.data.response.transaction_id);
-          window.open(`${response.data.response.actions[1].url}`, "_blank");
-        } else if (!isDesktop && selectedMethod === "gopay") {
-          setIdTransaction(response.data.response.transaction_id);
-          window.open(`${response.data.response.actions[1].url}`, "_blank");
-        } else {
-          setIdTransaction(response.data.response.transaction_id);
-          setBarcodeData(response.data.response.actions[0].url);
-          setShowPopup(true);
-          console.log(response.data.response.actions[0].url);
+        const response = await privateApi.post(
+          `/transaction/create/${idTiket}`,
+          {
+            quantity: qty,
+            nama: value?.name,
+            asal_kota: value?.lokasi,
+            judul_lagu: value?.cosplay,
+            instagram: value?.instagram,
+            nohp: value?.noHp,
+            cosplay_name: value?.cosplay,
+            payment: selectedMethod,
+          },
+        );
+        setLoading(false);
+        if (response?.data?.status == 200) {
+          if (device === "mobile" && selectedMethod === EPayment.shopee) {
+            console.log(response?.data);
+            toast.success(response?.data?.message);
+            setIdTransaction(response.data?.data?.transaction_id);
+            window.open(`${response?.data?.data?.actions[0]?.url}`, "_blank");
+            navigate("/history");
+          } else if (device === "mobile" && selectedMethod === EPayment.gopay) {
+            console.log(response?.data);
+            toast.success(response?.data?.message);
+            setIdTransaction(response.data?.data?.transaction_id);
+            window.open(`${response.data?.data?.actions[1]?.url}`, "_blank");
+            navigate("/history");
+          } else {
+            setShowPopup(true);
+            toast.success(response?.data?.message);
+            setIdTransaction(response.data?.data?.transaction_id);
+            setBarcodeData(response.data?.data?.actions[0]?.url);
+          }
         }
       } catch (error: any) {
-        console.log(error?.response?.data);
+        setLoading(false);
+        if (error?.response?.status == 400) {
+          toast.error(error?.response?.data?.message);
+        } else if (error?.response?.data?.status == 500) {
+          toast.error(error?.response?.data?.message);
+        } else {
+          console.log(error);
+        }
       }
     } else {
+      setLoading(false);
       return toast.error("Payment Wajib Dipilih");
     }
   };
   const closePopup = () => {
     setShowPopup(false);
   };
-  const { Item } = Form;
   const filterOption = (
     input: string,
     option?: { label: string; value: string },
@@ -104,13 +110,22 @@ const DetailPayment = () => {
               <Form layout="vertical" onFinish={handleSubmit}>
                 {tiket?.tags === "visitor" ? null : (
                   <>
-                    <Item name="name" label="Nama">
-                      <Input size="large" />
+                    <Item
+                      rules={[{ required: true, message: "Masukkan Nama" }]}
+                      name="name"
+                      label="Nama"
+                    >
+                      <Input size="large" disabled={loading} />
                     </Item>
-                    <Item name="lokasi" label="Kota">
+                    <Item
+                      rules={[{ required: true, message: "Masukkan Lokasi" }]}
+                      name="lokasi"
+                      label="Kota"
+                    >
                       <Select
                         size="large"
                         showSearch
+                        disabled={loading}
                         placeholder="Pilih Kota"
                         optionFilterProp="children"
                         filterOption={filterOption}
@@ -122,19 +137,47 @@ const DetailPayment = () => {
                         ]}
                       />
                     </Item>
-                    <Item name="instagram" label="Instagram">
-                      <Input addonBefore="@" size="large" />
+                    <Item
+                      name="instagram"
+                      rules={[
+                        { required: true, message: "Masukkan Nama Instagram" },
+                      ]}
+                      label="Instagram"
+                    >
+                      <Input addonBefore="@" disabled={loading} size="large" />
                     </Item>
-                    <Item name="noHp" label="No Hp">
-                      <Input size="large" />
+                    <Item
+                      rules={[
+                        { required: true, message: "Masukkan No Hp" },
+                        {
+                          min: 11,
+                          message: "No Hp minimal 11 digit",
+                        },
+                      ]}
+                      name="noHp"
+                      label="No Hp"
+                    >
+                      <Input size="large" disabled={loading} />
                     </Item>
                     {tiket?.tags === "music" ? (
-                      <Item name="song" label="Judul Lagu">
-                        <Input size="large" />
+                      <Item
+                        rules={[
+                          { required: true, message: "Masukkan Judul Lagu" },
+                        ]}
+                        name="song"
+                        label="Judul Lagu"
+                      >
+                        <Input size="large" disabled={loading} />
                       </Item>
                     ) : (
-                      <Item name="cosplay" label="Cosplay Name">
-                        <Input size="large" />
+                      <Item
+                        rules={[
+                          { required: true, message: "Masukkan Nama Cosplay" },
+                        ]}
+                        name="cosplay"
+                        label="Cosplay Name"
+                      >
+                        <Input size="large" disabled={loading} />
                       </Item>
                     )}
                   </>
@@ -160,7 +203,11 @@ const DetailPayment = () => {
                       className="rounded-sm bg-secondColors px-8 py-2.5 text-[14px] font-semibold text-white transition duration-300 hover:bg-mainColors"
                     >
                       {" "}
-                      Buat Tagihan Pembayaran
+                      {loading ? (
+                        <LoadingOutlined />
+                      ) : (
+                        "Buat Tagihan Pembayaran"
+                      )}
                     </button>
                     <p className="py-2 text-[12px] font-semibold text-[#666666]">
                       Dengan checkout, Anda setuju dengan Ketentuan Penggunaan
@@ -179,24 +226,27 @@ const DetailPayment = () => {
             <div className="flex flex-col gap-4">
               {paymentMethods.map((method, index) => (
                 <div key={index}>
-                  {isDesktop && method.name === "shopeepay" ? null : (
+                  {device === "dekstop" &&
+                  method.name === EPayment.shopee ? null : (
                     <div
-                      className={`flex cursor-pointer justify-between rounded-sm border-2 px-4 shadow-sm`}
+                      className={`flex ${
+                        loading ? "bg-gray-100" : ""
+                      } cursor-pointer justify-between rounded-sm border-2 px-4 shadow-sm`}
                       onClick={() => setSelectedMethod(method.name)}
                     >
                       <div className="flex items-center gap-2">
                         <input
                           type="radio"
                           name="paymentMethod"
+                          readOnly
                           checked={selectedMethod === method.name}
-                          onChange={() => {}}
                         />
                         <h1 className="text-[16px] font-semibold">
                           {method.name}
                         </h1>
                       </div>
                       <img
-                        className="right-0 h-full w-20 bg-transparent"
+                        className="right-0 h-full w-20 bg-transparent mix-blend-multiply"
                         src={method.logoSrc}
                         alt={method.name}
                       />
@@ -208,13 +258,14 @@ const DetailPayment = () => {
           </div>
         </div>
       </div>
-      {showPopup && (
-        <BarcodePopup
-          barcodeData={barcodeData}
-          onClose={closePopup}
-          idTransaction={idTransaction}
-        />
-      )}
+      <BarcodePopup
+        device={device}
+        payment={selectedMethod}
+        barcode={barcodeData}
+        onClose={closePopup}
+        showPopup={showPopup}
+        idTransaction={idTransaction}
+      />
     </div>
   );
 };

@@ -56,7 +56,7 @@ const Sidebar = () => {
                     }`}
                   >
                     <span>{element.url}</span>
-                    <h1 className="hidden px-4 text-sm font-semibold md:block lg:block">
+                    <h1 className=" px-4 text-sm font-semibold md:block lg:block">
                       {expand && element.name}
                     </h1>
                   </div>

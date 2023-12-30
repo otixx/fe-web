@@ -1,55 +1,41 @@
-// QRCodeScannerPage.js
 import { Html5QrcodeScanner, Html5QrcodeResult } from "html5-qrcode";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-import Cookies from "js-cookie";
+import { privateApi } from "@/shared/axios/axios";
 
 const QRCodeScannerPage = () => {
   const navigate = useNavigate();
+  const idEvent = useParams().id;
   const [html5QrcodeScanner, setHtml5QrcodeScanner] =
     useState<Html5QrcodeScanner | null>(null);
-  const getToken: any = Cookies.get("token");
-  const token = JSON.parse(getToken);
 
   useEffect(() => {
-    const verbose: boolean = false;
-
     async function onScanSuccess(
       decodedText: string,
       decodedResult: Html5QrcodeResult,
     ) {
       try {
-        console.log(`Scan result: ${decodedText}`, decodedResult);
-
-        // Example: Call an API using Axios
-        await axios
-          .put(
-            `${import.meta.env.VITE_BE_URL}/transaction/checkin`,
-            {
-              id: decodedText,
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
-          )
-          .then(() => {
+        await privateApi
+          .put(`/transaction/checkin`, {
+            idQr: decodedText,
+            idEvent: idEvent,
+          })
+          .then((res) => {
             toast.success("Berhasil scan!");
+            navigate("/");
+            console.log(res);
           })
           .catch((err) => {
-            console.log(err);
+            toast.error(err?.response?.data?.message);
           });
       } catch (error: any) {
         console.error("Error calling API:", error.message);
       }
     }
 
-    function onScanError(errorMessage: string) {
-      console.log(errorMessage);
-    }
+    function onScanError() {}
+    const verbose: boolean = false;
 
     const scanner = new Html5QrcodeScanner(
       "reader",

@@ -2,42 +2,72 @@ import { QfindTicket } from "@/service/ticket/ticket.service";
 import { LuSearch } from "react-icons/lu";
 import dayjs from "dayjs";
 import { FormatDayjs } from "@/shared/dayjs/format";
-import { Ticket } from "@/interface/ticket.interface";
+import { ITicketData } from "@/interface/ticket.interface";
 import SkeletonCard from "@/components/Skeleton";
 import Carousel from "@/components/Carousel";
 import Card from "@/components/Card";
+import { useEffect, useState } from "react";
+import Notfound from "@/components/Notfound";
 const Index = () => {
-  const { data: ticket, status } = QfindTicket();
+  const [query, setQuery] = useState("");
+  const [url, setUrl] = useState("");
+
+  const [ticket, setTiket] = useState({} as ITicketData);
+
+  const fetchData = async () => {
+    const res = await QfindTicket({
+      url: query.length > 2 ? url : "",
+      key: query.length > 2 ? query : undefined,
+    });
+    setTiket(res);
+  };
+
+  useEffect(() => {
+    if (query.length > 2) {
+      const delay = setTimeout(() => {
+        fetchData();
+      }, 1000);
+      return () => clearTimeout(delay);
+    } else {
+      fetchData();
+    }
+  }, [query]);
 
   return (
     <div>
       <Carousel />
       <div className="container mx-auto py-5">
         <div className="flex w-full justify-end px-4 lg:px-0">
-          <form>
+          <form
+            onSubmit={(e) => {
+              return e.preventDefault();
+            }}
+          >
             <div className="relative">
               <div className="black pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[20px]">
                 <LuSearch />
               </div>
               <input
                 type="text"
+                onChange={(e) => {
+                  setQuery(e.target.value), setUrl("/search");
+                }}
                 className="block w-80 rounded-full border-2 border-gray-300 bg-gray-50 px-6 py-3.5 pl-10 text-[14px] text-black transition hover:border-secondColors hover:duration-500 focus:outline-none"
-                placeholder="Search Events..."
+                placeholder="Cari Event min 3 Char..."
               />
             </div>
           </form>
         </div>
       </div>
       <div className="container mx-auto mb-2 grid grid-cols-2 items-center justify-center gap-5  px-4 pb-10 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
-        {status === "pending" ? (
-          <SkeletonCard total={5} />
-        ) : ticket ? (
-          ticket.length > 0 ? (
-            ticket?.map((item: Ticket, index: number) => (
+        {ticket ? (
+          ticket && ticket?.data?.length > 0 ? (
+            ticket?.data?.map((item, index: number) => (
               <div key={index}>
                 <Card
                   image={JSON.parse(item?.image_url)["url"]}
                   title={item?.nama_kegiatan}
+                  tags={item?.tags}
                   date={dayjs(item?.date).format(FormatDayjs)}
                   price={new Intl.NumberFormat("id-ID", {
                     style: "currency",
@@ -49,10 +79,15 @@ const Index = () => {
               </div>
             ))
           ) : (
-            <p>sd</p>
+            <div className="col-span-12">
+              <Notfound
+                title="Event tidak ada"
+                description="gaada event ya awokwkwok"
+              />
+            </div>
           )
         ) : (
-          <p>Loading</p>
+          <SkeletonCard total={5} />
         )}
       </div>
     </div>

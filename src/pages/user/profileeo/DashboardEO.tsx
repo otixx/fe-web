@@ -8,11 +8,12 @@ import {
   Form,
   Input,
   Modal,
+  Pagination,
   Popconfirm,
   Select,
   Upload,
 } from "antd";
-import { ICreateEventsProps, IEvent } from "@/interface/event.interface";
+import { ICreateEventsProps, IDataEvent } from "@/interface/event.interface";
 import { LoadingOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { FormatDayjs, FormatDayjsInput } from "@/shared/dayjs/format";
@@ -25,15 +26,15 @@ const DashboardEO = () => {
   const [loading, setLoading] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [idEvent, setIdEvent] = useState("");
+  const [page, setPage] = useState(1);
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<any>([]);
-  const [valueEdit, setValueEdit] = useState({} as IEvent);
+  const [valueEdit, setValueEdit] = useState({} as IDataEvent);
 
   const { Item } = Form;
-  const event = QfindEvents();
-
-  const handleOpenUpdate = (value: IEvent) => {
-    setIdEvent(value?.id);
+  const event = QfindEvents(page);
+  const handleOpenUpdate = (value: IDataEvent) => {
+    setIdEvent(value.id);
     setOpenEdit(true);
     setValueEdit(value);
   };
@@ -117,6 +118,7 @@ const DashboardEO = () => {
   //     setFile(fileList);
   //   }
   // };
+
   return (
     <div className="w-full">
       <div className="grid h-28 grid-cols-12 items-center px-2">
@@ -126,7 +128,7 @@ const DashboardEO = () => {
         <div className="col-span-6 flex justify-end">
           <button
             onClick={() => setOpen(true)}
-            className="btnSignin my-2 flex w-32 cursor-pointer items-center justify-center gap-2 rounded-full bg-secondColors px-3 text-[14px] text-sm font-semibold text-white shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3"
+            className="btnSignin my-2 flex w-40 cursor-pointer items-center justify-center gap-2 rounded-full bg-secondColors px-3 py-3 text-[14px] text-sm font-semibold text-white shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3"
           >
             <LuCalendarPlus />
             Tambah Event
@@ -136,14 +138,14 @@ const DashboardEO = () => {
       <div className="grid grid-cols-12">
         <div className="col-span-12">
           <div className=" relative overflow-x-auto shadow-md sm:rounded-lg ">
-            <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-              <caption className="bg-white p-5 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
+            <table className="w-full text-left text-sm text-gray-500">
+              <caption className="bg-white px-5 text-left text-lg font-semibold text-gray-900 ">
                 List Event
-                <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-sm font-normal text-gray-500">
                   Lihat Semua Data anda disini
                 </p>
               </caption>
-              <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+              <thead className="bg-gray-50 text-xs uppercase text-gray-700">
                 <tr>
                   <th scope="col" className="px-6 py-3">
                     Nama Acara
@@ -161,8 +163,8 @@ const DashboardEO = () => {
               </thead>
               <tbody>
                 {event?.isFetched && event?.data ? (
-                  event?.data?.length > 0 ? (
-                    event?.data.map((element, index) => {
+                  event?.data?.data?.length > 0 ? (
+                    event?.data?.data?.map((element, index) => {
                       const dateEvent =
                         dayjs(element.tanggal_acara).format(FormatDayjs) >
                           dayjs().format(FormatDayjs) ||
@@ -234,6 +236,17 @@ const DashboardEO = () => {
           </div>
         </div>
       </div>
+      <div className="flex w-full items-center justify-center ">
+        <div className="p-5">
+          <Pagination
+            current={page}
+            total={event?.data?.jumlah}
+            pageSize={10}
+            onChange={(page) => setPage(page)}
+          />
+        </div>
+      </div>
+
       {open && (
         <Modal
           footer={false}
@@ -250,7 +263,7 @@ const DashboardEO = () => {
               name="nama_acara"
               label="Nama Acara"
             >
-              <Input size="large" disabled={loading} />
+              <Input size="large" placeholder="Nama Acara" disabled={loading} />
             </Item>
             <Item
               rules={[
@@ -259,7 +272,11 @@ const DashboardEO = () => {
               name="description"
               label="Deskripsi"
             >
-              <Input size="large" disabled={loading} />
+              {/* <Input size="large" disabled={loading} /> */}
+              <Input.TextArea
+                placeholder="Deskripsi Event"
+                disabled={loading}
+              />
             </Item>
             <Item
               rules={[{ required: true, message: "Tanggal Event Wajib" }]}
@@ -370,7 +387,7 @@ const DashboardEO = () => {
               <Input size="large" disabled={loading} />
             </Item>
             <Item name="description" label="Deskripsi">
-              <Input size="large" disabled={loading} />
+              <Input.TextArea disabled={loading} />
             </Item>
             <Item name="tanggal_acara" label="Tanggal Acara">
               <DatePicker

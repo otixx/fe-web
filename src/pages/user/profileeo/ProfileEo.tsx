@@ -17,7 +17,7 @@ const ProfileEo = () => {
         <div className="col-span-6 flex justify-end">
           <button
             onClick={() => setOpen(true)}
-            className="btnSignin my-2 flex w-32 cursor-pointer items-center justify-center gap-2 rounded-full bg-secondColors px-3 text-[14px] text-sm font-semibold text-white shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3"
+            className="btnSignin my-2 flex w-40 cursor-pointer items-center justify-center gap-2 rounded-full bg-secondColors px-3 py-3 text-[14px] text-sm font-semibold text-white shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3"
           >
             <LuUser />
             Edit Profie EO

@@ -3,8 +3,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import { QfindTicketbyId } from "@/service/ticket/ticket.service";
 import dayjs from "dayjs";
 import { FormatDayjs } from "@/shared/dayjs/format";
-import { LuCalendarDays, LuMap } from "react-icons/lu";
+import {
+  LuAlertCircle,
+  LuCalendarDays,
+  LuKey,
+  LuMap,
+  LuShieldCheck,
+} from "react-icons/lu";
 import toast from "react-hot-toast";
+import { Tag } from "antd";
 
 const DetailTiket = () => {
   const [quantity, setQuantity] = useState(1);
@@ -34,6 +41,8 @@ const DetailTiket = () => {
     e.preventDefault();
     navigate(`/detail/payment/${idTiket?.id}`, { state: { data: quantity } });
   };
+
+  console.log(ticketDetail);
 
   return (
     <div className="container mx-auto my-10 max-w-7xl p-5">
@@ -65,6 +74,10 @@ const DetailTiket = () => {
                   <LuMap />
                   {ticketDetail?.event?.lokasi}
                 </span>
+                <span className="flex items-center gap-2 font-semibold text-gray-800">
+                  <LuKey />
+                  <Tag color="blue">{ticketDetail?.tags}</Tag>
+                </span>
               </div>
             </div>
           </div>
@@ -82,8 +95,8 @@ const DetailTiket = () => {
               </div>
             </div>
           </div>
-          <div className="col-span-3 lg:col-span-1">
-            <h2>Product information</h2>
+          <div className="col-span-3 px-4 lg:col-span-1">
+            <h2 className="font-semibold text-mainColors">Harga</h2>
             <p className="truncate px-2 text-lg tracking-tight text-gray-900 lg:px-0 lg:text-3xl">
               {new Intl.NumberFormat("id-ID", {
                 style: "currency",
@@ -92,41 +105,58 @@ const DetailTiket = () => {
             </p>
             <form className="mt-10" onSubmit={handleCheckout}>
               <div>
-                <fieldset className="mt-4">
-                  <h1>Qty</h1>
-                  <div className="items-center space-x-3">
-                    <button
-                      type="button"
-                      className="rounded-md bg-gray-200 px-2 py-1"
-                      onClick={() => handleMin()}
-                      disabled={quantity === 1}
-                    >
-                      -
-                    </button>
-                    <input
-                      type="text"
-                      disabled
-                      value={quantity}
-                      onChange={handleInput}
-                      className="w-20 rounded-md border border-gray-300 py-1 text-center focus:outline-none"
-                    />
-                    <button
-                      type="button"
-                      disabled={quantity === 5}
-                      className="rounded-md bg-gray-200 px-2 py-1"
-                      onClick={() => handlePlus()}
-                    >
-                      +
-                    </button>
-                  </div>
-                </fieldset>
+                {ticketDetail?.quantity !== 0 && (
+                  <fieldset className="mt-4">
+                    <h1>Qty</h1>
+                    <div className="items-center space-x-3">
+                      <button
+                        type="button"
+                        className="rounded-md bg-gray-200 px-2 py-1"
+                        onClick={() => handleMin()}
+                        disabled={quantity === 1}
+                      >
+                        -
+                      </button>
+                      <input
+                        type="text"
+                        disabled
+                        value={quantity}
+                        onChange={handleInput}
+                        className="w-20 rounded-md border border-gray-300 py-1 text-center focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        disabled={quantity === 5}
+                        className="rounded-md bg-gray-200 px-2 py-1"
+                        onClick={() => handlePlus()}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </fieldset>
+                )}
               </div>
               <div className="cursor-pointer">
                 <button
+                  disabled={ticketDetail?.quantity === 0}
                   type="submit"
-                  className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-secondColors px-8 py-3 text-base font-medium text-white transition duration-500 hover:bg-mainColors"
+                  className={`mt-10 ${
+                    ticketDetail?.quantity === 0
+                      ? "cursor-not-allowed bg-gray-400"
+                      : "bg-secondColors hover:bg-mainColors"
+                  } flex w-full items-center justify-center gap-2 rounded-md border border-transparent py-3  text-base  font-semibold text-white transition duration-500 `}
                 >
-                  Checkout
+                  {ticketDetail?.quantity === 0 ? (
+                    <>
+                      <LuAlertCircle size={20} />
+                      Tiket Habis
+                    </>
+                  ) : (
+                    <>
+                      <LuShieldCheck size={20} />
+                      Checkout
+                    </>
+                  )}
                 </button>
               </div>
             </form>

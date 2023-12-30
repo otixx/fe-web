@@ -15,8 +15,14 @@ const LayoutEO = () => {
   }, []);
 
   const protectRouteEO = () => {
-    if (token && !profile?.profile?.status_eo) {
+    if (token && !profile?.status_eo) {
       navigate("/profile/eo/register");
+    } else if (
+      token &&
+      profile?.status_eo &&
+      registerPath?.pathname === "/profile/eo/register"
+    ) {
+      navigate("/");
     }
   };
   return (

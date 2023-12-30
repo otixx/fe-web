@@ -1,4 +1,9 @@
 export interface IEvent {
+  jumlah: number;
+  data: IDataEvent[];
+}
+
+export interface IDataEvent {
   id: string;
   description: string;
   img_rundown: string;

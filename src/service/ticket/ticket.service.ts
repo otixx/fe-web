@@ -6,6 +6,10 @@ import {
 import { privateApi } from "@/shared/axios/axios";
 import { useQuery } from "@tanstack/react-query";
 
+export interface ISearchParams {
+  url?: string;
+  key?: string;
+}
 export const QfindTicketbyId = ({ id }: IFindTicketProps) => {
   const fetcher = () => privateApi.get(`/tiket/${id}`);
   return useQuery({
@@ -17,22 +21,38 @@ export const QfindTicketbyId = ({ id }: IFindTicketProps) => {
   });
 };
 
-export const QfindTicket = () => {
-  const fetcher = () => privateApi.get(`/tiket`);
-  return useQuery({
-    queryKey: ["ticket"],
-    queryFn: fetcher,
-    select(res): Ticket[] {
-      return res?.data?.data;
-    },
-  });
+export const QfindTicket = async ({ url, key }: ISearchParams) => {
+  try {
+    const res = await privateApi.get(`/tiket${url}`, {
+      params: {
+        keyword: key,
+      },
+    });
+    if (res?.data) {
+      return res?.data;
+    }
+  } catch (error) {
+    return error;
+  }
 };
+
 export const QfindTicketbyEvent = (id: number) => {
   const fetcher = () => privateApi.get(`/tiket/event/${id}`);
   return useQuery({
     queryKey: ["ticketbyevent"],
     queryFn: fetcher,
     select(res): Ticket[] {
+      return res?.data?.data;
+    },
+  });
+};
+
+export const QHistoryTicketId = (id: string | undefined) => {
+  const fetcher = () => privateApi.get(`/transaction/tiket/${id}`);
+  return useQuery({
+    queryKey: ["historyticketid"],
+    queryFn: fetcher,
+    select(res) {
       return res?.data?.data;
     },
   });

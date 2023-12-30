@@ -3,7 +3,15 @@ import { LuScan, LuTicket } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import { privateApi } from "@/shared/axios/axios";
 import { Ticket } from "@/interface/ticket.interface";
-import { Button, DatePicker, Form, Input, Modal, Select } from "antd";
+import {
+  Button,
+  DatePicker,
+  Form,
+  Input,
+  Modal,
+  Pagination,
+  Select,
+} from "antd";
 import { FormatDayjs, FormatDayjsInput } from "@/shared/dayjs/format";
 import { LoadingOutlined } from "@ant-design/icons";
 import { QfindTicketbyEvent } from "@/service/ticket/ticket.service";
@@ -14,6 +22,7 @@ const DetailEvents = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+  const [page, setPage] = useState(1);
   const [detailData, setDetailData] = useState({} as Ticket);
 
   const idEvent: any = useParams().id;
@@ -36,7 +45,6 @@ const DetailEvents = () => {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
-    console.log(fileList);
     if (fileList) {
       const fileArray = Array.from(fileList) as File[];
       console.log(fileArray);
@@ -69,6 +77,7 @@ const DetailEvents = () => {
       console.log(error);
     }
   };
+
   const handleUpdateTiket = async (value: any) => {
     setLoading(true);
     const formData = new FormData();
@@ -112,19 +121,19 @@ const DetailEvents = () => {
         <div className="col-span-6 flex justify-end">
           <button
             onClick={() => setOpen(true)}
-            className="btnSignin my-2 flex w-32 cursor-pointer items-center justify-center gap-2 rounded-full bg-secondColors px-3 text-[14px] text-sm font-semibold text-white shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3"
+            className="btnSignin my-2 flex w-40 cursor-pointer items-center justify-center gap-2 rounded-full bg-secondColors px-3 py-3 text-[14px] text-sm font-semibold text-white shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3"
           >
             <LuTicket />
             Tambah Tiket
           </button>
         </div>
       </div>
-      <div className="flex justify-end">
+      <div className="flex justify-end px-2">
         {isDesktop === true ? null : (
-          <div className="cursor-pointer rounded-full bg-secondColors px-8 py-3 hover:border-secondColors hover:bg-mainColors">
+          <div className="col-span-6 flex justify-end">
             <button
-              onClick={() => navigate("/scan")}
-              className="flex items-center justify-center gap-2 text-[14px] font-semibold text-white"
+              onClick={() => navigate(`/scan/${idEvent}`)}
+              className="btnSignin my-2 flex w-40 cursor-pointer items-center justify-center gap-2 rounded-full bg-secondColors px-3 py-3 text-[14px] text-sm font-semibold text-white shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3"
             >
               <LuScan />
               Scan
@@ -165,6 +174,7 @@ const DetailEvents = () => {
                   </th>
                 </tr>
               </thead>
+
               <tbody>
                 {tiket &&
                   tiket.map((element, index: number) => {
@@ -179,7 +189,12 @@ const DetailEvents = () => {
                         >
                           {element?.nama_kegiatan}
                         </td>
-                        <td className="px-6 py-4">{element?.harga}</td>
+                        <td className="px-6 py-4">
+                          {new Intl.NumberFormat("id-ID", {
+                            style: "currency",
+                            currency: "IDR",
+                          }).format(Number(element?.harga))}
+                        </td>
                         <td className="px-6 py-4">{element?.tags}</td>
                         <td className="px-6 py-4">
                           {dayjs(element?.tanggal_preorder).format(FormatDayjs)}
@@ -206,6 +221,18 @@ const DetailEvents = () => {
           </div>
         </div>
       </div>
+      {tiket && tiket.length > 0 && (
+        <div className="flex w-full items-center justify-center ">
+          <div className="p-5">
+            <Pagination
+              current={page}
+              total={50}
+              pageSize={10}
+              onChange={(page) => setPage(page)}
+            />
+          </div>
+        </div>
+      )}
       {open && (
         <Modal
           footer={false}
@@ -223,7 +250,13 @@ const DetailEvents = () => {
               <Input size="large" disabled={loading} />
             </Item>
             <Item
-              rules={[{ required: true, message: "Harga Wajib Diisi" }]}
+              rules={[
+                { required: true, message: "Harga Wajib Diisi" },
+                {
+                  min: 5,
+                  message: "Minimal Harga Tiket Rp. 10.000,00",
+                },
+              ]}
               name="harga"
               label="Harga"
             >
@@ -247,6 +280,14 @@ const DetailEvents = () => {
                     label: "Music",
                   },
                   {
+                    value: "stand",
+                    label: "Stand",
+                  },
+                  {
+                    value: "visitor",
+                    label: "Visitor",
+                  },
+                  {
                     value: "cosplay",
                     label: "Cosplay",
                   },
@@ -259,6 +300,7 @@ const DetailEvents = () => {
               label="Tanggal Pre Order"
             >
               <DatePicker
+                showTime
                 format={FormatDayjsInput}
                 size="large"
                 disabled={loading}
@@ -272,6 +314,7 @@ const DetailEvents = () => {
               label="Tanggal Expired"
             >
               <DatePicker
+                showTime
                 format={FormatDayjsInput}
                 size="large"
                 disabled={loading}

@@ -1,46 +1,38 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoadingOutlined } from "@ant-design/icons";
-import { Alert, Spin } from "antd";
+import { Alert, Form, Input, Select, Spin } from "antd";
 import { toast } from "react-hot-toast";
 import { privateApi } from "@/shared/axios/axios";
 
 const RegisterEO = () => {
-  const [instagram, setInstagram] = useState("");
-  const [namaeo, setNamaeo] = useState("");
-  const [kota, setKota] = useState("");
   const [msg, setMsg] = useState("");
   const [status, setStatus] = useState(false);
-  const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-  const navigate = useNavigate();
 
-  const handleLogin = async (e: any) => {
-    e.preventDefault();
-    setTimeout(() => {
-      privateApi
-        .post(`/eo/register`, {
-          instagram: instagram,
-          namaeo: namaeo,
-          kota: kota,
-        })
-        .then((response) => {
-          console.log(response.data.token);
-          setStatus(false);
-          toast.success("EO Berhasil! Dibuat");
-          navigate("/profile/eo/events");
-        })
-        .catch((error: any) => {
-          if (error.response.status == 404) {
-            setMsg(error.response.data.message);
-            setStatus(false);
-          } else {
-            setMsg(error.response.data.message);
-            setStatus(false);
-          }
-          console.log(error.response);
-        });
-    }, 1000);
+  const navigate = useNavigate();
+  const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+  const { Item } = Form;
+
+  const handleLogin = async (value: any) => {
     setStatus(true);
+    try {
+      await privateApi.post(`/eo/register`, {
+        instagram: "@" + value?.instagram,
+        namaeo: "EO" + value?.nama,
+        kota: value?.lokasi,
+      });
+      setStatus(false);
+      toast.success("EO Berhasil! Dibuat");
+      navigate("/profile/eo/events");
+    } catch (error: any) {
+      if (error?.response?.status == 404) {
+        setMsg(error?.response?.data.message);
+        setStatus(false);
+      } else {
+        setMsg(error?.response?.data.message);
+        setStatus(false);
+      }
+    }
   };
 
   useEffect(() => {
@@ -50,6 +42,11 @@ const RegisterEO = () => {
       }, 2000);
     }
   }, [msg]);
+
+  const filterOption = (
+    input: string,
+    option?: { label: string; value: string },
+  ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   return (
     <div className="container mx-auto">
@@ -64,7 +61,7 @@ const RegisterEO = () => {
           </div>
           <div className="w-full justify-start p-4 shadow-lg lg:w-2/5">
             {msg ? <Alert showIcon message={`${msg}`} type="warning" /> : null}
-            <form onSubmit={handleLogin}>
+            <Form onFinish={handleLogin}>
               <div className="flex justify-center p-2">
                 <h1 className="text-[21px] font-bold text-mainColors">
                   Gaweo EO Cok
@@ -75,47 +72,46 @@ const RegisterEO = () => {
                   Nama EO yang unik, selalu terlihat menarik
                 </div>
               </div>
-              <div className="mb-6">
-                <input
-                  type="text"
-                  id="username"
-                  value={instagram}
-                  onChange={(e) => setInstagram(e.target.value)}
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm"
-                  placeholder="masukkan username instagram"
-                  required
+              <Item name="instagram">
+                <Input
+                  addonBefore="@"
+                  placeholder="Masukkan Username Instagram anda"
+                  size="large"
                 />
-              </div>
-              <div className="mb-6">
-                <input
-                  type="text"
-                  id="username"
-                  value={namaeo}
-                  onChange={(e) => setNamaeo(e.target.value)}
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm"
-                  placeholder="masukkan nama EO"
-                  required
+              </Item>
+              <Item name="nama">
+                <Input
+                  addonBefore="EO"
+                  placeholder="Masukkan Nama EO anda"
+                  size="large"
                 />
-              </div>
-              <div className="mb-6">
-                <input
-                  type="text"
-                  id="username"
-                  value={kota}
-                  onChange={(e) => setKota(e.target.value)}
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm"
-                  placeholder="masukkan kota"
-                  required
+              </Item>
+              <Item
+                rules={[{ required: true, message: "Lokasi Event Wajib" }]}
+                name="lokasi"
+              >
+                <Select
+                  size="large"
+                  showSearch
+                  placeholder="Pilih Kota"
+                  optionFilterProp="children"
+                  filterOption={filterOption}
+                  options={[
+                    {
+                      value: "jember",
+                      label: "Jember",
+                    },
+                  ]}
                 />
-              </div>
+              </Item>
               <button
                 type="submit"
-                className="rounded-lg  bg-secondColors px-5 py-3 text-center text-[14px] font-medium text-white hover:bg-hoverMainColors sm:w-auto lg:w-full"
+                className="rounded-lg bg-secondColors px-5 py-3 text-center text-[14px] font-medium text-white transition duration-500 hover:bg-hoverMainColors sm:w-auto lg:w-full"
               >
                 {" "}
-                {status ? <Spin indicator={antIcon} /> : "Masuk"}
+                {status ? <Spin indicator={antIcon} /> : "Register"}
               </button>
-            </form>
+            </Form>
           </div>
         </div>
       </div>

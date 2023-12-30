@@ -1,242 +1,191 @@
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import BarcodePopup from "./pay";
 import { privateApi } from "@/shared/axios/axios";
-import { Ticket } from "@/interface/ticket.interface";
+import { QfindTicketbyId } from "@/service/ticket/ticket.service";
+import { Form, Input, Select } from "antd";
+import toast from "react-hot-toast";
+import { LoadingOutlined } from "@ant-design/icons";
+import { paymentMethods } from "@/shared/tempData";
+import { useDevice } from "@/service/device/device.service";
+import { EPayment } from "@/enum/payment.enum";
 
 const DetailPayment = () => {
-  const [Tiket, setTiket] = useState<Ticket[]>([]);
   const idTiket = useParams().id;
   const location = useLocation();
-  const dataQtyPreviousPage = location.state?.data || 0;
   const [selectedMethod, setSelectedMethod] = useState("");
-  const [nama, setNama] = useState("");
-  const [kota, setKota] = useState("");
-  const [instagram, setInstagram] = useState("");
-  const [noHp, setNoHp] = useState("");
-  const [lagu, setLagu] = useState("");
-  const [cosplay, setCosplay] = useState("");
-
   const [showPopup, setShowPopup] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [barcodeData, setBarcodeData] = useState("");
   const [idTransaction, setIdTransaction] = useState("");
+  const device = useDevice((state) => state?.device);
 
-  // Check Device  -------------------------------------------------------
-  let userAgent = navigator.userAgent;
+  const qty = location?.state?.data;
+  const navigate = useNavigate();
+  const { Item } = Form;
 
-  // Mengekstrak informasi tambahan dari User Agent String
-  let isMobile = /Mobi/.test(userAgent);
-  let isTablet = /Tablet|iPad/.test(userAgent);
-  let isDesktop = !isMobile && !isTablet;
-  // Check Device End -------------------------------------------------------
+  const { data: tiket } = QfindTicketbyId({ id: idTiket });
 
-  useEffect(() => {
-    const getTiket = async () => {
+  const handleSubmit = async (value: any) => {
+    if (selectedMethod) {
+      setLoading(true);
       try {
-        const response = await privateApi.get(`/tiket/${idTiket}`);
-        setTiket([response.data.data]);
-      } catch (error: any) {
-        console.log(error.response);
-      }
-    };
-    getTiket();
-  }, [idTiket]);
-
-  const handleMethodChange = (method: any) => {
-    setSelectedMethod(method);
-  };
-
-  const paymentMethods = [
-    {
-      name: "qris",
-      logoSrc:
-        "https://logowik.com/content/uploads/images/qris-qris-quick-response-code-indonesian-standard8461.logowik.com.webp",
-    },
-    {
-      name: "gopay",
-      logoSrc: "https://logowik.com/content/uploads/images/gopay7196.jpg",
-    },
-    {
-      name: "shopeepay",
-      logoSrc: "https://logowik.com/content/uploads/images/shopeepay4268.jpg",
-    },
-  ];
-
-  const handleSubmit = (event: any) => {
-    event.preventDefault();
-    if (selectedMethod.length === 0) {
-      return console.log("harus isi method");
-    }
-
-    const data = {
-      quantity: dataQtyPreviousPage,
-      nama: nama,
-      asal_kota: kota,
-      judul_lagu: lagu,
-      instagram: instagram,
-      nohp: noHp,
-      cosplay_name: cosplay,
-      payment:
-        isDesktop && selectedMethod === "shopeepay" ? "" : selectedMethod,
-    };
-
-    const pushSubmit = async () => {
-      try {
-        const responses = await privateApi.post(
-          `/transaction/${idTiket}`,
-          data,
+        const response = await privateApi.post(
+          `/transaction/create/${idTiket}`,
+          {
+            quantity: qty,
+            nama: value?.name,
+            asal_kota: value?.lokasi,
+            judul_lagu: value?.cosplay,
+            instagram: value?.instagram,
+            nohp: value?.noHp,
+            cosplay_name: value?.cosplay,
+            payment: selectedMethod,
+          },
         );
-        if (isDesktop === false && selectedMethod === "shopeepay") {
-          setIdTransaction(responses.data.response.transaction_id);
-          window.open(`${responses.data.response.actions[1].url}`, "_blank");
-        } else if (isDesktop === false && selectedMethod === "gopay") {
-          setIdTransaction(responses.data.response.transaction_id);
-          window.open(`${responses.data.response.actions[1].url}`, "_blank");
-        } else {
-          setIdTransaction(responses.data.response.transaction_id);
-          setBarcodeData(responses.data.response.actions[0].url);
-          setShowPopup(true);
-          console.log(responses.data.response.actions[0].url);
+        setLoading(false);
+        if (response?.data?.status == 200) {
+          if (device === "mobile" && selectedMethod === EPayment.shopee) {
+            console.log(response?.data);
+            toast.success(response?.data?.message);
+            setIdTransaction(response.data?.data?.transaction_id);
+            window.open(`${response?.data?.data?.actions[0]?.url}`, "_blank");
+            navigate("/history");
+          } else if (device === "mobile" && selectedMethod === EPayment.gopay) {
+            console.log(response?.data);
+            toast.success(response?.data?.message);
+            setIdTransaction(response.data?.data?.transaction_id);
+            window.open(`${response.data?.data?.actions[1]?.url}`, "_blank");
+            navigate("/history");
+          } else {
+            setShowPopup(true);
+            toast.success(response?.data?.message);
+            setIdTransaction(response.data?.data?.transaction_id);
+            setBarcodeData(response.data?.data?.actions[0]?.url);
+          }
         }
       } catch (error: any) {
-        console.log(error);
+        setLoading(false);
+        if (error?.response?.status == 400) {
+          toast.error(error?.response?.data?.message);
+        } else if (error?.response?.data?.status == 500) {
+          toast.error(error?.response?.data?.message);
+        } else {
+          console.log(error);
+        }
       }
-    };
-    pushSubmit();
+    } else {
+      setLoading(false);
+      return toast.error("Payment Wajib Dipilih");
+    }
   };
   const closePopup = () => {
     setShowPopup(false);
   };
+  const filterOption = (
+    input: string,
+    option?: { label: string; value: string },
+  ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+
   return (
     <div className="container mx-auto">
       <div className="p-4">
         <div className="grid grid-cols-5 gap-4">
-          {Tiket.map((item, index) => (
-            <div
-              className="order-2 col-span-5 gap-2 rounded-sm p-4 lg:order-1 lg:col-span-3"
-              key={index}
-            >
-              <div className="mt-2 py-4">
-                <h1 className="text-2xl font-bold">Detail Pemesanan</h1>
-              </div>
+          <div className="order-2 col-span-5 gap-2 rounded-sm p-4 lg:order-1 lg:col-span-3">
+            <div className="mt-2 py-4">
+              <h1 className="text-2xl font-bold">Detail Pemesanan</h1>
+            </div>
 
-              <div className="flex justify-between py-4">
-                <h1 className="text-[16px] font-bold">{item.nama_kegiatan}</h1>
-                <h1 className="font-semibold text-[#666666]">
-                  {new Intl.NumberFormat("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                  }).format(Number(item.harga))}
-                </h1>
-              </div>
-              <hr />
-              <div className="py-4">
-                {Tiket[0].tags === "visitor" ? null : (
-                  <form className="py-4">
-                    <div className="py-2">
-                      <label htmlFor="name" className="block font-semibold">
-                        Nama
-                      </label>
-                      <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        onChange={(e) => setNama(e.target.value)}
-                        className="w-full rounded-md border-2 p-2"
-                        placeholder="Isi Nama"
+            <div className="flex justify-between py-4">
+              <h1 className="text-[16px] font-bold">{tiket?.nama_kegiatan}</h1>
+              <h1 className="font-semibold text-[#666666]">
+                {new Intl.NumberFormat("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                }).format(Number(tiket?.harga))}
+              </h1>
+            </div>
+            <hr />
+            <div className="py-4">
+              <Form layout="vertical" onFinish={handleSubmit}>
+                {tiket?.tags === "visitor" ? null : (
+                  <>
+                    <Item
+                      rules={[{ required: true, message: "Masukkan Nama" }]}
+                      name="name"
+                      label="Nama"
+                    >
+                      <Input size="large" disabled={loading} />
+                    </Item>
+                    <Item
+                      rules={[{ required: true, message: "Masukkan Lokasi" }]}
+                      name="lokasi"
+                      label="Kota"
+                    >
+                      <Select
+                        size="large"
+                        showSearch
+                        disabled={loading}
+                        placeholder="Pilih Kota"
+                        optionFilterProp="children"
+                        filterOption={filterOption}
+                        options={[
+                          {
+                            value: "jember",
+                            label: "Jember",
+                          },
+                        ]}
                       />
-                    </div>
-
-                    <div className="py-2">
-                      <label htmlFor="city" className="block font-semibold">
-                        Asal Kota
-                      </label>
-                      <input
-                        type="text"
-                        id="city"
-                        name="city"
-                        onChange={(e) => setKota(e.target.value)}
-                        className="w-full rounded-md border-2 p-2"
-                        placeholder="Isi Asal Kota"
-                      />
-                    </div>
-
-                    <div className="py-2">
-                      <label
-                        htmlFor="instagram"
-                        className="block font-semibold"
+                    </Item>
+                    <Item
+                      name="instagram"
+                      rules={[
+                        { required: true, message: "Masukkan Nama Instagram" },
+                      ]}
+                      label="Instagram"
+                    >
+                      <Input addonBefore="@" disabled={loading} size="large" />
+                    </Item>
+                    <Item
+                      rules={[
+                        { required: true, message: "Masukkan No Hp" },
+                        {
+                          min: 11,
+                          message: "No Hp minimal 11 digit",
+                        },
+                      ]}
+                      name="noHp"
+                      label="No Hp"
+                    >
+                      <Input size="large" disabled={loading} />
+                    </Item>
+                    {tiket?.tags === "music" ? (
+                      <Item
+                        rules={[
+                          { required: true, message: "Masukkan Judul Lagu" },
+                        ]}
+                        name="song"
+                        label="Judul Lagu"
                       >
-                        Instagram
-                      </label>
-                      <input
-                        type="text"
-                        id="instagram"
-                        name="instagram"
-                        onChange={(e) => setInstagram(e.target.value)}
-                        className="w-full rounded-md border-2 p-2"
-                        placeholder="Isi Instagram"
-                      />
-                    </div>
-
-                    <div className="py-2">
-                      <label
-                        htmlFor="phoneNumber"
-                        className="block font-semibold"
-                      >
-                        Nomor HP
-                      </label>
-                      <input
-                        type="text"
-                        id="phoneNumber"
-                        name="phoneNumber"
-                        onChange={(e) => setNoHp(e.target.value)}
-                        className="w-full rounded-md border-2 p-2"
-                        placeholder="Isi Nomor HP"
-                      />
-                    </div>
-                    {Tiket[0].tags === "music" ? (
-                      <div className="py-2">
-                        <label
-                          htmlFor="songTitle"
-                          className="block font-semibold"
-                        >
-                          Judul Lagu
-                        </label>
-                        <input
-                          type="text"
-                          id="songTitle"
-                          name="songTitle"
-                          onChange={(e) => setLagu(e.target.value)}
-                          className="w-full rounded-md border-2 p-2"
-                          placeholder="Isi Judul Lagu"
-                        />
-                      </div>
+                        <Input size="large" disabled={loading} />
+                      </Item>
                     ) : (
-                      <div className="py-2">
-                        <label
-                          htmlFor="cosplayName"
-                          className="block font-semibold"
-                        >
-                          Cosplay Name
-                        </label>
-                        <input
-                          type="text"
-                          id="cosplayName"
-                          name="cosplayName"
-                          onChange={(e) => setCosplay(e.target.value)}
-                          className="w-full rounded-md border-2 p-2"
-                          placeholder="Isi Cosplay Name"
-                        />
-                      </div>
+                      <Item
+                        rules={[
+                          { required: true, message: "Masukkan Nama Cosplay" },
+                        ]}
+                        name="cosplay"
+                        label="Cosplay Name"
+                      >
+                        <Input size="large" disabled={loading} />
+                      </Item>
                     )}
-                  </form>
+                  </>
                 )}
-                <form className="py-4" onSubmit={handleSubmit}>
+                <div className="py-4">
                   <div className="flex justify-between py-4">
                     <h1 className="font text-[14px] font-semibold">Qty</h1>
-                    <h1 className="font-semibold text-[#666666]">
-                      x {dataQtyPreviousPage}
-                    </h1>
+                    <h1 className="font-semibold text-[#666666]">x {qty}</h1>
                   </div>
                   <hr />
                   <div className="flex justify-between py-4">
@@ -245,16 +194,20 @@ const DetailPayment = () => {
                       {new Intl.NumberFormat("id-ID", {
                         style: "currency",
                         currency: "IDR",
-                      }).format(Number(item.harga) * dataQtyPreviousPage)}
+                      }).format(Number(tiket?.harga) * qty)}
                     </h1>
                   </div>
                   <div className="flex flex-col py-4">
                     <button
                       type="submit"
-                      className="rounded-sm bg-secondColors px-8 py-2.5 text-[14px] font-semibold text-white"
+                      className="rounded-sm bg-secondColors px-8 py-2.5 text-[14px] font-semibold text-white transition duration-300 hover:bg-mainColors"
                     >
                       {" "}
-                      Buat Tagihan Pembayaran
+                      {loading ? (
+                        <LoadingOutlined />
+                      ) : (
+                        "Buat Tagihan Pembayaran"
+                      )}
                     </button>
                     <p className="py-2 text-[12px] font-semibold text-[#666666]">
                       Dengan checkout, Anda setuju dengan Ketentuan Penggunaan
@@ -263,34 +216,37 @@ const DetailPayment = () => {
                       layanan kapan saja.
                     </p>
                   </div>
-                </form>
-              </div>
+                </div>
+              </Form>
             </div>
-          ))}
+          </div>
 
           <div className="order-2 col-span-5 h-fit rounded-sm p-4 shadow-lg lg:order-1 lg:col-span-2">
             <h1 className="p-4 text-2xl font-bold"> Pilih Metode Pembayaran</h1>
             <div className="flex flex-col gap-4">
               {paymentMethods.map((method, index) => (
                 <div key={index}>
-                  {isDesktop === true && method.name === "shopeepay" ? null : (
+                  {device === "dekstop" &&
+                  method.name === EPayment.shopee ? null : (
                     <div
-                      className={`flex cursor-pointer justify-between rounded-sm border-2 px-4 shadow-sm`}
-                      onClick={() => handleMethodChange(method.name)}
+                      className={`flex ${
+                        loading ? "bg-gray-100" : ""
+                      } cursor-pointer justify-between rounded-sm border-2 px-4 shadow-sm`}
+                      onClick={() => setSelectedMethod(method.name)}
                     >
                       <div className="flex items-center gap-2">
                         <input
                           type="radio"
                           name="paymentMethod"
+                          readOnly
                           checked={selectedMethod === method.name}
-                          onChange={() => {}}
                         />
                         <h1 className="text-[16px] font-semibold">
                           {method.name}
                         </h1>
                       </div>
                       <img
-                        className="right-0 h-full w-20 bg-transparent"
+                        className="right-0 h-full w-20 bg-transparent mix-blend-multiply"
                         src={method.logoSrc}
                         alt={method.name}
                       />
@@ -302,34 +258,14 @@ const DetailPayment = () => {
           </div>
         </div>
       </div>
-      {showPopup && (
-        <BarcodePopup
-          barcodeData={barcodeData}
-          onClose={closePopup}
-          idTransaction={idTransaction}
-        />
-      )}
-
-      <style>{`
-        .popup-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        .popup {
-          background: white;
-          padding: 20px;
-          border-radius: 8px;
-          text-align: center;
-        }
-      `}</style>
+      <BarcodePopup
+        device={device}
+        payment={selectedMethod}
+        barcode={barcodeData}
+        onClose={closePopup}
+        showPopup={showPopup}
+        idTransaction={idTransaction}
+      />
     </div>
   );
 };

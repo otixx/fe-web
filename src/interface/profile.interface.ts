@@ -1,12 +1,14 @@
+import { Dayjs } from "dayjs";
 export interface IProfile {
-  instagram: string;
-  kota: string;
-  nama_eo: string;
-  profile: {
-    name: string;
-    email: string;
-    noHp: string;
-    alamat: string;
-    status_eo: boolean;
+  alamat: string;
+  createdAt: Dayjs;
+  email: string;
+  eo: {
+    instagram: string;
+    nama_eo: string;
+    kota: string;
   };
+  name: string;
+  nohp: string;
+  status_eo: boolean;
 }

@@ -1,140 +1,125 @@
 import { useState } from "react";
-import { LuMail, LuPhone, LuUser, LuXCircle } from "react-icons/lu";
-import { privateApi } from "@/shared/axios/axios";
-import Popup from "@/components/Popup";
+import { LuMail, LuPhone, LuUser } from "react-icons/lu";
+// import { LoadingOutlined } from "@ant-design/icons";
+import { Form, Input, Modal } from "antd";
+import { useProfile } from "@/service/user/user.service";
 
 const ProfileEo = () => {
   const [open, setOpen] = useState(false);
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const updateEO = () => {
-    privateApi
-      .put(`/eo/update`)
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log(error.response.data);
-      });
-  };
+  const profile = useProfile((state) => state?.profile);
+  const { Item } = Form;
   return (
-    <div className="w-full px-4 py-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Profile EO</h1>
-        <div className="btnSignin w-32 cursor-pointer rounded-full bg-secondColors px-3 py-2 text-sm shadow-lg hover:border-secondColors hover:bg-mainColors lg:w-44 lg:px-8 lg:py-3">
+    <div className="w-full">
+      <div className="grid h-28 grid-cols-12 items-center px-2">
+        <div className="col-span-6">
+          <h1 className="text-2xl font-bold">Profile EO</h1>
+        </div>
+        <div className="col-span-6 flex justify-end">
           <button
-            onClick={() => handleOpen()}
-            className="text-[14px] font-semibold text-white"
+            onClick={() => setOpen(true)}
+            className="btnSignin my-2 flex w-40 cursor-pointer items-center justify-center gap-2 rounded-full bg-secondColors px-3 py-3 text-[14px] text-sm font-semibold text-white shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3"
           >
-            Edit Profile EO
+            <LuUser />
+            Edit Profie EO
           </button>
         </div>
       </div>
       {open && (
-        <Popup onConfirm={handleClose}>
-          <div className="relative max-h-full w-full max-w-md">
-            <div className="relative rounded-lg bg-white shadow">
+        <Modal
+          footer={false}
+          width={768}
+          title="Edit Profile EO"
+          open={open}
+          onCancel={() => setOpen(false)}
+        >
+          <Form
+            name="basic"
+            layout="vertical"
+            fields={[
+              {
+                name: "name",
+                value: profile?.eo?.nama_eo,
+              },
+              {
+                name: "instagram",
+                value: profile?.eo?.instagram,
+              },
+            ]}
+          >
+            <Item name="name" label="Nama EO">
+              <Input size="large" />
+            </Item>
+            <Item name="instagram" label="Nama Instagram">
+              <Input addonBefore="@" size="large" />
+            </Item>
+
+            <div className="flex justify-end gap-2 py-2">
               <button
-                type="button"
-                onClick={() => handleClose()}
-                className="absolute right-2.5 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent text-black hover:bg-gray-200"
-                data-modal-hide="authentication-modal"
+                onClick={() => setOpen(false)}
+                className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
               >
-                <LuXCircle />
+                Cancel
               </button>
-              <div className="px-6 py-6 lg:px-8">
-                <h3 className="mb-4 text-2xl font-semibold text-black">
-                  Edit Profile EO
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Nama EO
-                    </label>
-                    <input
-                      type="text"
-                      // onChange={(e) => setName(e.target.value)}
-                      className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Nama Instagram
-                    </label>
-                    <input
-                      type="text"
-                      // onChange={(e) => setInstagram(e.target.value)}
-                      className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-black">
-                      Kota
-                    </label>
-                    <input
-                      type="text"
-                      // onChange={(e) => setKota(e.target.value)}
-                      className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2 py-2">
-                    <button
-                      type="submit"
-                      onClick={() => handleClose()}
-                      className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => updateEO()}
-                      className=" rounded-full bg-mainColors px-10 py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
-                    >
-                      Update
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <button
+                type="submit"
+                className="flex w-32 items-center justify-center rounded-full bg-mainColors py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
+              >
+                "Update"
+                {/* {loading ? <LoadingOutlined /> : "Update"} */}
+              </button>
             </div>
-          </div>
-        </Popup>
+          </Form>
+        </Modal>
       )}
       <div className="mt-5 grid grid-cols-12 gap-4 p-4">
-        <div className="col-span-12 justify-center lg:col-span-3">
-          <div className="relative mb-6">
+        <div className="col-span-12 justify-center space-y-4 lg:col-span-3">
+          <div className="relative">
             <label className="mb-2 block text-sm font-semibold text-gray-900">
               Username
             </label>
             <div className="relative">
               <div className="pointer-events-none flex items-center gap-4 p-2">
                 <LuUser />
-                {/* <h1>{profile.name}</h1> */}
+                <h1>{profile?.eo?.nama_eo}</h1>
               </div>
             </div>
           </div>
-          <div className="relative mb-6">
+          <div className="relative">
             <label className="mb-2 block text-sm font-semibold text-gray-900">
               Email
             </label>
             <div className="relative">
               <div className="pointer-events-none flex items-center gap-4 p-2">
                 <LuMail />
-                {/* <h1>{profile.email}</h1> */}
+                <h1>{profile?.email}</h1>
               </div>
             </div>
           </div>
-          <div className="relative mb-6">
+          <div className="relative">
             <label className="mb-2 block text-sm font-semibold text-gray-900">
               No Hp
             </label>
             <div className="relative">
               <div className="pointer-events-none flex items-center gap-4 p-2">
                 <LuPhone />
-                {/* <h1>{profile.nohp}</h1> */}
+                <h1>
+                  {profile?.nohp ? profile?.nohp : "No Hp Belum di Masukkan"}
+                </h1>
+              </div>
+            </div>
+          </div>
+          <div className="relative">
+            <label className="mb-2 block text-sm font-semibold text-gray-900">
+              Instagram
+            </label>
+            <div className="relative">
+              <div className="pointer-events-none flex items-center gap-4 p-2">
+                <LuPhone />
+                <h1>
+                  {profile?.eo?.instagram
+                    ? profile?.eo?.instagram
+                    : "Instagram Belum di Masukkan"}
+                </h1>
               </div>
             </div>
           </div>

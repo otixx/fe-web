@@ -4,11 +4,9 @@ import { LuKey, LuLogOut, LuUser, LuUserCog } from "react-icons/lu";
 import { Avatar, Dropdown } from "antd";
 import { useProfile } from "@/service/user/user.service";
 import { ItemType } from "@/interface/navbar.interface";
-import { IProfile } from "@/interface/profile.interface";
-
 const Navbar = () => {
   const navigate = useNavigate();
-  const profile: IProfile = useProfile((state) => state?.profile);
+  const profile: any = useProfile((state) => state?.profile);
   const isEO = profile?.status_eo;
   const styleMenuItems = `flex cursor-pointer items-center gap-2`;
 
@@ -72,7 +70,7 @@ const Navbar = () => {
 
   return (
     <>
-      <header className="bg-mainColors">
+      <header className="bg-mainColors shadow-lg shadow-slate-300">
         <nav className="mx-auto flex items-center justify-between p-4 lg:px-6">
           <div className="flex">
             <div onClick={() => navigate("/")}>
@@ -83,20 +81,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex gap-4">
-            {profile ? (
-              <>
-                <Dropdown menu={{ items }} placement="bottomRight" arrow>
-                  <div className="flex cursor-pointer items-center gap-2 font-semibold text-white">
-                    <Avatar
-                      size={35}
-                      src={`https://api.dicebear.com/7.x/adventurer/svg?seed=Sassy`}
-                    />
-                    Hi,
-                    <span className="font-medium"> {profile?.name}</span>
-                  </div>
-                </Dropdown>
-              </>
-            ) : (
+            {profile && profile?.status == 403 ? (
               <>
                 <div onClick={() => navigate("/auth/signup")}>
                   <div className="btnSignup hidden cursor-pointer rounded-full border-2 border-secondColors px-8 py-3 text-[14px] transition duration-700 hover:border-mainColors hover:bg-secondColors lg:block">
@@ -110,6 +95,19 @@ const Navbar = () => {
                     </button>
                   </div>
                 </div>
+              </>
+            ) : (
+              <>
+                <Dropdown menu={{ items }} placement="bottomRight" arrow>
+                  <div className="flex cursor-pointer items-center gap-2 font-semibold text-white">
+                    <Avatar
+                      size={35}
+                      src={`https://api.dicebear.com/7.x/adventurer/svg?seed=Sassy`}
+                    />
+                    Hi,
+                    <span className="font-medium"> {profile?.name}</span>
+                  </div>
+                </Dropdown>
               </>
             )}
           </div>

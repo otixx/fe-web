@@ -18,4 +18,5 @@ export interface ICreateEventsProps {
   lokasi: string;
   file?: any;
   tanggal_acara: any;
+  waktu_event: any;
 }

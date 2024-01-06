@@ -48,7 +48,7 @@ const Login = () => {
       <Form
         name="basic"
         layout="vertical"
-        labelCol={{ span: 8 }}
+        labelCol={{ span: 15 }}
         wrapperCol={{ span: 24 }}
         initialValues={{ remember: true }}
         onFinish={handleLogin}
@@ -68,7 +68,7 @@ const Login = () => {
           </Link>
         </div>
         <Form.Item
-          label="Username"
+          label="Email atau username"
           name="username"
           rules={[{ required: true, message: "Masukkan Username" }]}
         >
@@ -85,7 +85,7 @@ const Login = () => {
 
         <button
           type="submit"
-          className=" w-full rounded-lg bg-secondColors px-5 py-3 text-center text-[14px] font-medium text-white transition duration-700 hover:bg-hoverMainColors lg:w-full"
+          className="w-full rounded-lg bg-secondColors px-5 py-3 text-center text-[14px] font-medium text-white shadow-lg transition duration-700 hover:bg-hoverMainColors lg:w-full"
         >
           {" "}
           {status ? <LoadingOutlined spin /> : "Masuk"}

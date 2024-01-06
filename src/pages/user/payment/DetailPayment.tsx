@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import BarcodePopup from "./pay";
 import { privateApi } from "@/shared/axios/axios";
 import { QfindTicketbyId } from "@/service/ticket/ticket.service";
@@ -60,8 +60,8 @@ const DetailPayment = () => {
           } else {
             setShowPopup(true);
             toast.success(response?.data?.message);
-            setIdTransaction(response.data?.data?.transaction_id);
-            setBarcodeData(response.data?.data?.actions[0]?.url);
+            setIdTransaction(response?.data?.data?.transaction_id);
+            setBarcodeData(response?.data?.data?.actions[0]?.url);
           }
         }
       } catch (error: any) {

@@ -55,10 +55,10 @@ function App() {
               <Route path="eo/register" element={<RegisterEO />} />
             </Route>
 
+            <Route path="/scan/:id" element={<QRCodeScannerPage />} />
             <Route path="/history" element={<History />} />
             <Route path="/history/:id" element={<Detailhistory />} />
             <Route path="/detail/payment/:id" element={<DetailPayment />} />
-            <Route path="/scan/:id" element={<QRCodeScannerPage />} />
           </Route>
         </Routes>
       </Router>

@@ -1,2 +1,3 @@
 export const FormatDayjs = "DD MMMM YYYY";
-export const FormatDayjsInput = "DD/MM/YYYY HH:mm:ss";
+export const FormatDayjsInput = "DD/MM/YYYY";
+export const FormatTime = " HH:mm:ss";

@@ -73,7 +73,7 @@ const ResetPassword = () => {
 
         <button
           type="submit"
-          className=" w-full rounded-lg bg-secondColors px-5 py-3 text-center text-[14px] font-medium text-white transition duration-700 hover:bg-hoverMainColors lg:w-full"
+          className="w-full rounded-lg bg-secondColors px-5 py-3 text-center text-[14px] font-medium text-white shadow-lg transition duration-700 hover:bg-hoverMainColors lg:w-full"
         >
           {" "}
           {status ? <LoadingOutlined spin /> : "Submit"}

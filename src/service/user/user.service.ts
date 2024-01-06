@@ -13,7 +13,7 @@ export const useProfile = create<IProfileState>((set) => ({
       const response = await privateApi.get(`/profile`);
       set({ profile: response?.data?.data });
     } catch (error: any) {
-      set({ profile: error?.data });
+      set({ profile: error?.response });
     }
   },
 }));

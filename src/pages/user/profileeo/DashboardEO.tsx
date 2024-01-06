@@ -11,12 +11,17 @@ import {
   Pagination,
   Popconfirm,
   Select,
+  TimePicker,
   Upload,
 } from "antd";
 import { ICreateEventsProps, IDataEvent } from "@/interface/event.interface";
 import { LoadingOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { FormatDayjs, FormatDayjsInput } from "@/shared/dayjs/format";
+import {
+  FormatDayjs,
+  FormatDayjsInput,
+  FormatTime,
+} from "@/shared/dayjs/format";
 import { privateApi } from "@/shared/axios/axios";
 import toast from "react-hot-toast";
 import SkeletonTable from "@/components/SkeletonTable";
@@ -42,17 +47,16 @@ const DashboardEO = () => {
   const handleAddEvents = async (value: ICreateEventsProps) => {
     setLoading(true);
     if (file.size) {
-      console.log(dayjs(value?.tanggal_acara).format(FormatDayjsInput));
       const formData = new FormData();
       formData.append("nama_acara", value?.nama_acara);
       formData.append("description", value?.description);
       formData.append(
         "tanggal_acara",
-        dayjs(value?.tanggal_acara).format(FormatDayjsInput),
+        dayjs(value?.tanggal_acara).format(FormatDayjsInput) +
+          dayjs(value?.waktu_event).format(FormatTime),
       );
       formData.append("lokasi", value?.lokasi);
       formData.append("file", file);
-
       try {
         const response = await privateApi.post(`/event`, formData);
         toast.success(response?.data?.message);
@@ -60,7 +64,7 @@ const DashboardEO = () => {
         setOpen(false);
       } catch (error: any) {
         setLoading(false);
-        toast.error(error);
+        toast.error(error?.response?.data?.message);
       }
     } else {
       toast.error("Harap ganti gambar terlebih dahulu");
@@ -283,12 +287,29 @@ const DashboardEO = () => {
               name="tanggal_acara"
               label="Tanggal Acara"
             >
-              <DatePicker showTime size="large" disabled={loading} />
+              <DatePicker
+                style={{ width: "100%" }}
+                size="large"
+                disabled={loading}
+              />
             </Item>
             <Item
-              rules={[{ required: true, message: "Lokasi Event Wajib" }]}
+              rules={[{ required: true, message: "Waktu Acara Wajib" }]}
+              name="waktu_event"
+              label="Waktu Acara"
+            >
+              <TimePicker
+                style={{ width: "100%" }}
+                size="large"
+                placeholder="Pilih Waktu Acara"
+                format={FormatTime}
+                disabled={loading}
+              />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Lokasi Acara Wajib" }]}
               name="lokasi"
-              label="Nama Acara"
+              label="Pilih Lokasi Acara"
             >
               <Select
                 size="large"
@@ -307,7 +328,7 @@ const DashboardEO = () => {
             </Item>
             <Item
               rules={[{ required: true, message: "Lokasi Event Wajib" }]}
-              label="Upload Gambar Event"
+              label="Upload Gambar Acara"
               name="file"
             >
               <Upload
@@ -331,19 +352,19 @@ const DashboardEO = () => {
                 className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
               />
             </Item> */}
-            <div className="flex justify-end gap-2 py-2">
+            <div className="flex justify-center gap-2 py-2 md:justify-end lg:justify-end xl:justify-end">
               <button
                 onClick={() => {
                   setOpen(false), setLoading(false);
                 }}
-                className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
+                className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black transition duration-500 hover:border-mainColors hover:bg-mainColors hover:text-white focus:outline-none focus:ring-4"
               >
                 Cancel
               </button>
               <button
                 disabled={loading}
                 type="submit"
-                className="flex w-32 items-center justify-center rounded-full bg-mainColors py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
+                className="flex w-32 items-center justify-center rounded-full bg-mainColors py-2 text-center text-sm font-semibold text-white transition duration-500 hover:bg-secondColors focus:outline-none focus:ring-4"
               >
                 {loading ? <LoadingOutlined /> : "Create"}
               </button>

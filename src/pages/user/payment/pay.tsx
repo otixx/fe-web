@@ -19,7 +19,6 @@ const BarcodePopup = ({
   const [paymentStatus, setPaymentStatus] = useState("pending");
   const [loading, setLoading] = useState(false);
 
-  console.log(barcode);
   const handlePay = async () => {
     setLoading(true);
     try {

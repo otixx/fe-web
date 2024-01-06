@@ -16,9 +16,9 @@ const Card = ({
           <div className="truncate rounded-xl shadow-lg">
             <div className="relative h-64 w-full">
               <img
-                className="h-full w-full rounded-t-lg object-cover"
                 src={image}
-                alt="imgEvent"
+                className="h-full w-full object-cover"
+                alt={`Image`}
               />
               <div className="absolute right-0 top-0">
                 <div className="flex w-20 justify-center rounded-bl-md bg-mainColors text-sm font-semibold text-white">

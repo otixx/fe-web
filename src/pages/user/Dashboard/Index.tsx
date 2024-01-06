@@ -60,8 +60,8 @@ const Index = () => {
         </div>
       </div>
       <div className="container mx-auto mb-2 grid grid-cols-2 items-center justify-center gap-5  px-4 pb-10 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
-        {ticket ? (
-          ticket && ticket?.data?.length > 0 ? (
+        {ticket && ticket?.data ? (
+          ticket?.data?.length > 0 ? (
             ticket?.data?.map((item, index: number) => (
               <div key={index}>
                 <Card

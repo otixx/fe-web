@@ -2,16 +2,22 @@ import { Status } from "@/enum/status.enum";
 import { IDetailFormHistory } from "@/interface/history.interface";
 import { useHistory } from "@/service/transaction/history.service";
 import { FormatDayjs } from "@/shared/dayjs/format";
-import { Skeleton } from "antd";
+import { Modal, Skeleton } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BarcodePopup from "../payment/pay";
 import { useDevice } from "@/service/device/device.service";
 import { EPayment } from "@/enum/payment.enum";
+import { privateApi } from "@/shared/axios/axios";
+import { LoadingOutlined } from "@ant-design/icons";
+import toast from "react-hot-toast";
 
 const History = () => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [id, setId] = useState("");
   const [idTransaction, setIdTransaction] = useState("");
   const [barcode, setBarcode] = useState("");
   const [payment, setPayment] = useState("");
@@ -32,6 +38,23 @@ const History = () => {
       setIdTransaction(data?.transaction_id);
       setBarcode(data?.actions[0].url);
       setOpen(true);
+    }
+  };
+
+  const handleDelete = async () => {
+    const data = JSON.parse(id);
+    setLoading(true);
+    console.log(data?.transaction_id);
+    try {
+      const res = await privateApi.post(`/transaction/cancel`, {
+        order_id: data?.transaction_id,
+      });
+      setLoading(false);
+      setOpenDelete(false);
+      toast.success(res?.data?.message);
+    } catch (error: any) {
+      setLoading(false);
+      console.log(error?.response?.data);
     }
   };
 
@@ -89,12 +112,23 @@ const History = () => {
                     </div>
                     <div className="flex justify-end">
                       {transaction?.status_payment === "pending" ? (
-                        <button
-                          className={`rounded-md bg-secondColors px-4 py-2 font-semibold text-white transition duration-300 hover:bg-mainColors`}
-                          onClick={() => handleSubmit(formDetail)}
-                        >
-                          Selesaikan Pembayaran
-                        </button>
+                        <div className="space-x-2">
+                          <button
+                            onClick={() => {
+                              setOpenDelete(true),
+                                setId(transaction?.response_payment);
+                            }}
+                            className={`rounded-md bg-red-600 px-4 py-2 font-semibold text-white transition duration-300 hover:bg-red-900`}
+                          >
+                            Batalkan Pesanan
+                          </button>
+                          <button
+                            className={`rounded-md bg-secondColors px-4 py-2 font-semibold text-white transition duration-300 hover:bg-mainColors`}
+                            onClick={() => handleSubmit(formDetail)}
+                          >
+                            Selesaikan Pembayaran
+                          </button>
+                        </div>
                       ) : (
                         <button
                           className={`rounded-md px-4 py-2 font-semibold text-white  ${
@@ -128,6 +162,42 @@ const History = () => {
         showPopup={open}
         idTransaction={idTransaction}
       />
+      {openDelete && (
+        <Modal
+          open={openDelete}
+          onCancel={() => setOpenDelete(false)}
+          footer={false}
+        >
+          <div className="flex flex-col justify-center space-y-5">
+            <div className="text-center">
+              <h1 className="text-lg font-semibold">Batalkan Pesanan ?</h1>
+            </div>
+            <div className="text-center text-sm">
+              Harap diperhatikan bahwa pembatalan pesanan mungkin berdampak pada
+              status pembayaran dan ketersediaan produk. Pastikan untuk
+              memeriksa kebijakan pembatalan dan konfirmasi kembali sebelum
+              melanjutkan.
+            </div>
+            <div className="flex justify-center gap-2 py-2 md:justify-end lg:justify-end xl:justify-end">
+              <button
+                onClick={() => {
+                  setOpenDelete(false);
+                }}
+                className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black transition duration-500 hover:border-mainColors hover:bg-mainColors hover:text-white focus:outline-none focus:ring-4"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={loading}
+                onClick={handleDelete}
+                className="flex w-32 items-center justify-center rounded-full bg-red-600 py-2 text-center text-sm font-semibold text-white transition duration-500 hover:bg-red-900 focus:outline-none focus:ring-4"
+              >
+                {loading ? <LoadingOutlined /> : "Delete"}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

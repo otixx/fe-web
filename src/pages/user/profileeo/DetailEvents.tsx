@@ -12,7 +12,11 @@ import {
   Pagination,
   Select,
 } from "antd";
-import { FormatDayjs, FormatDayjsInput } from "@/shared/dayjs/format";
+import {
+  FormatDayjs,
+  FormatDayjsInput,
+  FormatTime,
+} from "@/shared/dayjs/format";
 import { LoadingOutlined } from "@ant-design/icons";
 import { QfindTicketbyEvent } from "@/service/ticket/ticket.service";
 import dayjs from "dayjs";
@@ -60,11 +64,13 @@ const DetailEvents = () => {
     formData.append("tags", value?.tags);
     formData.append(
       "tanggal_preorder",
-      value?.tanggal_preorder.format(FormatDayjsInput),
+      value?.tanggal_preorder.format(FormatDayjsInput) +
+        dayjs().hour(0o0).minute(0o0).second(0o0).format(FormatTime),
     );
     formData.append(
       "tanggal_expired",
-      value?.tanggal_expired.format(FormatDayjsInput),
+      value?.tanggal_expired.format(FormatDayjsInput) +
+        dayjs().hour(0o0).minute(0o0).second(0o0).format(FormatTime),
     );
     formData.append("image", file);
     try {
@@ -72,9 +78,9 @@ const DetailEvents = () => {
       toast.success(res?.data?.message);
       setLoading(false);
       setOpen(false);
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
       setLoading(false);
-      console.log(error);
     }
   };
 
@@ -300,7 +306,8 @@ const DetailEvents = () => {
               label="Tanggal Pre Order"
             >
               <DatePicker
-                showTime
+                placement="topRight"
+                style={{ width: "100%" }}
                 format={FormatDayjsInput}
                 size="large"
                 disabled={loading}
@@ -314,9 +321,10 @@ const DetailEvents = () => {
               label="Tanggal Expired"
             >
               <DatePicker
-                showTime
                 format={FormatDayjsInput}
+                className="testingyo"
                 size="large"
+                style={{ width: "100%" }}
                 disabled={loading}
               />
             </Item>

@@ -16,14 +16,14 @@ const Index = () => {
 
   const fetchData = async () => {
     const res = await QfindTicket({
-      url: query.length > 2 ? url : "",
-      key: query.length > 2 ? query : undefined,
+      url: query.length >= 4 ? url : "",
+      key: query.length >= 4 ? query : undefined,
     });
     setTiket(res);
   };
 
   useEffect(() => {
-    if (query.length > 2) {
+    if (query.length >= 4) {
       const delay = setTimeout(() => {
         fetchData();
       }, 1000);
@@ -53,7 +53,7 @@ const Index = () => {
                   setQuery(e.target.value), setUrl("/search");
                 }}
                 className="block w-80 rounded-full border-2 border-gray-300 bg-gray-50 px-6 py-3.5 pl-10 text-[14px] text-black transition hover:border-secondColors hover:duration-500 focus:outline-none"
-                placeholder="Cari Event min 3 Char..."
+                placeholder="Cari Event min 4 Char..."
               />
             </div>
           </form>

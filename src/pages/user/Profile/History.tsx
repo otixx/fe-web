@@ -96,9 +96,9 @@ const History = () => {
                       <p className="text-gray-600">
                         Tanggal Transaksi:{" "}
                         <span className="font-semibold">
-                          {dayjs(
-                            transaction?.tiket?.event?.tanggal_acara,
-                          ).format(FormatDayjs)}
+                          {dayjs(transaction?.tiket?.event?.createdAt).format(
+                            FormatDayjs,
+                          )}
                         </span>
                       </p>
                       <p className="text-gray-600">
@@ -112,18 +112,18 @@ const History = () => {
                     </div>
                     <div className="flex justify-end">
                       {transaction?.status_payment === "pending" ? (
-                        <div className="space-x-2">
+                        <div className="flex gap-2">
                           <button
                             onClick={() => {
                               setOpenDelete(true),
                                 setId(transaction?.response_payment);
                             }}
-                            className={`rounded-md bg-red-600 px-4 py-2 font-semibold text-white transition duration-300 hover:bg-red-900`}
+                            className={` rounded-md bg-red-600 px-4 py-2 font-semibold text-white transition duration-300 hover:bg-red-900`}
                           >
                             Batalkan Pesanan
                           </button>
                           <button
-                            className={`rounded-md bg-secondColors px-4 py-2 font-semibold text-white transition duration-300 hover:bg-mainColors`}
+                            className={` rounded-md bg-secondColors px-4 py-2 font-semibold text-white transition duration-300 hover:bg-mainColors`}
                             onClick={() => handleSubmit(formDetail)}
                           >
                             Selesaikan Pembayaran

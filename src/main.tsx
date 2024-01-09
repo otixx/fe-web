@@ -9,6 +9,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       theme={{
         token: {
           fontFamily: "Poppins",
+          colorPrimary: "#512370",
         },
       }}
     >

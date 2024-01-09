@@ -53,7 +53,7 @@ const Detailhistory = () => {
             </div>
 
             <div className="col-span-12 md:col-span-4 lg:col-span-4">
-              {dayjs(history?.data?.createdAt).format(FormatDayjsInput) <
+              {dayjs(history?.data?.createdAt).format(FormatDayjsInput) ==
               dayjs().format(FormatDayjsInput) ? (
                 <QRCodeSVG
                   height={300}
@@ -62,14 +62,23 @@ const Detailhistory = () => {
                 />
               ) : (
                 <div>
-                  <p className="text-red-500">
-                    Barcode will be available when the event starts.
-                  </p>
+                  {dayjs(history?.data?.createdAt).format(FormatDayjsInput) >
+                  dayjs().format(FormatDayjsInput) ? (
+                    <p className="font-semibold text-red-500">
+                      Maaf Barcode tidak dapat ditampilkan karena acara sudah
+                      lewat.
+                    </p>
+                  ) : (
+                    <p className="font-semibold text-red-500">
+                      Maaf Barcode tidak dapat ditampilkan karena acara belum
+                      dimulai.
+                    </p>
+                  )}
                 </div>
               )}
               <div className="py-5">
                 <button
-                  className="w-full rounded-md bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600"
+                  className="w-full rounded-md bg-secondColors px-4 py-2 font-semibold text-white transition duration-300 hover:bg-mainColors"
                   onClick={() => navigate("/history")}
                 >
                   Back to History

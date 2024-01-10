@@ -1,29 +1,28 @@
 import { Form, Input } from "antd";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { LoadingOutlined } from "@ant-design/icons";
 import { publicAPi } from "@/shared/axios/axios";
+import toast from "react-hot-toast";
 
 const ResetPasswordForm = () => {
   const { username } = useParams();
   const [status, setStatus] = useState(false);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: any) => {
-    e.preventDefault();
     setStatus(true);
     try {
-      await publicAPi.put(
-        `http://localhost:5000/user/reset-password/${username}`,
-        { password, confPassword: confirmPassword },
-      );
-      setStatus(true);
-      setPassword("");
-      setConfirmPassword("");
-    } catch (error) {
-      console.log(error);
-      setStatus(true);
+      const res = await publicAPi.put(`user/reset-password/${username}`, {
+        password: e?.password,
+        confPassword: e?.repeatPassword,
+      });
+      toast.success(res?.data?.message);
+      setStatus(false);
+      navigate("/auth/signin");
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
+      setStatus(false);
     }
   };
 
@@ -50,12 +49,25 @@ const ResetPasswordForm = () => {
             label="Kata Sandi Baru"
             name="password"
             rules={[
-              { required: true, message: "tidak boleh kosong" },
+              { required: true, message: "Masukkan Kata Sandi Baru" },
               {
                 min: 8,
-                pattern: /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                message: "• Kata sandi harus memiliki setidaknya 8 karakter",
+              },
+              {
+                pattern: /^(?=.*[A-Z])/,
                 message:
-                  "Kata sandi min 8 char dan kombinasi huruf, angka kapital,angka dan tanda baca",
+                  "• Kata sandi harus mengandung setidaknya satu huruf kapital",
+              },
+              {
+                pattern: /^(?=.*[!@#$%^&*])/,
+                message:
+                  "• Kata sandi harus mengandung setidaknya satu tanda baca",
+              },
+              {
+                pattern: /^(?=.*[a-zA-Z\d!@#$%^&*])/,
+                message:
+                  "• Kata sandi harus mengandung kombinasi huruf, angka, dan tanda baca",
               },
             ]}
           >

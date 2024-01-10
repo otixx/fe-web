@@ -21,9 +21,9 @@ module.exports = {
         intern: "Poppins",
       },
       colors: {
-        mainColors: "#152955",
-        hoverMainColors: "#0d204a",
-        secondColors: "#0049cc",
+        mainColors: "#7209B7",
+        hoverMainColors: "#512370",
+        secondColors: "#512370",
         thirdColors: "#9575DE",
         black: "#2B2730",
       },

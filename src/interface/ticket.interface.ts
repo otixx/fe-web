@@ -30,6 +30,7 @@ export interface ITicketDetail {
     description: string;
     lokasi: string;
     tanggal_acara: Dayjs;
+    img_rundown?: string;
   };
   quantity: number;
   harga: number;
@@ -37,4 +38,13 @@ export interface ITicketDetail {
   image_url: string;
   nama_kegiatan: string;
   tags: string;
+}
+
+export interface IDataImgUrl {
+  url: string;
+  idPublic: string;
+}
+
+export interface IDataEventImg {
+  url: string;
 }

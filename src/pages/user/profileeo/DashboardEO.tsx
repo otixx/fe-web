@@ -78,7 +78,8 @@ const DashboardEO = () => {
     formData.append("description", value?.description);
     formData.append(
       "tanggal_acara",
-      dayjs(value?.tanggal_acara).format(FormatDayjsInput),
+      dayjs(value?.tanggal_acara).format(FormatDayjsInput) +
+        dayjs().hour(0o0).minute(0o0).second(0o0).format(FormatTime),
     );
     formData.append("lokasi", value?.lokasi);
     formData.append("file", file);
@@ -132,7 +133,7 @@ const DashboardEO = () => {
         <div className="col-span-6 flex justify-end">
           <button
             onClick={() => setOpen(true)}
-            className="btnSignin my-2 flex w-40 cursor-pointer items-center justify-center gap-2 rounded-full bg-secondColors px-3 py-3 text-[14px] text-sm font-semibold text-white shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3"
+            className="btnSignin my-2 flex w-40 cursor-pointer items-center justify-center gap-2 rounded-full bg-mainColors px-3 py-3 text-[14px] text-sm font-semibold text-white shadow-lg transition duration-500 hover:border-secondColors hover:bg-mainColors lg:w-48 lg:px-8 lg:py-3"
           >
             <LuCalendarPlus />
             Tambah Event
@@ -155,6 +156,9 @@ const DashboardEO = () => {
                     Nama Acara
                   </th>
                   <th scope="col" className="px-6 py-3">
+                    Waktu Event
+                  </th>
+                  <th scope="col" className="px-6 py-3">
                     Lokasi
                   </th>
                   <th scope="col" className="px-6 py-3">
@@ -169,11 +173,13 @@ const DashboardEO = () => {
                 {event?.isFetched && event?.data ? (
                   event?.data?.data?.length > 0 ? (
                     event?.data?.data?.map((element, index) => {
-                      const dateEvent =
-                        dayjs(element.tanggal_acara).format(FormatDayjs) >
-                          dayjs().format(FormatDayjs) ||
-                        dayjs(element.tanggal_acara).format(FormatDayjs) ==
-                          dayjs().format(FormatDayjs);
+                      const tanggalAcara = dayjs(element.tanggal_acara);
+                      const hariIni = dayjs();
+
+                      const belumMulai = tanggalAcara.isAfter(hariIni, "day");
+                      const dahMulai = tanggalAcara.isSame(hariIni, "day");
+                      const dahAbis = tanggalAcara.isBefore(hariIni, "day");
+
                       return (
                         <tr
                           className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
@@ -185,30 +191,49 @@ const DashboardEO = () => {
                           >
                             {element?.nama_acara}
                           </td>
+                          <td
+                            scope="row"
+                            className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white"
+                          >
+                            {dayjs(element?.tanggal_acara).format(FormatDayjs)}
+                          </td>
                           <td className="px-6 py-4">{element?.lokasi}</td>
                           <td className="px-6 py-4">
-                            {dateEvent
-                              ? `tanggal masih aktif`
-                              : `Event Sudah Selesai`}
+                            {belumMulai
+                              ? `Event Belum Mulai`
+                              : dahMulai
+                                ? `Event Sedang Berlangsung`
+                                : dahAbis
+                                  ? `Event Sudah Habis`
+                                  : `Status Tidak Diketahui`}
                           </td>
                           <td className="flex items-center gap-4 px-6 py-4 text-center">
-                            <Button
+                            <button
+                              disabled={dahMulai || dahAbis}
                               onClick={() =>
                                 navigate(`/profile/eo/events/${element.id}`)
                               }
-                              type="primary"
-                              style={{ backgroundColor: "#0049cc" }}
+                              className={`h-10 w-14 rounded-md font-semibold  ${
+                                dahAbis || dahMulai
+                                  ? `border-2  bg-slate-100 text-slate-300`
+                                  : `bg-secondColors text-white shadow-sm hover:bg-mainColors`
+                              }`}
                             >
                               View
-                            </Button>
-                            <Button
+                            </button>
+                            <button
                               onClick={() => handleOpenUpdate(element)}
-                              disabled={!dateEvent}
-                              type="default"
+                              disabled={dahMulai || dahAbis}
+                              className={`h-10 w-14 rounded-md font-semibold  ${
+                                dahAbis || dahMulai
+                                  ? `border-2  bg-slate-100 text-slate-300`
+                                  : `bg-[#1f2937] text-white shadow-sm hover:bg-[#141b24]`
+                              }`}
                             >
                               Edit
-                            </Button>
+                            </button>
                             <Popconfirm
+                              disabled={dahMulai || dahAbis}
                               title="Hapus Event"
                               description="Apakah anda yakin ingin menghapus event ini ?"
                               onConfirm={() => toast.success("succes")}
@@ -217,9 +242,17 @@ const DashboardEO = () => {
                               okType="default"
                               showCancel={false}
                             >
-                              <Button type="primary" danger>
+                              <button
+                                className={`h-10 w-14 rounded-md font-semibold  ${
+                                  dahAbis || dahMulai
+                                    ? `border-2  bg-slate-100 text-slate-300`
+                                    : `bg-red-600 text-white shadow-sm
+                                     hover:bg-red-900`
+                                }`}
+                                disabled={dahMulai || dahAbis}
+                              >
                                 Delete
-                              </Button>
+                              </button>
                             </Popconfirm>
                           </td>
                         </tr>
@@ -244,6 +277,7 @@ const DashboardEO = () => {
         <div className="p-5">
           <Pagination
             current={page}
+            style={{ borderColor: "red" }}
             total={event?.data?.jumlah}
             pageSize={10}
             onChange={(page) => setPage(page)}
@@ -290,6 +324,7 @@ const DashboardEO = () => {
               <DatePicker
                 style={{ width: "100%" }}
                 size="large"
+                showToday={false}
                 disabled={loading}
               />
             </Item>
@@ -301,6 +336,7 @@ const DashboardEO = () => {
               <TimePicker
                 style={{ width: "100%" }}
                 size="large"
+                showNow={false}
                 placeholder="Pilih Waktu Acara"
                 format={FormatTime}
                 disabled={loading}
@@ -414,6 +450,7 @@ const DashboardEO = () => {
               <DatePicker
                 format={FormatDayjsInput}
                 size="large"
+                showNow={false}
                 disabled={loading}
               />
             </Item>

@@ -47,11 +47,11 @@ const Sidebar = () => {
               <div className="space-y-2 font-medium">
                 <Link to={element.to}>
                   <div
-                    className={`flex cursor-pointer items-center px-4 py-2 text-black hover:bg-[#03034F] hover:text-white ${
+                    className={`flex cursor-pointer items-center px-4 py-2 text-black hover:bg-secondColors hover:text-white ${
                       location.pathname.includes(element.to) ||
                       (element.subUrl &&
                         location.pathname.includes(element.subUrl))
-                        ? "bg-[#03034F] text-white"
+                        ? "bg-secondColors text-white"
                         : ""
                     }`}
                   >

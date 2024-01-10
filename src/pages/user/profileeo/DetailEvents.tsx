@@ -258,10 +258,14 @@ const DetailEvents = () => {
             <Item
               rules={[
                 { required: true, message: "Harga Wajib Diisi" },
-                {
-                  min: 5,
-                  message: "Minimal Harga Tiket Rp. 10.000,00",
-                },
+                () => ({
+                  validator(_, value) {
+                    if (!isNaN(value) && value >= 10000) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject("Minimal Harga Tiket Rp. 10.000,00");
+                  },
+                }),
               ]}
               name="harga"
               label="Harga"
@@ -310,6 +314,7 @@ const DetailEvents = () => {
                 style={{ width: "100%" }}
                 format={FormatDayjsInput}
                 size="large"
+                showNow={false}
                 disabled={loading}
               />
             </Item>
@@ -323,6 +328,7 @@ const DetailEvents = () => {
               <DatePicker
                 format={FormatDayjsInput}
                 className="testingyo"
+                showNow={false}
                 size="large"
                 style={{ width: "100%" }}
                 disabled={loading}
@@ -398,7 +404,7 @@ const DetailEvents = () => {
             <Item name="nama_acara" label="Nama Acara">
               <Input size="large" disabled={loading} />
             </Item>
-            <Item name="harga" label="Deskripsi">
+            <Item name="harga" label="Harga">
               <Input type="number" size="large" disabled={loading} />
             </Item>
 
@@ -426,6 +432,7 @@ const DetailEvents = () => {
               <DatePicker
                 format={FormatDayjsInput}
                 size="large"
+                showNow={false}
                 disabled={loading}
               />
             </Item>
@@ -433,6 +440,7 @@ const DetailEvents = () => {
               <DatePicker
                 format={FormatDayjsInput}
                 size="large"
+                showNow={false}
                 disabled={loading}
               />
             </Item>

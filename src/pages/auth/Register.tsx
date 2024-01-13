@@ -4,7 +4,7 @@ import { Alert, Form, Input, Modal } from "antd";
 import { publicAPi } from "@/shared/axios/axios";
 import { LoadingOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
-import { IRegisterProps } from "@/interface/register.interface";
+import { IRegisterProps } from "@/utils/interface/register.interface";
 
 export const Register = () => {
   const [status, setStatus] = useState(false);
@@ -112,11 +112,6 @@ export const Register = () => {
                 pattern: /^(?=.*[A-Z])/,
                 message:
                   "• Kata sandi harus mengandung setidaknya satu huruf kapital",
-              },
-              {
-                pattern: /^(?=.*[!@#$%^&*])/,
-                message:
-                  "• Kata sandi harus mengandung setidaknya satu tanda baca",
               },
               {
                 pattern: /^(?=.*[a-zA-Z\d!@#$%^&*])/,

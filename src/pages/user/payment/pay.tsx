@@ -5,7 +5,7 @@ import { LuWallet } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { LoadingOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
-import { BarcodePopupProps } from "@/types/pay.types";
+import { BarcodePopupProps } from "@/utils/types/pay.types";
 
 const BarcodePopup = ({
   barcode,
@@ -91,6 +91,7 @@ const BarcodePopup = ({
             ) : (
               <>
                 <img src={barcode} alt="Barcode" className="p-4" />
+                <h1>{barcode}</h1>
                 <div className="flex justify-end space-x-4">
                   <button
                     onClick={onClose}

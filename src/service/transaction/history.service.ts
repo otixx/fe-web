@@ -1,9 +1,9 @@
 import {
   IDataTransaction,
   IHistoryTicketDetail,
-} from "@/interface/history.interface";
+} from "@/utils/interface/history.interface";
 import { privateApi } from "@/shared/axios/axios";
-import { IHistoryProps, IHistoryState } from "@/types/history.type";
+import { IHistoryProps, IHistoryState } from "@/utils/types/history.type";
 import { useQuery } from "@tanstack/react-query";
 import { create } from "zustand";
 

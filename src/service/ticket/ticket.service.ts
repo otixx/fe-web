@@ -2,7 +2,7 @@ import {
   IFindTicketProps,
   ITicketDetail,
   Ticket,
-} from "@/interface/ticket.interface";
+} from "@/utils/interface/ticket.interface";
 import { privateApi } from "@/shared/axios/axios";
 import { useQuery } from "@tanstack/react-query";
 
@@ -41,7 +41,7 @@ export const QfindTicketbyEvent = (id: number) => {
   return useQuery({
     queryKey: ["ticketbyevent"],
     queryFn: fetcher,
-    select(res): Ticket[] {
+    select(res): Ticket {
       return res?.data?.data;
     },
   });

@@ -1,4 +1,4 @@
-import { TDataSlide } from "@/types/carousel.types";
+import { TDataSlide } from "@/utils/types/carousel.types";
 
 export const paymentMethods = [
   {

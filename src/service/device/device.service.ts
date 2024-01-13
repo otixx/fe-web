@@ -1,4 +1,4 @@
-import { IDeviceCheck } from "@/types/device.type";
+import { IDeviceCheck } from "@/utils/types/device.type";
 import { create } from "zustand";
 
 export const useDevice = create<IDeviceCheck>((set) => ({

@@ -5,6 +5,7 @@ import { QfindEvents } from "@/service/events/events.service";
 import {
   Button,
   DatePicker,
+  Empty,
   Form,
   Input,
   Modal,
@@ -14,7 +15,10 @@ import {
   TimePicker,
   Upload,
 } from "antd";
-import { ICreateEventsProps, IDataEvent } from "@/interface/event.interface";
+import {
+  ICreateEventsProps,
+  IDataEvent,
+} from "@/utils/interface/event.interface";
 import { LoadingOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import {
@@ -46,7 +50,7 @@ const DashboardEO = () => {
 
   const handleAddEvents = async (value: ICreateEventsProps) => {
     setLoading(true);
-    if (file.size) {
+    if (file) {
       const formData = new FormData();
       formData.append("nama_acara", value?.nama_acara);
       formData.append("description", value?.description);
@@ -56,12 +60,20 @@ const DashboardEO = () => {
           dayjs(value?.waktu_event).format(FormatTime),
       );
       formData.append("lokasi", value?.lokasi);
-      formData.append("file", file);
+      file.forEach((file: any) => {
+        formData.append("image", file.originFileObj);
+      });
+
       try {
-        const response = await privateApi.post(`/event`, formData);
+        const response = await privateApi.post(`/event/create`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
         toast.success(response?.data?.message);
         setLoading(false);
         setOpen(false);
+        setFile([]);
       } catch (error: any) {
         setLoading(false);
         toast.error(error?.response?.data?.message);
@@ -82,11 +94,14 @@ const DashboardEO = () => {
         dayjs().hour(0o0).minute(0o0).second(0o0).format(FormatTime),
     );
     formData.append("lokasi", value?.lokasi);
-    formData.append("file", file);
+    file.forEach((file: any) => {
+      formData.append("image", file.originFileObj);
+    });
     try {
       const res = await privateApi.put(`/event/update/${idEvent}`, formData);
       setOpenEdit(false);
       event.refetch();
+      setFile([]);
       toast.success(res?.data?.message);
     } catch (error) {
       console.log(error);
@@ -99,30 +114,15 @@ const DashboardEO = () => {
   ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   const handleFile = (info: any) => {
-    const isLt2M = info?.file.size / 1024 / 1024 < 1;
+    const isLt2M = info.fileList.every(
+      (file: any) => file.size / 1024 / 1024 < 1,
+    );
     if (!isLt2M) {
       toast.error("Size gambar tidak boleh lebih dari 1 MB");
     } else {
-      setFile(info?.file);
+      setFile([...info.fileList]);
     }
   };
-
-  // const handleImageChange = (e: any) => {
-  //   const fileList: any = e.target.files;
-  //   if (fileList?.length > 0) {
-  //     const fileArray = Array.from(fileList) as File[];
-  //     const isFileSizeValid = fileArray.every(
-  //       (file) => file.size <= 1024 * 1024,
-  //     );
-  //     if (isFileSizeValid) {
-  //       setFile(fileArray);
-  //     } else {
-  //       toast.error("Size gambar tidak boleh lebih dari 1 MB");
-  //     }
-  //   } else {
-  //     setFile(fileList);
-  //   }
-  // };
 
   return (
     <div className="w-full">
@@ -243,13 +243,12 @@ const DashboardEO = () => {
                               showCancel={false}
                             >
                               <button
-                                className={`h-10 w-14 rounded-md font-semibold  ${
+                                className={`flex h-10 w-14 items-center justify-center rounded-md font-semibold  ${
                                   dahAbis || dahMulai
                                     ? `border-2  bg-slate-100 text-slate-300`
                                     : `bg-red-600 text-white shadow-sm
                                      hover:bg-red-900`
                                 }`}
-                                disabled={dahMulai || dahAbis}
                               >
                                 Delete
                               </button>
@@ -259,7 +258,11 @@ const DashboardEO = () => {
                       );
                     })
                   ) : (
-                    <tr>Tidak ada data</tr>
+                    <tr>
+                      <td className="py-4" colSpan={5}>
+                        <Empty />
+                      </td>
+                    </tr>
                   )
                 ) : (
                   <tr>
@@ -310,7 +313,6 @@ const DashboardEO = () => {
               name="description"
               label="Deskripsi"
             >
-              {/* <Input size="large" disabled={loading} /> */}
               <Input.TextArea
                 placeholder="Deskripsi Event"
                 disabled={loading}
@@ -326,6 +328,9 @@ const DashboardEO = () => {
                 size="large"
                 showToday={false}
                 disabled={loading}
+                disabledDate={(current) =>
+                  current && dayjs(current).isBefore(dayjs(), "day")
+                }
               />
             </Item>
             <Item
@@ -364,30 +369,17 @@ const DashboardEO = () => {
             </Item>
             <Item
               rules={[{ required: true, message: "Lokasi Event Wajib" }]}
-              label="Upload Gambar Acara"
+              label="Upload Gambar Rundown"
               name="file"
             >
               <Upload
                 onChange={handleFile}
                 accept=".png,.jpg,.jpeg"
-                maxCount={1}
+                multiple={true}
               >
                 <Button icon={<LuUpload />}>Upload</Button>
               </Upload>
             </Item>
-            {/* <Item
-              rules={[
-                { required: true, message: "Tanggal Expired Tiket Wajib" },
-              ]}
-              label="Gambar Tiket"
-            >
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
-              />
-            </Item> */}
             <div className="flex justify-center gap-2 py-2 md:justify-end lg:justify-end xl:justify-end">
               <button
                 onClick={() => {
@@ -448,10 +440,14 @@ const DashboardEO = () => {
             </Item>
             <Item name="tanggal_acara" label="Tanggal Acara">
               <DatePicker
+                style={{ width: "100%" }}
                 format={FormatDayjsInput}
                 size="large"
                 showNow={false}
                 disabled={loading}
+                disabledDate={(current) =>
+                  current && dayjs(current).isBefore(dayjs(), "day")
+                }
               />
             </Item>
             <Item name="lokasi" label="Nama Acara">
@@ -472,19 +468,14 @@ const DashboardEO = () => {
             </Item>
             <Item label="Upload Gambar Event" name="file">
               <Upload
-                fileList={[
-                  {
-                    uid: "1",
-                    name: "file.png",
-                  },
-                ]}
                 onChange={handleFile}
                 accept=".png,.jpg,.jpeg"
-                maxCount={1}
+                multiple={true}
               >
                 <Button icon={<LuUpload />}>Upload</Button>
               </Upload>
             </Item>
+
             <div className="flex justify-end gap-2 py-2">
               <button
                 onClick={() => setOpenEdit(false)}

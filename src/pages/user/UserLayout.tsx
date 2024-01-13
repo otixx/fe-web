@@ -26,26 +26,25 @@ const UserLayout = () => {
   const protectRoute = () => {
     if (!token && !landing && !detail) {
       navigate("/auth/signin");
-    }
-
-    if (
-      profile?.status === 403 &&
-      profile?.data === "Forbidden" &&
-      !landing &&
-      !detail
-    ) {
-      Cookies.remove("token");
-      toast.error("Sesi Anda Telah Berakhir");
-      navigate("/auth/signin");
+    } else {
+      if (
+        profile?.status === 403 &&
+        profile?.data === "Forbidden" &&
+        !landing &&
+        !detail
+      ) {
+        Cookies.remove("token");
+        toast.error("Sesi Anda Telah Berakhir");
+        navigate("/auth/signin");
+      }
     }
   };
-
   useEffect(() => {
     const asyncComponentLoad = async () => {
       await Promise.all([
         componentLoad(),
-        protectRoute(),
         getProfile(),
+        protectRoute(),
         getDevice(),
       ]);
       setLoading(false);

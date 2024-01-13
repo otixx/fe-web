@@ -16,7 +16,9 @@ const LayoutEO = () => {
 
   const protectRouteEO = () => {
     if (token && !profile?.status_eo) {
-      navigate("/profile/eo/register");
+      // aktifkan jika sudah banyak EO
+      // navigate("/profile/eo/register");
+      navigate("/");
     } else if (
       token &&
       profile?.status_eo &&

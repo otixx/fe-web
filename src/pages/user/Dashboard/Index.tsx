@@ -2,7 +2,7 @@ import { QfindTicket } from "@/service/ticket/ticket.service";
 import { LuSearch } from "react-icons/lu";
 import dayjs from "dayjs";
 import { FormatDayjs } from "@/shared/dayjs/format";
-import { ITicketData } from "@/interface/ticket.interface";
+import { ITicketData } from "@/utils/interface/ticket.interface";
 import SkeletonCard from "@/components/Skeleton";
 import Carousel from "@/components/Carousel";
 import Card from "@/components/Card";
@@ -53,7 +53,7 @@ const Index = () => {
                   setQuery(e.target.value), setUrl("/search");
                 }}
                 className="block w-80 rounded-full border-2 border-gray-300 bg-gray-50 px-6 py-3.5 pl-10 text-[14px] text-black transition hover:border-secondColors hover:duration-500 focus:outline-none"
-                placeholder="Cari Event min 4 Char..."
+                placeholder="Masukkan min 4 karakter.."
               />
             </div>
           </form>
@@ -82,7 +82,7 @@ const Index = () => {
             <div className="col-span-12">
               <Notfound
                 title="Event tidak ada"
-                description="gaada event ya awokwkwok"
+                description="Maaf sepertinya keyword yang anda masukkan tidak ada"
               />
             </div>
           )

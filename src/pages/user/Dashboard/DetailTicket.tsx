@@ -13,7 +13,7 @@ import {
 } from "react-icons/lu";
 import toast from "react-hot-toast";
 import { Image, Tag } from "antd";
-import { IDataEventImg, IDataImgUrl } from "@/interface/ticket.interface";
+import { IDataEventImg, IDataImgUrl } from "@/utils/interface/ticket.interface";
 
 const DetailTiket = () => {
   const [quantity, setQuantity] = useState(1);
@@ -69,16 +69,21 @@ const DetailTiket = () => {
     e.preventDefault();
     navigate(`/detail/payment/${idTiket?.id}`, { state: { data: quantity } });
   };
+  const tanggalAcara = dayjs(ticketDetail?.tanggal_preorder);
+  const hariIni = dayjs();
+  const belumMulai = tanggalAcara.isAfter(hariIni, "day");
+  const dahAbis = hariIni === dayjs(ticketDetail?.tanggal_expired);
 
   return (
     <div className="container mx-auto my-10 max-w-7xl p-5">
       <div className="mx-auto mt-6 space-y-4">
         <div className="grid grid-cols-3 justify-between gap-5">
           <div className="order-1 col-span-3 h-80 lg:col-span-2">
-            <img
-              src={dataImg && dataImg.url}
-              alt="imgDetail"
-              className="h-full w-full rounded-lg object-cover object-center"
+            <Image
+              width="100%"
+              style={{ objectFit: "cover", borderRadius: "5px" }}
+              height={320}
+              src={dataImg && dataImg?.url}
             />
           </div>
           <div className="order-2 col-span-3 rounded-lg lg:col-span-1 lg:shadow-lg">
@@ -126,10 +131,17 @@ const DetailTiket = () => {
                   {ticketDetail?.event?.description}
                 </p>
               </div>
-              {dataEventImg &&
-                dataEventImg.map((img, index) => (
-                  <Image width={350} height={350} src={img?.url} key={index} />
-                ))}
+              <div className="flex gap-2">
+                {dataEventImg &&
+                  dataEventImg.map((img, index) => (
+                    <Image
+                      width={350}
+                      height={350}
+                      src={img?.url}
+                      key={index}
+                    />
+                  ))}
+              </div>
             </div>
           </div>
 
@@ -178,20 +190,27 @@ const DetailTiket = () => {
                 <button
                   disabled={
                     ticketDetail?.quantity === 0 ||
-                    ticketDetail?.quantity === null
+                    ticketDetail?.quantity === null ||
+                    belumMulai ||
+                    dahAbis
                   }
                   type="submit"
                   className={`mt-10 ${
-                    ticketDetail?.quantity === 0
+                    ticketDetail?.quantity === 0 || tanggalAcara > hariIni
                       ? "cursor-not-allowed bg-gray-400"
                       : "bg-secondColors hover:bg-mainColors"
-                  } flex w-full items-center justify-center gap-2 rounded-md border border-transparent py-3  text-base  font-semibold text-white transition duration-500 `}
+                  } flex w-full items-center justify-center gap-2 rounded-md border border-transparent py-3 text-base font-semibold text-white transition duration-500 `}
                 >
                   {ticketDetail?.quantity === 0 ||
-                  ticketDetail?.quantity === null ? (
+                  ticketDetail?.quantity === null ||
+                  belumMulai ? (
                     <>
                       <LuAlertCircle size={20} />
-                      Tiket Habis
+                      {belumMulai
+                        ? "Maaf belum tanggal preorder"
+                        : dahAbis
+                          ? "Maaf Event Sudah Selesai"
+                          : "Tiket Habis"}
                     </>
                   ) : (
                     <>

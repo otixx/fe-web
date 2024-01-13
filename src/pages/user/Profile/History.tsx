@@ -1,14 +1,14 @@
-import { Status } from "@/enum/status.enum";
-import { IDetailFormHistory } from "@/interface/history.interface";
+import { Status } from "@/utils/enum/status.enum";
+import { IDetailFormHistory } from "@/utils/interface/history.interface";
 import { useHistory } from "@/service/transaction/history.service";
 import { FormatDayjs } from "@/shared/dayjs/format";
-import { Modal, Skeleton } from "antd";
+import { Empty, Modal, Skeleton } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BarcodePopup from "../payment/pay";
 import { useDevice } from "@/service/device/device.service";
-import { EPayment } from "@/enum/payment.enum";
+import { EPayment } from "@/utils/enum/payment.enum";
 import { privateApi } from "@/shared/axios/axios";
 import { LoadingOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
@@ -44,7 +44,6 @@ const History = () => {
   const handleDelete = async () => {
     const data = JSON.parse(id);
     setLoading(true);
-    console.log(data?.transaction_id);
     try {
       const res = await privateApi.post(`/transaction/cancel`, {
         order_id: data?.transaction_id,
@@ -54,7 +53,6 @@ const History = () => {
       toast.success(res?.data?.message);
     } catch (error: any) {
       setLoading(false);
-      console.log(error?.response?.data);
     }
   };
 
@@ -63,11 +61,17 @@ const History = () => {
   }, []);
 
   return (
-    <div className="container mx-auto p-8">
-      <h1 className="mb-8 text-3xl font-bold">Transaction History</h1>
+    <div
+      className={`container mx-auto ${
+        transactions && transactions.length === 0 && "h-[80vh]"
+      } p-8`}
+    >
+      <h1 className="mb-2 text-3xl font-bold">Transaction History</h1>
       {transactions ? (
         transactions?.length === 0 ? (
-          <p>Anda Belum Melakukan Transaksi.</p>
+          <div className="flex h-full w-full items-center justify-center">
+            <Empty />
+          </div>
         ) : (
           <div className="min-h-screen">
             <ul className="space-y-4">
@@ -75,6 +79,13 @@ const History = () => {
                 const formDetail: IDetailFormHistory = JSON.parse(
                   transaction?.response_payment,
                 );
+                const tanggalAcara = dayjs(
+                  transaction?.tiket?.event?.tanggal_acara,
+                );
+                const hariIni = dayjs();
+
+                const belumMulai = tanggalAcara.isAfter(hariIni, "day");
+                const dahAbis = tanggalAcara.isBefore(hariIni, "day");
                 return (
                   <li
                     key={index}
@@ -134,14 +145,26 @@ const History = () => {
                           className={`rounded-md px-4 py-2 font-semibold text-white  ${
                             transaction.status === Status?.checkin
                               ? "cursor-not-allowed bg-gray-400"
-                              : "bg-secondColors hover:bg-mainColors"
+                              : belumMulai
+                                ? "cursor-not-allowed bg-gray-400"
+                                : "bg-mainColors hover:bg-hoverMainColors"
                           }`}
-                          disabled={transaction.status === Status?.checkin}
+                          disabled={
+                            transaction.status === Status?.checkin
+                              ? true
+                              : belumMulai || dahAbis
+                                ? true
+                                : false
+                          }
                           onClick={() =>
                             navigate(`/history/${transaction?.id}`)
                           }
                         >
-                          Detail
+                          {transaction.status === Status?.checkin
+                            ? "Sudah Checkin"
+                            : belumMulai
+                              ? "Event belum mulai"
+                              : "Event sudah berakhir"}
                         </button>
                       )}
                     </div>
@@ -154,6 +177,7 @@ const History = () => {
       ) : (
         <Skeleton avatar active paragraph={{ rows: 3 }} />
       )}
+
       <BarcodePopup
         device={device}
         payment={payment}

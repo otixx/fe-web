@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { LoadingOutlined } from "@ant-design/icons";
 import { paymentMethods } from "@/shared/tempData";
 import { useDevice } from "@/service/device/device.service";
-import { EPayment } from "@/enum/payment.enum";
+import { EPayment } from "@/utils/enum/payment.enum";
 
 const DetailPayment = () => {
   const idTiket = useParams().id;
@@ -46,13 +46,11 @@ const DetailPayment = () => {
         setLoading(false);
         if (response?.data?.status == 200) {
           if (device === "mobile" && selectedMethod === EPayment.shopee) {
-            console.log(response?.data);
             toast.success(response?.data?.message);
             setIdTransaction(response.data?.data?.transaction_id);
             window.open(`${response?.data?.data?.actions[0]?.url}`, "_blank");
             navigate("/history");
           } else if (device === "mobile" && selectedMethod === EPayment.gopay) {
-            console.log(response?.data);
             toast.success(response?.data?.message);
             setIdTransaction(response.data?.data?.transaction_id);
             window.open(`${response.data?.data?.actions[1]?.url}`, "_blank");
@@ -71,7 +69,7 @@ const DetailPayment = () => {
         } else if (error?.response?.data?.status == 500) {
           toast.error(error?.response?.data?.message);
         } else {
-          console.log(error);
+          toast.error(error?.response?.data?.message);
         }
       }
     } else {
@@ -89,26 +87,28 @@ const DetailPayment = () => {
 
   return (
     <div className="container mx-auto">
-      <div className="p-4">
-        <div className="grid grid-cols-5 gap-4">
-          <div className="order-2 col-span-5 gap-2 rounded-sm p-4 lg:order-1 lg:col-span-3">
-            <div className="mt-2 py-4">
-              <h1 className="text-2xl font-bold">Detail Pemesanan</h1>
-            </div>
+      <div className="space-y-2 p-4">
+        <Form layout="vertical" onFinish={handleSubmit}>
+          <div className="grid grid-cols-5 gap-2">
+            <div className="order-1 col-span-5 gap-2 rounded-sm p-4 lg:order-1 lg:col-span-3">
+              <div className="mt-2 py-4">
+                <h1 className="text-2xl font-bold">Detail Pemesanan</h1>
+              </div>
 
-            <div className="flex justify-between py-4">
-              <h1 className="text-[16px] font-bold">{tiket?.nama_kegiatan}</h1>
-              <h1 className="font-semibold text-[#666666]">
-                {new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                }).format(Number(tiket?.harga))}
-              </h1>
-            </div>
-            <hr />
-            <div className="py-4">
-              <Form layout="vertical" onFinish={handleSubmit}>
-                {tiket?.tags === "visitor" ? null : (
+              <div className="flex justify-between py-4">
+                <h1 className="text-[16px] font-bold">
+                  {tiket?.nama_kegiatan}
+                </h1>
+                <h1 className="font-semibold text-[#666666]">
+                  {new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  }).format(Number(tiket?.harga))}
+                </h1>
+              </div>
+              <hr />
+              <div className="py-4">
+                {tiket?.tags === "visitor" || tiket?.tags === "stand" ? null : (
                   <>
                     <Item
                       rules={[{ required: true, message: "Masukkan Nama" }]}
@@ -150,8 +150,8 @@ const DetailPayment = () => {
                       rules={[
                         { required: true, message: "Masukkan No Hp" },
                         {
-                          min: 11,
-                          message: "No Hp minimal 11 digit",
+                          min: 10,
+                          message: "No Hp minimal 10 digit",
                         },
                       ]}
                       name="noHp"
@@ -182,81 +182,81 @@ const DetailPayment = () => {
                     )}
                   </>
                 )}
-                <div className="py-4">
-                  <div className="flex justify-between py-4">
-                    <h1 className="font text-[14px] font-semibold">Qty</h1>
-                    <h1 className="font-semibold text-[#666666]">x {qty}</h1>
-                  </div>
-                  <hr />
-                  <div className="flex justify-between py-4">
-                    <h1 className="font text-[14px] font-semibold">Total</h1>
-                    <h1 className="font-semibold ">
-                      {new Intl.NumberFormat("id-ID", {
-                        style: "currency",
-                        currency: "IDR",
-                      }).format(Number(tiket?.harga) * qty)}
-                    </h1>
-                  </div>
-                  <div className="flex flex-col py-4">
-                    <button
-                      type="submit"
-                      className="rounded-sm bg-secondColors px-8 py-2.5 text-[14px] font-semibold text-white transition duration-300 hover:bg-mainColors"
-                    >
-                      {" "}
-                      {loading ? (
-                        <LoadingOutlined />
-                      ) : (
-                        "Buat Tagihan Pembayaran"
-                      )}
-                    </button>
-                    <p className="py-2 text-[12px] font-semibold text-[#666666]">
-                      Dengan checkout, Anda setuju dengan Ketentuan Penggunaan
-                      kami dan mengonfirmasi bahwa Anda telah membaca Kebijakan
-                      Privasi kami. Anda dapat membatalkan biaya perpanjangan
-                      layanan kapan saja.
-                    </p>
-                  </div>
-                </div>
-              </Form>
+              </div>
             </div>
-          </div>
-
-          <div className="order-2 col-span-5 h-fit rounded-sm p-4 shadow-lg lg:order-1 lg:col-span-2">
-            <h1 className="p-4 text-2xl font-bold"> Pilih Metode Pembayaran</h1>
-            <div className="flex flex-col gap-4">
-              {paymentMethods.map((method, index) => (
-                <div key={index}>
-                  {device === "dekstop" &&
-                  method.name === EPayment.shopee ? null : (
-                    <div
-                      className={`flex ${
-                        loading ? "bg-gray-100" : ""
-                      } cursor-pointer justify-between rounded-sm border-2 px-4 shadow-sm`}
-                      onClick={() => setSelectedMethod(method.name)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="paymentMethod"
-                          readOnly
-                          checked={selectedMethod === method.name}
+            <div className="order-2 col-span-5 h-fit rounded-sm p-4 shadow-lg lg:order-1 lg:col-span-2">
+              <h1 className="p-4 text-2xl font-bold">
+                {" "}
+                Pilih Metode Pembayaran
+              </h1>
+              <div className="flex flex-col gap-4">
+                {paymentMethods.map((method, index) => (
+                  <div key={index}>
+                    {device === "dekstop" &&
+                    method.name === EPayment.shopee ? null : (
+                      <div
+                        className={`flex ${
+                          loading ? "bg-gray-100" : ""
+                        } cursor-pointer justify-between rounded-sm border-2 px-4 shadow-sm`}
+                        onClick={() => setSelectedMethod(method.name)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            readOnly
+                            checked={selectedMethod === method.name}
+                          />
+                          <h1 className="text-[16px] font-semibold">
+                            {method.name}
+                          </h1>
+                        </div>
+                        <img
+                          className="right-0 h-full w-20 bg-transparent mix-blend-multiply"
+                          src={method.logoSrc}
+                          alt={method.name}
                         />
-                        <h1 className="text-[16px] font-semibold">
-                          {method.name}
-                        </h1>
                       </div>
-                      <img
-                        className="right-0 h-full w-20 bg-transparent mix-blend-multiply"
-                        src={method.logoSrc}
-                        alt={method.name}
-                      />
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+          <div className="grid grid-cols-5">
+            <div className="col-span-5 lg:col-span-3">
+              <div className="flex justify-between py-4">
+                <h1 className="font text-[14px] font-semibold">Qty</h1>
+                <h1 className="font-semibold text-[#666666]">x {qty}</h1>
+              </div>
+              <hr />
+              <div className="flex justify-between py-4">
+                <h1 className="font text-[14px] font-semibold">Total</h1>
+                <h1 className="font-semibold ">
+                  {new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  }).format(Number(tiket?.harga) * qty)}
+                </h1>
+              </div>
+              <div className="flex flex-col py-4">
+                <button
+                  type="submit"
+                  className="rounded-sm bg-secondColors px-8 py-2.5 text-[14px] font-semibold text-white transition duration-300 hover:bg-mainColors"
+                >
+                  {" "}
+                  {loading ? <LoadingOutlined /> : "Buat Tagihan Pembayaran"}
+                </button>
+                <p className="py-2 text-[12px] font-semibold text-[#666666]">
+                  Dengan checkout, Anda setuju dengan Ketentuan Penggunaan kami
+                  dan mengonfirmasi bahwa Anda telah membaca Kebijakan Privasi
+                  kami. Anda dapat membatalkan biaya perpanjangan layanan kapan
+                  saja.
+                </p>
+              </div>
+            </div>
+          </div>
+        </Form>
       </div>
       <BarcodePopup
         device={device}

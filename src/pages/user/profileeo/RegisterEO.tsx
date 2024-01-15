@@ -4,7 +4,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { Alert, Form, Input, Select, Spin } from "antd";
 import { toast } from "react-hot-toast";
 import { privateApi } from "@/shared/axios/axios";
-
+import authImg from "../../../../public/auth.svg";
 const RegisterEO = () => {
   const [msg, setMsg] = useState("");
   const [status, setStatus] = useState(false);
@@ -53,18 +53,14 @@ const RegisterEO = () => {
       <div className="p-4">
         <div className="flex h-screen items-center justify-center gap-4">
           <div className="hidden w-2/5 p-5 lg:block">
-            <img
-              src="https://www.loket.com/web/assets/img/auth/icon-login.svg"
-              className="object-cover"
-              alt=""
-            />
+            <img src={authImg} className="object-cover" alt="" />
           </div>
           <div className="w-full justify-start p-4 shadow-lg lg:w-2/5">
             {msg ? <Alert showIcon message={`${msg}`} type="warning" /> : null}
             <Form onFinish={handleLogin}>
               <div className="flex justify-center p-2">
                 <h1 className="text-[21px] font-bold text-mainColors">
-                  Gaweo EO Cok
+                  Pendaftaran Akun EO
                 </h1>
               </div>
               <div className="flex justify-center p-2">

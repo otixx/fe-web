@@ -1,8 +1,9 @@
 import {
   IFindTicketProps,
   ITicketDetail,
+  ITiketHistory,
   Ticket,
-} from "@/interface/ticket.interface";
+} from "@/utils/interface/ticket.interface";
 import { privateApi } from "@/shared/axios/axios";
 import { useQuery } from "@tanstack/react-query";
 
@@ -41,7 +42,18 @@ export const QfindTicketbyEvent = (id: number) => {
   return useQuery({
     queryKey: ["ticketbyevent"],
     queryFn: fetcher,
-    select(res): Ticket[] {
+    select(res): Ticket {
+      return res?.data?.data;
+    },
+  });
+};
+
+export const QfindHistoryTiket = () => {
+  const fetcher = () => privateApi.get(`/tiket/eo`);
+  return useQuery({
+    queryKey: ["tiketEO"],
+    queryFn: fetcher,
+    select(res): ITiketHistory[] {
       return res?.data?.data;
     },
   });

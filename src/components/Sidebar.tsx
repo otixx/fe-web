@@ -51,7 +51,7 @@ const Sidebar = () => {
                       location.pathname.includes(element.to) ||
                       (element.subUrl &&
                         location.pathname.includes(element.subUrl))
-                        ? "bg-secondColors text-white"
+                        ? "bg-mainColors text-white"
                         : ""
                     }`}
                   >

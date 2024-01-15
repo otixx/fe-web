@@ -1,21 +1,38 @@
-import { useNavigate } from "react-router-dom";
+import { useMatch, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import { LuKey, LuLogOut, LuUser, LuUserCog } from "react-icons/lu";
+import { LuLogOut, LuUser, LuUserCog } from "react-icons/lu";
 import { Avatar, Dropdown } from "antd";
 import { useProfile } from "@/service/user/user.service";
-import { ItemType } from "@/interface/navbar.interface";
+import logo from "/logo.png";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 const Navbar = () => {
   const navigate = useNavigate();
   const profile: any = useProfile((state) => state?.profile);
   const isEO = profile?.status_eo;
   const styleMenuItems = `flex cursor-pointer items-center gap-2`;
+  const landing = location.pathname === "/";
+  const detail = useMatch("/detail/:id");
 
   const handleOut = () => {
     Cookies.remove("token");
     navigate("/auth/signin");
   };
 
-  const items: ItemType[] = [
+  useEffect(() => {
+    if (
+      profile?.status === 403 &&
+      profile?.data === "Forbidden" &&
+      !landing &&
+      !detail
+    ) {
+      Cookies.remove("token");
+      toast.error("Sesi Anda Telah Berakhir");
+      navigate("/auth/signin");
+    }
+  }, []);
+
+  const items: any = [
     {
       key: "1",
       label: (
@@ -25,29 +42,27 @@ const Navbar = () => {
       ),
       onClick: () => navigate("/profile"),
     },
-    ...(isEO
-      ? [
-          {
-            key: "2",
-            label: (
-              <div className={styleMenuItems}>
-                <LuUserCog /> Profile EO
-              </div>
-            ),
-            onClick: () => navigate("/profile/eo/events"),
-          },
-        ]
-      : [
-          {
-            key: "3",
-            label: (
-              <div className={styleMenuItems}>
-                <LuKey /> Register EO
-              </div>
-            ),
-            onClick: () => navigate("/profile/eo/register"),
-          },
-        ]),
+    isEO && {
+      key: "2",
+      label: (
+        <div className={styleMenuItems}>
+          <LuUserCog /> Profile EO
+        </div>
+      ),
+      onClick: () => navigate("/profile/eo/events"),
+    },
+    // aktifkan jika sudah banyak EO
+    // : [
+    //     {
+    //       key: "3",
+    //       label: (
+    //         <div className={styleMenuItems}>
+    //           <LuKey /> Register EO
+    //         </div>
+    //       ),
+    //       onClick: () => navigate("/profile/eo/register"),
+    //     },
+    //   ]
     {
       key: "4",
       label: (
@@ -75,7 +90,7 @@ const Navbar = () => {
           <div className="flex">
             <div onClick={() => navigate("/")}>
               <div className="-m-1.5 cursor-pointer p-1.5 text-[18px] font-bold text-white">
-                Otakutixx
+                <img src={logo} className="h-10 w-full" />
               </div>
             </div>
           </div>

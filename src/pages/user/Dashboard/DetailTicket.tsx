@@ -2,18 +2,19 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { QfindTicketbyId } from "@/service/ticket/ticket.service";
 import dayjs from "dayjs";
-import { FormatDayjs } from "@/shared/dayjs/format";
+import { FormatDayjs, FormatDetailTicket } from "@/shared/dayjs/format";
 import {
   LuAlertCircle,
   LuCalendarDays,
   LuKey,
   LuMap,
+  LuTimer,
   LuShieldCheck,
   LuTicket,
 } from "react-icons/lu";
 import toast from "react-hot-toast";
 import { Image, Tag } from "antd";
-import { IDataEventImg, IDataImgUrl } from "@/interface/ticket.interface";
+import { IDataEventImg, IDataImgUrl } from "@/utils/interface/ticket.interface";
 
 const DetailTiket = () => {
   const [quantity, setQuantity] = useState(1);
@@ -69,47 +70,115 @@ const DetailTiket = () => {
     e.preventDefault();
     navigate(`/detail/payment/${idTiket?.id}`, { state: { data: quantity } });
   };
+  const tanggalAcara = dayjs(ticketDetail?.tanggal_preorder).format(
+    "YYY-MM-DD",
+  );
+  const hariIni = dayjs().format(FormatDetailTicket);
+  const belumMulai =
+    hariIni < dayjs(ticketDetail?.tanggal_preorder).format("YYY-MM-DD");
+  const dahAbis =
+    hariIni > dayjs(ticketDetail?.tanggal_expired).format(FormatDetailTicket);
 
+  // console.log(ticketDetail);
+  // console.log(ticketDetail?.tanggal_expired);
   return (
     <div className="container mx-auto my-10 max-w-7xl p-5">
       <div className="mx-auto mt-6 space-y-4">
         <div className="grid grid-cols-3 justify-between gap-5">
           <div className="order-1 col-span-3 h-80 lg:col-span-2">
-            <img
-              src={dataImg && dataImg.url}
-              alt="imgDetail"
-              className="h-full w-full rounded-lg object-cover object-center"
+            <Image
+              width="100%"
+              style={{ objectFit: "cover", borderRadius: "5px" }}
+              height={320}
+              src={dataImg && dataImg?.url}
             />
           </div>
           <div className="order-2 col-span-3 rounded-lg lg:col-span-1 lg:shadow-lg">
             <div className="h-full w-full rounded-lg bg-white px-2 lg:p-6">
               <div className="space-y-4">
                 <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-                  {ticketDetail?.nama_kegiatan}
+                  {ticketDetail ? (
+                    ticketDetail?.nama_kegiatan
+                  ) : (
+                    <div
+                      role="status"
+                      className="animate-pulse space-y-8 rtl:space-x-reverse md:flex md:items-center md:space-x-8 md:space-y-0"
+                    >
+                      <div className="w-full">
+                        <div className="mb-4 h-2.5 w-48 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                      </div>
+                    </div>
+                  )}
                 </h1>
                 <h3 className="text-sm font-semibold text-mainColors">
                   Highlights :
                 </h3>
                 <span className="flex items-center gap-2 text-gray-800">
                   <LuCalendarDays />
-                  {dayjs(ticketDetail?.event?.tanggal_acara).format(
-                    FormatDayjs,
+                  {ticketDetail ? (
+                    dayjs(ticketDetail?.event?.tanggal_acara).format(
+                      FormatDayjs,
+                    )
+                  ) : (
+                    <div
+                      role="status"
+                      className="animate-pulse space-y-8 rtl:space-x-reverse md:flex md:items-center md:space-x-8 md:space-y-0"
+                    >
+                      <div className="w-full">
+                        <div className="mb-4 h-2.5 w-48 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                      </div>
+                    </div>
                   )}
                 </span>
                 <span className="flex items-center gap-2 text-gray-800">
                   <LuMap />
-                  {ticketDetail?.event?.lokasi}
+                  {ticketDetail ? (
+                    ticketDetail?.event?.lokasi
+                  ) : (
+                    <div
+                      role="status"
+                      className="animate-pulse space-y-8 rtl:space-x-reverse md:flex md:items-center md:space-x-8 md:space-y-0"
+                    >
+                      <div className="w-full">
+                        <div className="mb-4 h-2.5 w-48 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                      </div>
+                    </div>
+                  )}
                 </span>
                 <span className="flex items-center gap-2 text-gray-800">
                   <LuTicket />
-                  {ticketDetail?.quantity == 0 ||
-                  ticketDetail?.quantity === null
-                    ? "Stok Habis"
-                    : `${ticketDetail?.quantity} Qty`}
+                  {ticketDetail ? (
+                    ticketDetail?.quantity == 0 ||
+                    ticketDetail?.quantity === null ? (
+                      "Stok Habis"
+                    ) : (
+                      `${ticketDetail?.quantity} Qty`
+                    )
+                  ) : (
+                    <div
+                      role="status"
+                      className="animate-pulse space-y-8 rtl:space-x-reverse md:flex md:items-center md:space-x-8 md:space-y-0"
+                    >
+                      <div className="w-full">
+                        <div className="mb-4 h-2.5 w-48 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                      </div>
+                    </div>
+                  )}
                 </span>
                 <span className="flex items-center gap-2 font-semibold text-gray-800">
                   <LuKey />
-                  <Tag color="blue">{ticketDetail?.tags}</Tag>
+                  {ticketDetail ? (
+                    <Tag color="blue">{ticketDetail?.tags}</Tag>
+                  ) : (
+                    <div
+                      role="status"
+                      className="animate-pulse space-y-8 rtl:space-x-reverse md:flex md:items-center md:space-x-8 md:space-y-0"
+                    >
+                      <div className="w-full">
+                        <div className="mb-4 h-2.5 w-48 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                      </div>
+                    </div>
+                  )}
                 </span>
               </div>
             </div>
@@ -122,82 +191,163 @@ const DetailTiket = () => {
                 <h3 className="text-lg font-semibold text-mainColors">
                   Description Event :
                 </h3>
-                <p className="  text-base text-gray-900">
-                  {ticketDetail?.event?.description}
-                </p>
+                <div className="  text-base text-gray-900">
+                  {ticketDetail ? (
+                    ticketDetail?.event?.description
+                  ) : (
+                    <div
+                      role="status"
+                      className="animate-pulse space-y-8 rtl:space-x-reverse md:flex md:items-center md:space-x-8 md:space-y-0"
+                    >
+                      <div className="w-full">
+                        <div className="mb-4 h-2.5 w-48 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-              {dataEventImg &&
-                dataEventImg.map((img, index) => (
-                  <Image width={350} height={350} src={img?.url} key={index} />
-                ))}
+              <div className="flex gap-2">
+                {dataEventImg ? (
+                  dataEventImg &&
+                  dataEventImg.map((img, index) => (
+                    <Image
+                      width={350}
+                      height={350}
+                      src={img?.url}
+                      key={index}
+                    />
+                  ))
+                ) : (
+                  <div
+                    role="status"
+                    className="animate-pulse space-y-8 rtl:space-x-reverse md:flex md:items-center md:space-x-8 md:space-y-0"
+                  >
+                    <div className="w-full">
+                      <div className="mb-4 h-2.5 w-48 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           <div className="order-3 col-span-9 px-4 lg:col-span-3">
             <h2 className="font-semibold text-mainColors">Harga</h2>
-            <p className="truncate px-2 text-lg tracking-tight text-gray-900 lg:px-0 lg:text-3xl">
-              {new Intl.NumberFormat("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              }).format(Number(ticketDetail?.harga) * quantity)}
-            </p>
+            <div className="truncate px-2 text-lg tracking-tight text-gray-900 lg:px-0 lg:text-3xl">
+              {ticketDetail?.harga ? (
+                new Intl.NumberFormat("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                }).format(Number(ticketDetail?.harga) * quantity)
+              ) : (
+                <div
+                  role="status"
+                  className="animate-pulse space-y-8 rtl:space-x-reverse md:flex md:items-center md:space-x-8 md:space-y-0"
+                >
+                  <div className="w-full">
+                    <div className="mb-4 h-2.5 w-48 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                  </div>
+                </div>
+              )}
+            </div>
             <form className="mt-10" onSubmit={handleCheckout}>
               <div>
-                {ticketDetail?.quantity && ticketDetail?.quantity !== 0 && (
-                  <fieldset className="mt-4">
-                    <h1>Qty</h1>
-                    <div className="items-center space-x-3">
-                      <button
-                        type="button"
-                        className="rounded-md bg-gray-200 px-2 py-1 shadow-sm transition duration-150 hover:bg-gray-300"
-                        onClick={() => handleMin()}
-                        disabled={quantity === 1}
-                      >
-                        -
-                      </button>
-                      <input
-                        type="text"
-                        disabled
-                        value={quantity}
-                        onChange={handleInput}
-                        className="w-20 rounded-md border border-gray-300 py-1 text-center focus:outline-none"
-                      />
-                      <button
-                        type="button"
-                        disabled={quantity === 5}
-                        className="rounded-md bg-gray-200 px-2 py-1 shadow-sm transition duration-150 hover:bg-gray-300"
-                        onClick={() => handlePlus(ticketDetail?.quantity)}
-                      >
-                        +
-                      </button>
+                {ticketDetail ? (
+                  ticketDetail?.quantity &&
+                  ticketDetail?.quantity !== 0 && (
+                    <fieldset className="mt-4">
+                      <h1>Qty</h1>
+                      <div className="items-center space-x-3">
+                        <button
+                          type="button"
+                          className="rounded-md bg-gray-200 px-2 py-1 shadow-sm transition duration-150 hover:bg-gray-300"
+                          onClick={() => handleMin()}
+                          disabled={quantity === 1}
+                        >
+                          -
+                        </button>
+                        <input
+                          type="text"
+                          disabled
+                          value={quantity}
+                          onChange={handleInput}
+                          className="w-20 rounded-md border border-gray-300 py-1 text-center focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          disabled={quantity === 5}
+                          className="rounded-md bg-gray-200 px-2 py-1 shadow-sm transition duration-150 hover:bg-gray-300"
+                          onClick={() => handlePlus(ticketDetail?.quantity)}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </fieldset>
+                  )
+                ) : (
+                  <div
+                    role="status"
+                    className="animate-pulse space-y-8 rtl:space-x-reverse md:flex md:items-center md:space-x-8 md:space-y-0"
+                  >
+                    <div className="w-full">
+                      <div className="mb-4 h-2.5 w-48 rounded-full bg-gray-200 dark:bg-gray-700"></div>
                     </div>
-                  </fieldset>
+                  </div>
                 )}
               </div>
               <div className="cursor-pointer">
                 <button
                   disabled={
                     ticketDetail?.quantity === 0 ||
-                    ticketDetail?.quantity === null
+                    ticketDetail?.quantity === null ||
+                    belumMulai ||
+                    dahAbis
                   }
                   type="submit"
                   className={`mt-10 ${
-                    ticketDetail?.quantity === 0
+                    ticketDetail?.quantity === 0 ||
+                    tanggalAcara > hariIni ||
+                    dahAbis
                       ? "cursor-not-allowed bg-gray-400"
                       : "bg-secondColors hover:bg-mainColors"
-                  } flex w-full items-center justify-center gap-2 rounded-md border border-transparent py-3  text-base  font-semibold text-white transition duration-500 `}
+                  } flex w-full items-center justify-center gap-2 rounded-md border border-transparent py-3 text-base font-semibold text-white transition duration-500 `}
                 >
-                  {ticketDetail?.quantity === 0 ||
-                  ticketDetail?.quantity === null ? (
-                    <>
-                      <LuAlertCircle size={20} />
-                      Tiket Habis
-                    </>
+                  {ticketDetail ? (
+                    ticketDetail?.quantity === 0 ||
+                    ticketDetail?.quantity === null ||
+                    belumMulai ? (
+                      <>
+                        <LuAlertCircle size={20} />
+                        {belumMulai
+                          ? `Maaf belum tanggal preorder, Mulai Oder ${dayjs(
+                              ticketDetail?.tanggal_preorder,
+                            ).format("DD-MM-YYYY")}`
+                          : "Tiket Habis"}
+                      </>
+                    ) : (
+                      <>
+                        {dahAbis ? (
+                          <span className="flex gap-2">
+                            <LuTimer size={20} />
+                            Maaf Pembelian sudah tutup
+                          </span>
+                        ) : (
+                          <span className="flex gap-2">
+                            <LuShieldCheck size={20} />
+                            Checkout
+                          </span>
+                        )}
+                      </>
+                    )
                   ) : (
-                    <>
-                      <LuShieldCheck size={20} />
-                      Checkout
-                    </>
+                    <div
+                      role="status"
+                      className="animate-pulse space-y-8 rtl:space-x-reverse md:flex md:items-center md:space-x-8 md:space-y-0"
+                    >
+                      <div className="w-full">
+                        <div className="mb-4 h-2.5 w-48 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                      </div>
+                    </div>
                   )}
                 </button>
               </div>

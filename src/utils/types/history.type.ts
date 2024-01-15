@@ -1,7 +1,7 @@
 import {
   IDataTransaction,
   IHistoryTicketDetail,
-} from "@/interface/history.interface";
+} from "@/utils/interface/history.interface";
 
 export type IHistoryState = {
   history: IHistoryTicketDetail[];

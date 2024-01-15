@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LuMail, LuPhone, LuUser } from "react-icons/lu";
+import { LuInstagram, LuMail, LuUser } from "react-icons/lu";
 // import { LoadingOutlined } from "@ant-design/icons";
 import { Form, Input, Modal } from "antd";
 import { useProfile } from "@/service/user/user.service";
@@ -97,24 +97,11 @@ const ProfileEo = () => {
           </div>
           <div className="relative">
             <label className="mb-2 block text-sm font-semibold text-gray-900">
-              No Hp
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none flex items-center gap-4 p-2">
-                <LuPhone />
-                <h1>
-                  {profile?.nohp ? profile?.nohp : "No Hp Belum di Masukkan"}
-                </h1>
-              </div>
-            </div>
-          </div>
-          <div className="relative">
-            <label className="mb-2 block text-sm font-semibold text-gray-900">
               Instagram
             </label>
             <div className="relative">
               <div className="pointer-events-none flex items-center gap-4 p-2">
-                <LuPhone />
+                <LuInstagram />
                 <h1>
                   {profile?.eo?.instagram
                     ? profile?.eo?.instagram

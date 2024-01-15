@@ -1,4 +1,4 @@
-import { ICardProps } from "@/interface/card.interface";
+import { ICardProps } from "@/utils/interface/card.interface";
 import { Link } from "react-router-dom";
 const Card = ({
   image,

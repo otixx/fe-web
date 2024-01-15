@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 import { privateApi } from "@/shared/axios/axios";
 import { Button, Drawer, Form, Input } from "antd";
 import { useProfile } from "@/service/user/user.service";
-import { IProfile } from "@/interface/profile.interface";
+import { IProfile } from "@/utils/interface/profile.interface";
 
 const Profile = () => {
   const [open, setOpen] = useState(false);

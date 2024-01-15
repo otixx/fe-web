@@ -2,14 +2,15 @@ import { useState } from "react";
 import { LuScan, LuTicket } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import { privateApi } from "@/shared/axios/axios";
-import { Ticket } from "@/interface/ticket.interface";
 import {
   Button,
   DatePicker,
+  Empty,
   Form,
   Input,
   Modal,
   Pagination,
+  Popconfirm,
   Select,
 } from "antd";
 import {
@@ -21,13 +22,14 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { QfindTicketbyEvent } from "@/service/ticket/ticket.service";
 import dayjs from "dayjs";
 import toast from "react-hot-toast";
+import { TDetailTicketProps } from "@/utils/types/ticket.types";
 
 const DetailEvents = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [page, setPage] = useState(1);
-  const [detailData, setDetailData] = useState({} as Ticket);
+  const [detailData, setDetailData] = useState({} as TDetailTicketProps);
 
   const idEvent: any = useParams().id;
   const [loading, setLoading] = useState(false);
@@ -42,7 +44,7 @@ const DetailEvents = () => {
   const { data: tiket } = QfindTicketbyEvent(idEvent);
   const { Item } = Form;
 
-  const handleOpenUpdate = (element: Ticket) => {
+  const handleOpenUpdate = (element: TDetailTicketProps) => {
     setOpenEdit(true);
     setDetailData(element);
   };
@@ -51,7 +53,6 @@ const DetailEvents = () => {
     const fileList = e.target.files;
     if (fileList) {
       const fileArray = Array.from(fileList) as File[];
-      console.log(fileArray);
       setFile(fileArray[0]);
     }
   };
@@ -62,6 +63,7 @@ const DetailEvents = () => {
     formData.append("nama_kegiatan", value?.nama_kegiatan);
     formData.append("harga", value?.harga);
     formData.append("tags", value?.tags);
+    formData.append("quantity", value?.quantity);
     formData.append(
       "tanggal_preorder",
       value?.tanggal_preorder.format(FormatDayjsInput) +
@@ -90,25 +92,26 @@ const DetailEvents = () => {
     formData.append("nama_kegiatan", value?.nama_acara);
     formData.append("harga", value?.harga);
     formData.append("tags", value?.tags);
+    formData.append("quantity", value?.quantity);
     formData.append(
       "tanggal_preorder",
-      value?.tanggal_pre.format(FormatDayjsInput),
+      dayjs(value?.tanggal_pre).format(FormatDayjsInput) +
+        dayjs().hour(0o0).minute(0o0).second(0o0).format(FormatTime),
     );
     formData.append(
       "tanggal_expired",
-      value?.tanggal_exp.format(FormatDayjsInput),
+      dayjs(value?.tanggal_exp).format(FormatDayjsInput) +
+        dayjs().hour(0o0).minute(0o0).second(0o0).format(FormatTime),
     );
     formData.append("file", file);
-    console.log(file);
-
     try {
       const res = await privateApi.put(`/tiket/${detailData?.id}`, formData);
       toast.success(res?.data?.message);
       setLoading(false);
       setOpenEdit(false);
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
       setLoading(false);
-      console.log(error);
     }
     setLoading(false);
   };
@@ -118,6 +121,15 @@ const DetailEvents = () => {
     option?: { label: string; value: string },
   ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await privateApi.delete(`/tiket/delete/${id}`);
+      toast.success(res?.data?.message);
+      window.location.reload();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message);
+    }
+  };
   return (
     <div className="w-full">
       <div className="grid h-28 grid-cols-12 items-center px-2">
@@ -182,8 +194,8 @@ const DetailEvents = () => {
               </thead>
 
               <tbody>
-                {tiket &&
-                  tiket.map((element, index: number) => {
+                {tiket && tiket?.data && tiket?.data?.length > 0 ? (
+                  tiket?.data.map((element, index: number) => {
                     return (
                       <tr
                         className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
@@ -215,24 +227,40 @@ const DetailEvents = () => {
                           >
                             Edit
                           </Button>
-                          <Button type="primary" danger>
-                            Delete
-                          </Button>
+                          <Popconfirm
+                            title="Hapus Tiket"
+                            description="Apakah anda yakin ingin menghapus Tiket ini ?"
+                            onConfirm={() => handleDelete(element?.id)}
+                            okText="Ya"
+                            okType="default"
+                            showCancel={false}
+                          >
+                            <Button type="primary" danger>
+                              Delete
+                            </Button>
+                          </Popconfirm>
                         </td>
                       </tr>
                     );
-                  })}
+                  })
+                ) : (
+                  <tr>
+                    <td className="py-4" colSpan={6}>
+                      <Empty />
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </div>
       </div>
-      {tiket && tiket.length > 0 && (
+      {tiket && tiket?.data?.length > 0 && (
         <div className="flex w-full items-center justify-center ">
           <div className="p-5">
             <Pagination
               current={page}
-              total={50}
+              total={tiket?.jumlah}
               pageSize={10}
               onChange={(page) => setPage(page)}
             />
@@ -270,7 +298,20 @@ const DetailEvents = () => {
               name="harga"
               label="Harga"
             >
-              <Input size="large" type="number" disabled={loading} />
+              <Input
+                step={500}
+                size="large"
+                type="number"
+                min={10000}
+                disabled={loading}
+              />
+            </Item>
+            <Item
+              rules={[{ required: true, message: "Quantity Wajib Diisi" }]}
+              name="quantity"
+              label="Quantity"
+            >
+              <Input size="large" type="number" min={1} disabled={loading} />
             </Item>
             <Item
               rules={[{ required: true, message: "Lokasi Event Wajib" }]}
@@ -316,6 +357,9 @@ const DetailEvents = () => {
                 size="large"
                 showNow={false}
                 disabled={loading}
+                disabledDate={(current) =>
+                  current && dayjs(current).isBefore(dayjs(), "day")
+                }
               />
             </Item>
             <Item
@@ -332,6 +376,9 @@ const DetailEvents = () => {
                 size="large"
                 style={{ width: "100%" }}
                 disabled={loading}
+                disabledDate={(current) =>
+                  current && dayjs(current).isBefore(dayjs(), "day")
+                }
               />
             </Item>
             <Item
@@ -389,6 +436,10 @@ const DetailEvents = () => {
                 value: detailData?.tags,
               },
               {
+                name: "quantity",
+                value: detailData?.quantity,
+              },
+              {
                 name: "tanggal_pre",
                 value: dayjs(detailData?.tanggal_preorder),
               },
@@ -405,6 +456,14 @@ const DetailEvents = () => {
               <Input size="large" disabled={loading} />
             </Item>
             <Item name="harga" label="Harga">
+              <Input
+                type="number"
+                step={1000}
+                size="large"
+                disabled={loading}
+              />
+            </Item>
+            <Item name="quantity" label="Qty">
               <Input type="number" size="large" disabled={loading} />
             </Item>
 
@@ -430,35 +489,28 @@ const DetailEvents = () => {
             </Item>
             <Item name="tanggal_pre" label="Tanggal Pre Order">
               <DatePicker
+                style={{ width: "100%" }}
                 format={FormatDayjsInput}
                 size="large"
                 showNow={false}
                 disabled={loading}
+                disabledDate={(current) =>
+                  current && dayjs(current).isBefore(dayjs(), "day")
+                }
               />
             </Item>
             <Item name="tanggal_exp" label="Tanggal Expired">
               <DatePicker
+                style={{ width: "100%" }}
                 format={FormatDayjsInput}
                 size="large"
                 showNow={false}
                 disabled={loading}
+                disabledDate={(current) =>
+                  current && dayjs(current).isBefore(dayjs(), "day")
+                }
               />
             </Item>
-            {/* <Item label="Upload Gambar Event" name="file">
-              <Upload
-                fileList={[
-                  {
-                    uid: "1",
-                    name: "file.png",
-                  },
-                ]}
-                onChange={handleFile}
-                accept=".png,.jpg,.jpeg"
-                maxCount={1}
-              >
-                <Button icon={<LuUpload />}>Upload</Button>
-              </Upload>
-            </Item> */}
             <div className="flex justify-end gap-2 py-2">
               <button
                 onClick={() => setOpenEdit(false)}

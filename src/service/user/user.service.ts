@@ -1,4 +1,4 @@
-import { IProfile } from "@/interface/profile.interface";
+import { IProfile } from "@/utils/interface/profile.interface";
 import { privateApi } from "@/shared/axios/axios";
 import { create } from "zustand";
 

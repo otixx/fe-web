@@ -2,7 +2,6 @@ import { useState } from "react";
 import { LuScan, LuTicket } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import { privateApi } from "@/shared/axios/axios";
-import { Ticket } from "@/utils/interface/ticket.interface";
 import {
   Button,
   DatePicker,
@@ -11,6 +10,7 @@ import {
   Input,
   Modal,
   Pagination,
+  Popconfirm,
   Select,
 } from "antd";
 import {
@@ -121,6 +121,15 @@ const DetailEvents = () => {
     option?: { label: string; value: string },
   ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await privateApi.delete(`/tiket/delete/${id}`);
+      toast.success(res?.data?.message);
+      window.location.reload();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message);
+    }
+  };
   return (
     <div className="w-full">
       <div className="grid h-28 grid-cols-12 items-center px-2">
@@ -218,9 +227,18 @@ const DetailEvents = () => {
                           >
                             Edit
                           </Button>
-                          <Button type="primary" danger>
-                            Delete
-                          </Button>
+                          <Popconfirm
+                            title="Hapus Tiket"
+                            description="Apakah anda yakin ingin menghapus Tiket ini ?"
+                            onConfirm={() => handleDelete(element?.id)}
+                            okText="Ya"
+                            okType="default"
+                            showCancel={false}
+                          >
+                            <Button type="primary" danger>
+                              Delete
+                            </Button>
+                          </Popconfirm>
                         </td>
                       </tr>
                     );
@@ -281,7 +299,7 @@ const DetailEvents = () => {
               label="Harga"
             >
               <Input
-                step={1000}
+                step={500}
                 size="large"
                 type="number"
                 min={10000}
@@ -493,21 +511,6 @@ const DetailEvents = () => {
                 }
               />
             </Item>
-            {/* <Item label="Upload Gambar Event" name="file">
-              <Upload
-                fileList={[
-                  {
-                    uid: "1",
-                    name: "file.png",
-                  },
-                ]}
-                onChange={handleFile}
-                accept=".png,.jpg,.jpeg"
-                maxCount={1}
-              >
-                <Button icon={<LuUpload />}>Upload</Button>
-              </Upload>
-            </Item> */}
             <div className="flex justify-end gap-2 py-2">
               <button
                 onClick={() => setOpenEdit(false)}

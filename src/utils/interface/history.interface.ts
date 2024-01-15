@@ -29,6 +29,7 @@ export interface IHistoryTicketDetail {
       description: string;
       img_rundown: string;
       tanggal_acara: string;
+      waktu_acara: string;
       lokasi: string;
       eo_id: string;
       createdAt: string;

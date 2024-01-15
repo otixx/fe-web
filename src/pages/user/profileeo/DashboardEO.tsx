@@ -56,8 +56,11 @@ const DashboardEO = () => {
       formData.append("description", value?.description);
       formData.append(
         "tanggal_acara",
-        dayjs(value?.tanggal_acara).format(FormatDayjsInput) +
-          dayjs(value?.waktu_event).format(FormatTime),
+        dayjs(value?.tanggal_acara).format(FormatDayjsInput),
+      );
+      formData.append(
+        "waktu_acara",
+        dayjs(value?.waktu_event).format(FormatTime),
       );
       formData.append("lokasi", value?.lokasi);
       file.forEach((file: any) => {
@@ -73,6 +76,7 @@ const DashboardEO = () => {
         toast.success(response?.data?.message);
         setLoading(false);
         setOpen(false);
+        window.location.reload();
         setFile([]);
       } catch (error: any) {
         setLoading(false);
@@ -90,8 +94,11 @@ const DashboardEO = () => {
     formData.append("description", value?.description);
     formData.append(
       "tanggal_acara",
-      dayjs(value?.tanggal_acara).format(FormatDayjsInput) +
-        dayjs().hour(0o0).minute(0o0).second(0o0).format(FormatTime),
+      dayjs(value?.tanggal_acara).format(FormatDayjsInput),
+    );
+    formData.append(
+      "waktu_acara",
+      dayjs(value?.waktu_event).format(FormatTime),
     );
     formData.append("lokasi", value?.lokasi);
     file.forEach((file: any) => {
@@ -101,6 +108,7 @@ const DashboardEO = () => {
       const res = await privateApi.put(`/event/update/${idEvent}`, formData);
       setOpenEdit(false);
       event.refetch();
+      window.location.reload();
       setFile([]);
       toast.success(res?.data?.message);
     } catch (error) {
@@ -123,7 +131,19 @@ const DashboardEO = () => {
       setFile([...info.fileList]);
     }
   };
-
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await privateApi.delete(`/event/delete`, {
+        data: {
+          id: id,
+        },
+      });
+      toast.success(res?.data?.message);
+      window.location.reload();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message);
+    }
+  };
   return (
     <div className="w-full">
       <div className="grid h-28 grid-cols-12 items-center px-2">
@@ -236,8 +256,7 @@ const DashboardEO = () => {
                               disabled={dahMulai || dahAbis}
                               title="Hapus Event"
                               description="Apakah anda yakin ingin menghapus event ini ?"
-                              onConfirm={() => toast.success("succes")}
-                              onCancel={() => toast.error("failed")}
+                              onConfirm={() => handleDelete(element?.id)}
                               okText="Ya"
                               okType="default"
                               showCancel={false}

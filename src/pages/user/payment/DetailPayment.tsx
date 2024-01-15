@@ -16,6 +16,7 @@ const DetailPayment = () => {
   const [selectedMethod, setSelectedMethod] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [expired, setExpired] = useState("");
   const [barcodeData, setBarcodeData] = useState("");
   const [idTransaction, setIdTransaction] = useState("");
   const device = useDevice((state) => state?.device);
@@ -44,6 +45,7 @@ const DetailPayment = () => {
           },
         );
         setLoading(false);
+        setExpired(response?.data?.data?.expiry_time);
         if (response?.data?.status == 200) {
           if (device === "mobile" && selectedMethod === EPayment.shopee) {
             toast.success(response?.data?.message);
@@ -259,6 +261,7 @@ const DetailPayment = () => {
         </Form>
       </div>
       <BarcodePopup
+        expired={expired}
         device={device}
         payment={selectedMethod}
         barcode={barcodeData}

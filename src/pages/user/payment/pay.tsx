@@ -14,6 +14,7 @@ const BarcodePopup = ({
   payment,
   showPopup,
   idTransaction,
+  expired,
 }: BarcodePopupProps) => {
   const navigate = useNavigate();
   const [paymentStatus, setPaymentStatus] = useState("pending");
@@ -55,15 +56,16 @@ const BarcodePopup = ({
             <p className="mb-4 text-gray-600">
               Terima kasih! Pembelian tiket telah berhasil.
             </p>
-
-            <button
-              className="rounded-md bg-secondColors px-4 py-2 font-extrabold text-white hover:bg-mainColors"
-              onClick={() => {
-                navigate("/history");
-              }}
-            >
-              Selesai
-            </button>
+            {location.pathname !== "/history" && (
+              <button
+                className="rounded-md bg-secondColors px-4 py-2 font-extrabold text-white hover:bg-mainColors"
+                onClick={() => {
+                  navigate("/history");
+                }}
+              >
+                Selesai
+              </button>
+            )}
           </div>
         </>
       ) : (
@@ -90,8 +92,14 @@ const BarcodePopup = ({
               </>
             ) : (
               <>
-                <img src={barcode} alt="Barcode" className="p-4" />
+                <img src={barcode} alt="Barcode" className="h-2/4 w-2/4 p-4" />
                 <h1>{barcode}</h1>
+                <div className="py-2 text-center">
+                  <h1>Mohon Bayar Sebelum Waktu</h1>
+                  <p className="text-xl font-semibold text-red-500">
+                    {expired}
+                  </p>
+                </div>
                 <div className="flex justify-end space-x-4">
                   <button
                     onClick={onClose}

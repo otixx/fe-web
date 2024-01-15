@@ -1,9 +1,13 @@
 import { Status } from "@/utils/enum/status.enum";
 import { IDetailFormHistory } from "@/utils/interface/history.interface";
 import { useHistory } from "@/service/transaction/history.service";
-import { FormatDayjs } from "@/shared/dayjs/format";
+import {
+  FormatDayjs,
+  FormatDetailTicket,
+  FormatHistory,
+} from "@/shared/dayjs/format";
 import { Empty, Modal, Skeleton } from "antd";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BarcodePopup from "../payment/pay";
@@ -21,12 +25,14 @@ const History = () => {
   const [idTransaction, setIdTransaction] = useState("");
   const [barcode, setBarcode] = useState("");
   const [payment, setPayment] = useState("");
+  const [expired, setExpired] = useState<Dayjs | null>(null);
   const navigate = useNavigate();
   const transactions = useHistory((state) => state?.history);
   const getHistory = useHistory((state) => state?.getHistory);
   const device = useDevice((state) => state?.device);
 
   const handleSubmit = (data: IDetailFormHistory) => {
+    setExpired(data?.expiry_time);
     setPayment(data?.payment_type);
     if (device === "mobile" && data?.payment_type === EPayment.shopee) {
       setIdTransaction(data?.transaction_id);
@@ -82,10 +88,15 @@ const History = () => {
                 const tanggalAcara = dayjs(
                   transaction?.tiket?.event?.tanggal_acara,
                 );
-                const hariIni = dayjs();
+                const hariIni = dayjs().format(FormatHistory);
 
                 const belumMulai = tanggalAcara.isAfter(hariIni, "day");
-                const dahAbis = tanggalAcara.isBefore(hariIni, "day");
+                const dahAbis =
+                  hariIni >
+                  transaction?.tiket?.event?.tanggal_acara +
+                    " " +
+                    transaction?.tiket?.event?.waktu_acara;
+
                 return (
                   <li
                     key={index}
@@ -145,7 +156,7 @@ const History = () => {
                           className={`rounded-md px-4 py-2 font-semibold text-white  ${
                             transaction.status === Status?.checkin
                               ? "cursor-not-allowed bg-gray-400"
-                              : belumMulai
+                              : belumMulai || dahAbis
                                 ? "cursor-not-allowed bg-gray-400"
                                 : "bg-mainColors hover:bg-hoverMainColors"
                           }`}
@@ -164,7 +175,9 @@ const History = () => {
                             ? "Sudah Checkin"
                             : belumMulai
                               ? "Event belum mulai"
-                              : "Event sudah berakhir"}
+                              : dahAbis
+                                ? "Event sudah berakhir"
+                                : "Checkin"}
                         </button>
                       )}
                     </div>
@@ -179,6 +192,7 @@ const History = () => {
       )}
 
       <BarcodePopup
+        expired={expired}
         device={device}
         payment={payment}
         barcode={barcode}

@@ -68,7 +68,7 @@ const Index = () => {
                   image={JSON.parse(item?.image_url)["url"]}
                   title={item?.nama_kegiatan}
                   tags={item?.tags}
-                  date={dayjs(item?.date).format(FormatDayjs)}
+                  date={dayjs(item?.event?.tanggal_acara).format(FormatDayjs)}
                   price={new Intl.NumberFormat("id-ID", {
                     style: "currency",
                     currency: "IDR",

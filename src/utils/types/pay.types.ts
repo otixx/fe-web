@@ -3,6 +3,7 @@ export type BarcodePopupProps = {
   onClose: () => void;
   showPopup: boolean;
   device: string;
+  expired: any;
   payment: string;
   idTransaction: string | undefined;
 };

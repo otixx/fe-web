@@ -1,22 +1,14 @@
 // import SkeletonTable from "@/components/SkeletonTable";
 // import { FormatDayjs } from "@/shared/dayjs/format";
 // import { Button, Pagination } from "antd";
-// import dayjs from "dayjs";
-// import { QfindTicket } from "@/service/ticket/ticket.service";
-// import { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
+import SkeletonTable from "@/components/SkeletonTable";
+import { QfindHistoryTiket } from "@/service/ticket/ticket.service";
+import { FormatDayjs } from "@/shared/dayjs/format";
+import { Empty } from "antd";
+import dayjs from "dayjs";
 
 const Riwayat = () => {
-  // const [ticket, setTicket] = useState();
-  // const fetchData = async () => {
-  //   const res = await QfindTicket({});
-  //   setTicket(res);
-  // };
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
-  // const [page, setPage] = useState(1);
-  // const navigate = useNavigate();
+  const tiketHistory = QfindHistoryTiket();
   return (
     <div className="w-full">
       <div className="grid h-28 grid-cols-12 items-center px-2">
@@ -51,15 +43,12 @@ const Riwayat = () => {
                   <th scope="col" className="px-6 py-3">
                     Tgl Exp
                   </th>
-                  <th scope="col" className="px-6 py-3">
-                    Action
-                  </th>
                 </tr>
               </thead>
-              {/* <tbody>
-                {ticket && ticket?.data ? (
-                  ticket?.data?.length > 0 ? (
-                    ticket?.data?.map((element) => (
+              <tbody>
+                {tiketHistory && tiketHistory?.data ? (
+                  tiketHistory?.data?.length > 0 ? (
+                    tiketHistory?.data?.map((element) => (
                       <tr
                         className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
                         key={element.id}
@@ -78,7 +67,7 @@ const Riwayat = () => {
                         <td className="px-6 py-4">
                           {dayjs(element?.tanggal_expired).format(FormatDayjs)}
                         </td>
-                        <td className="flex gap-4 px-6 py-4 text-center">
+                        {/* <td className="flex gap-4 px-6 py-4 text-center">
                           <Button
                             onClick={() =>
                               navigate(
@@ -90,11 +79,15 @@ const Riwayat = () => {
                           >
                             View
                           </Button>
-                        </td>
+                        </td> */}
                       </tr>
                     ))
                   ) : (
-                    <tr>Tidak ada data</tr>
+                    <tr>
+                      <td className="py-4" colSpan={5}>
+                        <Empty />
+                      </td>
+                    </tr>
                   )
                 ) : (
                   <tr>
@@ -104,7 +97,7 @@ const Riwayat = () => {
                   </tr>
                 )}
                 {}
-              </tbody> */}
+              </tbody>
             </table>
           </div>
         </div>

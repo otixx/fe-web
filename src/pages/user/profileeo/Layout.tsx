@@ -18,7 +18,7 @@ const LayoutEO = () => {
     if (token && !profile?.status_eo) {
       // aktifkan jika sudah banyak EO
       // navigate("/profile/eo/register");
-      navigate("/");
+      navigate("/profile");
     } else if (
       token &&
       profile?.status_eo &&

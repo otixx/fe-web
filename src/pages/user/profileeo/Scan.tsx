@@ -2,7 +2,7 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-import { privateApi } from "@/shared/axios/axios";
+import { privateApi, publicAPi } from "@/shared/axios/axios";
 import { Modal } from "antd";
 
 const QRCodeScannerPage = () => {
@@ -13,21 +13,25 @@ const QRCodeScannerPage = () => {
   const [html5QrcodeScanner, setHtml5QrcodeScanner] =
     useState<Html5QrcodeScanner | null>(null);
   const [requestSent, setRequestSent] = useState(false);
-
-  const verbose: boolean = false;
+  const [scanEnabled, setScanEnabled] = useState(1);
 
   useEffect(() => {
     const scanner = new Html5QrcodeScanner(
       "reader",
       { fps: 5, qrbox: 250 },
-      verbose,
+      false,
     );
 
+    let lastScan: any = null;
     const onScanSuccess = async (decodedText: string) => {
+      if (lastScan === decodedText || requestSent) {
+        return;
+      }
       setRes("");
-      if (!requestSent) {
-        try {
-          const res = await privateApi.put(`/transaction/checkin`, {
+      setRequestSent(false);
+      try {
+        if (!requestSent) {
+          const res = await publicAPi.put(`/transaction/checkin`, {
             idQr: decodedText,
             idEvent: idEvent,
           });
@@ -35,24 +39,28 @@ const QRCodeScannerPage = () => {
           setModal(true);
           setRes(res);
           setRequestSent(true);
-        } catch (err: any) {
-          toast.error(err?.response?.data?.message);
-          setRes(err?.response?.data?.message);
+          setScanEnabled(+1);
         }
+      } catch (err: any) {
+        setRequestSent(true);
+        toast.error(err?.response?.data?.message);
+        setRes(err?.response?.data?.message);
       }
+      lastScan = decodedText;
     };
-
     function onScanError() {}
 
     scanner.render(onScanSuccess, onScanError);
     setHtml5QrcodeScanner(scanner);
 
-    return () => {
-      if (html5QrcodeScanner) {
-        html5QrcodeScanner.clear();
-      }
-    };
-  }, [idEvent, requestSent]);
+    // return () => {
+    //   if (html5QrcodeScanner) {
+    //     html5QrcodeScanner.clear();
+    //   }
+    // };
+
+    console.log("loping");
+  }, [scanEnabled]);
 
   const handleCloseScanner = () => {
     if (html5QrcodeScanner) {
@@ -76,7 +84,9 @@ const QRCodeScannerPage = () => {
           <div className="col-span-4 ">
             <h1>Status : </h1>
           </div>
-          <div className="col-span-8">{res && `user ini ${res}`}</div>
+          <div className="col-span-8">
+            {res && `user ini ${res?.data?.message}`}
+          </div>
         </div>
         <div className="w-full" id="reader"></div>
         <Toaster />
@@ -87,14 +97,14 @@ const QRCodeScannerPage = () => {
           Tutup Scan
         </button>
       </div>
-      <Modal
+      {/* <Modal
         title="Selesaikan Pembayaran"
         footer={false}
         onCancel={() => setModal(false)}
         open={modal}
       >
         sdd
-      </Modal>
+      </Modal> */}
     </div>
   );
 };

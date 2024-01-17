@@ -229,7 +229,7 @@ const DashboardEO = () => {
                           </td>
                           <td className="flex items-center gap-4 px-6 py-4 text-center">
                             <button
-                              disabled={dahMulai || dahAbis}
+                              disabled={dahAbis}
                               onClick={() =>
                                 navigate(`/profile/eo/events/${element.id}`)
                               }

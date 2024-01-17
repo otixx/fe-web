@@ -2,12 +2,14 @@
 // import { FormatDayjs } from "@/shared/dayjs/format";
 // import { Button, Pagination } from "antd";
 import SkeletonTable from "@/components/SkeletonTable";
+import { useNavigate } from "react-router-dom";
 import { QfindHistoryTiket } from "@/service/ticket/ticket.service";
 import { FormatDayjs } from "@/shared/dayjs/format";
 import { Empty } from "antd";
 import dayjs from "dayjs";
 
 const Riwayat = () => {
+  const navigate = useNavigate();
   const tiketHistory = QfindHistoryTiket();
   return (
     <div className="w-full">
@@ -43,6 +45,9 @@ const Riwayat = () => {
                   <th scope="col" className="px-6 py-3">
                     Tgl Exp
                   </th>
+                  <th scope="col" className="px-6 py-3">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -67,19 +72,18 @@ const Riwayat = () => {
                         <td className="px-6 py-4">
                           {dayjs(element?.tanggal_expired).format(FormatDayjs)}
                         </td>
-                        {/* <td className="flex gap-4 px-6 py-4 text-center">
-                          <Button
+                        <td className="flex gap-4 px-6 py-4 text-center">
+                          <button
                             onClick={() =>
                               navigate(
                                 `/profile/eo/riwayat/tiket/${element.id}`,
                               )
                             }
-                            type="primary"
                             style={{ backgroundColor: "#0049cc" }}
                           >
                             View
-                          </Button>
-                        </td> */}
+                          </button>
+                        </td>
                       </tr>
                     ))
                   ) : (

@@ -12,8 +12,18 @@ dist
 dist-ssr
 *.local
 
-#file
-.zip
+# Packages 
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+
+#env
 .env
 
 # Editor directories and files

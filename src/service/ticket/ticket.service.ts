@@ -4,7 +4,7 @@ import {
   ITiketHistory,
   Ticket,
 } from "@/utils/interface/ticket.interface";
-import { privateApi } from "@/shared/axios/axios";
+import { privateApi, publicAPi } from "@/shared/axios/axios";
 import { useQuery } from "@tanstack/react-query";
 
 export interface ISearchParams {
@@ -60,7 +60,7 @@ export const QfindHistoryTiket = () => {
 };
 
 export const QHistoryTicketId = (id: string | undefined) => {
-  const fetcher = () => privateApi.get(`/transaction/tiket/${id}`);
+  const fetcher = () => publicAPi.get(`/transaction/tiket/${id}`);
   return useQuery({
     queryKey: ["historyticketid"],
     queryFn: fetcher,

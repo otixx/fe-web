@@ -1,11 +1,7 @@
 import { Status } from "@/utils/enum/status.enum";
 import { IDetailFormHistory } from "@/utils/interface/history.interface";
 import { useHistory } from "@/service/transaction/history.service";
-import {
-  FormatDayjs,
-  FormatDetailTicket,
-  FormatHistory,
-} from "@/shared/dayjs/format";
+import { FormatDayjs, FormatHistory } from "@/shared/dayjs/format";
 import { Empty, Modal, Skeleton } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
@@ -85,17 +81,23 @@ const History = () => {
                 const formDetail: IDetailFormHistory = JSON.parse(
                   transaction?.response_payment,
                 );
+                const hariIni = dayjs().format(FormatHistory);
                 const tanggalAcara = dayjs(
                   transaction?.tiket?.event?.tanggal_acara,
                 );
-                const hariIni = dayjs().format(FormatHistory);
+                const eventStart = transaction?.tiket?.event?.tanggal_acara;
+                const eventTime = transaction?.tiket?.event?.waktu_acara;
+                const eventStartTime = dayjs(`${eventStart} ${eventTime}`);
+                const fiveMinutesBeforeEvent = eventStartTime.subtract(
+                  5,
+                  "minutes",
+                );
+                const lastCheckinTime = dayjs(`${eventStart} 23:59:59`);
 
-                const belumMulai = tanggalAcara.isAfter(hariIni, "day");
-                const dahAbis =
-                  hariIni >
-                  transaction?.tiket?.event?.tanggal_acara +
-                    " " +
-                    transaction?.tiket?.event?.waktu_acara;
+                const belumMulai =
+                  tanggalAcara.isAfter(hariIni, "day") ||
+                  dayjs().isBefore(fiveMinutesBeforeEvent);
+                const sudahBerakhir = dayjs().isAfter(lastCheckinTime);
 
                 return (
                   <li
@@ -156,14 +158,14 @@ const History = () => {
                           className={`rounded-md px-4 py-2 font-semibold text-white  ${
                             transaction.status === Status?.checkin
                               ? "cursor-not-allowed bg-gray-400"
-                              : belumMulai || dahAbis
+                              : belumMulai || sudahBerakhir
                                 ? "cursor-not-allowed bg-gray-400"
                                 : "bg-mainColors hover:bg-hoverMainColors"
                           }`}
                           disabled={
                             transaction.status === Status?.checkin
                               ? true
-                              : belumMulai || dahAbis
+                              : belumMulai || sudahBerakhir
                                 ? true
                                 : false
                           }
@@ -175,7 +177,7 @@ const History = () => {
                             ? "Sudah Checkin"
                             : belumMulai
                               ? "Event belum mulai"
-                              : dahAbis
+                              : sudahBerakhir
                                 ? "Event sudah berakhir"
                                 : "Checkin"}
                         </button>

@@ -2,13 +2,13 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-import { privateApi, publicAPi } from "@/shared/axios/axios";
-import { Modal } from "antd";
+import { publicAPi } from "@/shared/axios/axios";
+// import { Modal } from "antd";
 
 const QRCodeScannerPage = () => {
   const navigate = useNavigate();
   const idEvent = useParams().id;
-  const [modal, setModal] = useState(false);
+  // const [modal, setModal] = useState(false);
   const [res, setRes] = useState<any>(null);
   const [html5QrcodeScanner, setHtml5QrcodeScanner] =
     useState<Html5QrcodeScanner | null>(null);
@@ -36,10 +36,11 @@ const QRCodeScannerPage = () => {
             idEvent: idEvent,
           });
           console.log("Server response:", res?.data?.message);
-          setModal(true);
+          // setModal(true);
           setRes(res);
           setRequestSent(true);
           setScanEnabled(+1);
+          toast.success(res?.data?.message);
         }
       } catch (err: any) {
         setRequestSent(true);

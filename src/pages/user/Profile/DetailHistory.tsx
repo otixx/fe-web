@@ -10,7 +10,6 @@ const Detailhistory = () => {
   const id = useParams().id;
   const history = QfindHistoryDetail({ id });
 
-  console.log(history?.data?.status);
   return (
     <div className="container mx-auto h-screen p-8">
       {history.isFetched && history.data ? (

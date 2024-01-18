@@ -66,13 +66,11 @@ const DetailEvents = () => {
     formData.append("quantity", value?.quantity);
     formData.append(
       "tanggal_preorder",
-      value?.tanggal_preorder.format(FormatDayjsInput) +
-        dayjs().hour(0o0).minute(0o0).second(0o0).format(FormatTime),
+      value?.tanggal_preorder.format(FormatDayjsInput),
     );
     formData.append(
       "tanggal_expired",
-      value?.tanggal_expired.format(FormatDayjsInput) +
-        dayjs().hour(0o0).minute(0o0).second(0o0).format(FormatTime),
+      value?.tanggal_expired.format(FormatDayjsInput),
     );
     formData.append("image", file);
     try {
@@ -339,8 +337,12 @@ const DetailEvents = () => {
                     label: "Visitor",
                   },
                   {
-                    value: "cosplay",
-                    label: "Cosplay",
+                    value: "coswalk",
+                    label: "Coswalk",
+                  },
+                  {
+                    value: "coscomp",
+                    label: "Coscomp",
                   },
                 ]}
               />

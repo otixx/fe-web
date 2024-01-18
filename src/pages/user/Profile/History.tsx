@@ -139,8 +139,8 @@ const History = () => {
                         <div className="flex gap-2">
                           <button
                             onClick={() => {
-                              setOpenDelete(true),
-                                setId(transaction?.response_payment);
+                              setOpenDelete(true);
+                              setId(transaction?.response_payment);
                             }}
                             className={` rounded-md bg-red-600 px-4 py-2 font-semibold text-white transition duration-300 hover:bg-red-900`}
                           >

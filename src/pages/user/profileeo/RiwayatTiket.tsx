@@ -5,7 +5,6 @@ import { QHistoryTicketId } from "@/service/ticket/ticket.service";
 const RiwayatTiket = () => {
   const idTiket = useParams();
   const detailTicket = QHistoryTicketId(idTiket?.id);
-  console.log(detailTicket.data);
 
   return (
     <div className="w-full px-4 py-4">
@@ -19,7 +18,7 @@ const RiwayatTiket = () => {
               <caption className="bg-white p-5 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
                 List Tiket
                 <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
-                  Lihat Semua Tiket Event disini
+                  Lihat Semua Historu Pembelian Tiket Event disini
                 </p>
               </caption>
               <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">

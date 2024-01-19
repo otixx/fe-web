@@ -20,6 +20,7 @@ const DetailPayment = () => {
   const [barcodeData, setBarcodeData] = useState("");
   const [idTransaction, setIdTransaction] = useState("");
   const device = useDevice((state) => state?.device);
+  const [file, setFile] = useState<any>();
 
   const qty = location?.state?.data;
   const navigate = useNavigate();
@@ -30,19 +31,21 @@ const DetailPayment = () => {
   const handleSubmit = async (value: any) => {
     if (selectedMethod) {
       setLoading(true);
+
       try {
+        const formData = new FormData();
+        formData.append("nama", value?.name);
+        formData.append("asal_kota", value?.lokasi);
+        formData.append("judul_lagu", value?.judul_lagu);
+        formData.append("quantity", qty);
+        formData.append("instagram", value?.instagram);
+        formData.append("nohp", value?.noHp);
+        formData.append("cosplay_name", value?.cosplay);
+        formData.append("payment", selectedMethod);
+        formData.append("music", file);
         const response = await privateApi.post(
           `/transaction/create/${idTiket}`,
-          {
-            quantity: qty,
-            nama: value?.name,
-            asal_kota: value?.lokasi,
-            judul_lagu: value?.cosplay,
-            instagram: value?.instagram,
-            nohp: value?.noHp,
-            cosplay_name: value?.cosplay,
-            payment: selectedMethod,
-          },
+          formData,
         );
         setLoading(false);
         setExpired(response?.data?.data?.expiry_time);
@@ -86,6 +89,14 @@ const DetailPayment = () => {
     input: string,
     option?: { label: string; value: string },
   ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+
+  const handleMusicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+    if (fileList) {
+      const fileArray = Array.from(fileList) as File[];
+      setFile(fileArray[0]);
+    }
+  };
 
   return (
     <div className="container mx-auto">
@@ -161,16 +172,48 @@ const DetailPayment = () => {
                     >
                       <Input size="large" disabled={loading} />
                     </Item>
-                    {tiket?.tags === "music" ? (
-                      <Item
-                        rules={[
-                          { required: true, message: "Masukkan Judul Lagu" },
-                        ]}
-                        name="song"
-                        label="Judul Lagu"
-                      >
-                        <Input size="large" disabled={loading} />
-                      </Item>
+                    {tiket?.tags === "music" || tiket?.tags === "coscomp" ? (
+                      <>
+                        <Item
+                          rules={[
+                            { required: true, message: "Masukkan Judul Lagu" },
+                          ]}
+                          name="judul_lagu"
+                          label="Judul Lagu"
+                        >
+                          <Input size="large" disabled={loading} />
+                        </Item>
+                        {tiket?.tags === "coscomp" ? (
+                          <Item
+                            rules={[
+                              {
+                                required: true,
+                                message: "Masukkan Nama Cosplay",
+                              },
+                            ]}
+                            name="cosplay"
+                            label="Cosplay Name"
+                          >
+                            <Input size="large" disabled={loading} />
+                          </Item>
+                        ) : null}
+                        <Item
+                          rules={[
+                            {
+                              required: true,
+                              message: "Tanggal Expired Tiket Wajib",
+                            },
+                          ]}
+                          label="File Music"
+                        >
+                          <input
+                            type="file"
+                            accept="audio/*"
+                            onChange={handleMusicChange}
+                            className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
+                          />
+                        </Item>
+                      </>
                     ) : (
                       <Item
                         rules={[

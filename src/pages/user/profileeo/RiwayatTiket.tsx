@@ -1,25 +1,46 @@
 import { useParams } from "react-router-dom";
 // import { IHistoryTicket } from "@/interface/history.interface";
-import { QHistoryTicketId } from "@/service/ticket/ticket.service";
+import {
+  QHistoryTicketId,
+  QTotalPendapatan,
+} from "@/service/ticket/ticket.service";
+import { Col, Row, Statistic } from "antd";
 
 const RiwayatTiket = () => {
   const idTiket = useParams();
   const detailTicket = QHistoryTicketId(idTiket?.id);
-  console.log(detailTicket.data);
+  const pendapatan = QTotalPendapatan(idTiket?.id);
 
   return (
     <div className="w-full px-4 py-4">
-      <div className="flex items-center justify-between">
+      <div className="mb-10 flex items-center justify-between">
         <h1 className="text-2xl font-bold">History / Transaction</h1>
       </div>
+
       <div className="grid grid-cols-12 px-2 py-2">
         <div className="col-span-12">
-          <div className="relative overflow-x-auto shadow-md sm:rounded-lg ">
+          <div className="relative overflow-x-auto p-5 shadow-md sm:rounded-lg">
+            {pendapatan?.data === null ? (
+              <></>
+            ) : (
+              <Row>
+                <Col span={6}>
+                  <Statistic
+                    title="Total Pendapatan"
+                    value={"Rp. " + pendapatan?.data}
+                  />
+                </Col>
+                <Col span={6}></Col>
+                <Col span={6}></Col>
+                <Col span={6}></Col>
+              </Row>
+            )}
+
             <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
               <caption className="bg-white p-5 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
                 List Tiket
                 <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
-                  Lihat Semua Tiket Event disini
+                  Lihat Semua Historu Pembelian Tiket Event disini
                 </p>
               </caption>
               <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">

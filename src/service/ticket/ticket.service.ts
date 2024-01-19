@@ -69,3 +69,14 @@ export const QHistoryTicketId = (id: string | undefined) => {
     },
   });
 };
+
+export const QTotalPendapatan = (id: string | undefined) => {
+  const fetcher = () => publicAPi.get(`/transaction/totalpendapatan/${id}`);
+  return useQuery({
+    queryKey: ["totalpendapatan"],
+    queryFn: fetcher,
+    select(res) {
+      return res?.data?.data;
+    },
+  });
+};

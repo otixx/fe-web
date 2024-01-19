@@ -35,7 +35,6 @@ const QRCodeScannerPage = () => {
             idQr: decodedText,
             idEvent: idEvent,
           });
-          console.log("Server response:", res?.data?.message);
           // setModal(true);
           setRes(res);
           setRequestSent(true);
@@ -59,8 +58,6 @@ const QRCodeScannerPage = () => {
     //     html5QrcodeScanner.clear();
     //   }
     // };
-
-    console.log("loping");
   }, [scanEnabled]);
 
   const handleCloseScanner = () => {

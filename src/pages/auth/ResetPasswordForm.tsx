@@ -71,7 +71,7 @@ const ResetPasswordForm = () => {
               },
             ]}
           >
-            <Input size="large" />
+            <Input.Password size="large" />
           </Item>
 
           <Item
@@ -79,7 +79,7 @@ const ResetPasswordForm = () => {
             rules={[{ required: true, message: "tidak boleh kosong" }]}
             label="Ulangi Kata Sandi Baru"
           >
-            <Input size="large" />
+            <Input.Password size="large" />
           </Item>
 
           <button

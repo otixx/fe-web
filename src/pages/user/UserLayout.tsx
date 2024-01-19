@@ -63,9 +63,13 @@ const UserLayout = () => {
         <Loading />
       ) : (
         <>
-          {!scannerPath && <Navbar />}
-          <Outlet />
-          {!isProfileRoute && <Footer />}
+          <div className="flex min-h-screen flex-col">
+            {!scannerPath && <Navbar />}
+            <div className="flex-1">
+              <Outlet />
+            </div>
+            {!isProfileRoute && <Footer />}
+          </div>
         </>
       )}
     </div>

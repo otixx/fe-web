@@ -79,8 +79,6 @@ const DetailTiket = () => {
   const dahAbis =
     hariIni > dayjs(ticketDetail?.tanggal_expired).format(FormatDetailTicket);
 
-  // console.log(ticketDetail);
-  // console.log(ticketDetail?.tanggal_expired);
   return (
     <div className="container mx-auto my-10 max-w-7xl p-5">
       <div className="mx-auto mt-6 space-y-4">

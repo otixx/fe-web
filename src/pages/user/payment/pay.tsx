@@ -1,5 +1,5 @@
 import { privateApi } from "@/shared/axios/axios";
-import { Modal } from "antd";
+import { Col, CountdownProps, Modal, Row, Statistic } from "antd";
 import { useState } from "react";
 import { LuClock, LuWallet } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +19,12 @@ const BarcodePopup = ({
   const navigate = useNavigate();
   const [paymentStatus, setPaymentStatus] = useState("null");
   const [loading, setLoading] = useState(false);
+  const { Countdown } = Statistic;
+
+  const onFinish: CountdownProps["onFinish"] = () => {
+    // console.log("finished!");
+    navigate("/");
+  };
 
   const handlePay = async () => {
     setLoading(true);
@@ -148,10 +154,16 @@ const BarcodePopup = ({
                     />
                     <h1>{barcode}</h1>
                     <div className="py-2 text-center">
-                      <h1>Mohon Bayar Sebelum Waktu</h1>
-                      <p className="text-xl font-semibold text-red-500">
-                        {expired}
-                      </p>
+                      <h1>Mohon Bayar Sebelum Waktu Habis</h1>
+                      <Row justify="center">
+                        <Col span={12}>
+                          <Countdown
+                            title="Countdown"
+                            value={new Date(expired).getTime()}
+                            onFinish={onFinish}
+                          />
+                        </Col>
+                      </Row>
                     </div>
                     <div className="flex justify-end space-x-4">
                       <button

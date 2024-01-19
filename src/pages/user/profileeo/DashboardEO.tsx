@@ -48,8 +48,6 @@ const DashboardEO = () => {
     setValueEdit(value);
   };
 
-  console.log(event);
-
   const handleAddEvents = async (value: ICreateEventsProps) => {
     setLoading(true);
     if (file) {

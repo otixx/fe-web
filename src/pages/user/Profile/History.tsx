@@ -29,6 +29,7 @@ const History = () => {
 
   const handleSubmit = (data: IDetailFormHistory) => {
     setExpired(data?.expiry_time);
+
     setPayment(data?.payment_type);
     if (device === "mobile" && data?.payment_type === EPayment.shopee) {
       setIdTransaction(data?.transaction_id);

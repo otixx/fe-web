@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import dayjs from "dayjs";
 import { FormatDayjsInput } from "@/shared/dayjs/format";
-import { Tag } from "antd";
+import { QRCode, Tag } from "antd";
 import { QfindHistoryDetail } from "@/service/transaction/history.service";
 
 const Detailhistory = () => {
@@ -52,14 +52,18 @@ const Detailhistory = () => {
               </div>
             </div>
 
-            <div className="col-span-12 md:col-span-4 lg:col-span-4">
-              {dayjs(history?.data?.createdAt).format(FormatDayjsInput) ==
+            <div className="col-span-12 mt-10 md:col-span-4 lg:col-span-4">
+              {dayjs(history?.data?.createdAt).format(FormatDayjsInput) <
               dayjs().format(FormatDayjsInput) ? (
-                <QRCodeSVG
-                  height={300}
-                  width={300}
-                  value={history?.data?.barcode}
-                />
+                <>
+                  <QRCode
+                    size={300}
+                    iconSize={100}
+                    errorLevel="H"
+                    value={history?.data?.barcode}
+                    icon="https://res.cloudinary.com/dkaxlvjbb/image/upload/v1705650090/OTIXX_tzlegh.png"
+                  />
+                </>
               ) : (
                 <div>
                   {dayjs(history?.data?.createdAt).format(FormatDayjsInput) >

@@ -1,41 +1,42 @@
 import { useParams } from "react-router-dom";
-// import { IHistoryTicket } from "@/interface/history.interface";
 import {
   QHistoryTicketId,
   QTotalPendapatan,
 } from "@/service/ticket/ticket.service";
-import { Col, Row, Statistic } from "antd";
+import { Col, Modal, Row, Statistic } from "antd";
+import { IHistoryTicketDetailForm } from "@/utils/interface/history.interface";
+import { useState } from "react";
 
 const RiwayatTiket = () => {
   const idTiket = useParams();
   const detailTicket = QHistoryTicketId(idTiket?.id);
   const pendapatan = QTotalPendapatan(idTiket?.id);
-
+  const [open, setOpen] = useState(false);
+  const [data, setData] = useState({} as IHistoryTicketDetailForm);
+  const handleDetail = (e: IHistoryTicketDetailForm) => {
+    setOpen(true);
+    setData(e);
+  };
   return (
-    <div className="w-full px-4 py-4">
-      <div className="mb-10 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">History / Transaction</h1>
+    <div className="w-full">
+      <div className="grid h-28 grid-cols-12 items-center px-2">
+        <div className="col-span-12 items-center">
+          <h1 className="text-2xl font-bold">History / Transaction</h1>
+        </div>
       </div>
-
-      <div className="grid grid-cols-12 px-2 py-2">
+      <div className="grid grid-cols-12 px-2">
         <div className="col-span-12">
-          <div className="relative overflow-x-auto p-5 shadow-md sm:rounded-lg">
-            {pendapatan?.data === null ? (
-              <></>
-            ) : (
-              <Row>
+          <div className="relative overflow-x-auto shadow-md sm:rounded-lg ">
+            {pendapatan.isFetched && (
+              <Row style={{ paddingLeft: 20 }}>
                 <Col span={6}>
                   <Statistic
                     title="Total Pendapatan"
                     value={"Rp. " + pendapatan?.data}
                   />
                 </Col>
-                <Col span={6}></Col>
-                <Col span={6}></Col>
-                <Col span={6}></Col>
               </Row>
             )}
-
             <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
               <caption className="bg-white p-5 text-left text-lg font-semibold text-gray-900 dark:bg-gray-800 dark:text-white">
                 List Tiket
@@ -72,47 +73,80 @@ const RiwayatTiket = () => {
                   <th scope="col" className="px-6 py-3">
                     Detail Form
                   </th>
-                  {/* <th scope="col" className="px-6 py-3">
-                    Action
-                  </th> */}
                 </tr>
               </thead>
               <tbody>
-                {detailTicket?.data?.map((element: any, index: any) => (
-                  <tr
-                    className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
-                    key={index}
-                  >
-                    <td className="px-6 py-4">{index + 1}</td>
-                    <td className="px-6 py-4">{element?.profile.name}</td>
-                    <td className="px-6 py-4">{element?.profile.alamat}</td>
-                    <td className="px-6 py-4">{element?.total_harga}</td>
-                    <td className="px-6 py-4">{element?.quantity}</td>
-                    <td className="px-6 py-4">{element?.tiket.tags}</td>
-                    <td className="px-6 py-4">{element?.status_payment}</td>
-                    <td className="px-6 py-4">{element?.status}</td>
-                    <td className="px-6 py-4">{element?.detail_form}</td>
-                    {/* <td className="flex gap-4 px-6 py-4 text-center">
-                      <a
-                        href="#"
-                        className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-                      >
-                        Edit
-                      </a>
-                      <a
-                        href="#"
-                        className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-                      >
-                        Delete
-                      </a>
-                    </td> */}
-                  </tr>
-                ))}
+                {detailTicket?.data?.map((element, index: any) => {
+                  const tags: IHistoryTicketDetailForm = JSON.parse(
+                    element?.detail_form,
+                  );
+                  return (
+                    <tr
+                      className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
+                      key={index}
+                    >
+                      <td className="px-6 py-4">{index + 1}</td>
+                      <td className="px-6 py-4">{element?.profile?.name}</td>
+                      <td className="px-6 py-4">{element?.profile?.alamat}</td>
+                      <td className="px-6 py-4">{element?.total_harga}</td>
+                      <td className="px-6 py-4">{element?.quantity}</td>
+                      <td className="px-6 py-4">{element?.tiket.tags}</td>
+                      <td className="px-6 py-4">{element?.status_payment}</td>
+                      <td className="px-6 py-4">{element?.status}</td>
+                      <td className="px-6 py-4">
+                        {tags?.tags === "visitor" ? (
+                          tags?.tags
+                        ) : (
+                          <button
+                            onClick={() => handleDetail(tags)}
+                            className="h-10 w-14 rounded-md bg-secondColors font-semibold text-white shadow-sm hover:bg-mainColors "
+                          >
+                            Detail
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+
+      <Modal
+        open={open}
+        footer={false}
+        onCancel={() => setOpen(false)}
+        closeIcon={false}
+      >
+        <div className="p-4">
+          <div className="mb-4">
+            <strong>Asal Kota:</strong> {data?.asal_kota}
+          </div>
+          <div className="mb-4">
+            <strong>Instagram:</strong> {data?.instagram}
+          </div>
+          <div className="mb-4">
+            <strong>Judul Lagu:</strong> {data?.judul_lagu}
+          </div>
+          <div className="mb-4">
+            <strong>Nama:</strong> {data?.nama}
+          </div>
+          <div className="mb-4">
+            <strong>No HP:</strong> {data?.nohp}
+          </div>
+          <div className="mb-4">
+            <strong>Music URL:</strong>{" "}
+            <button
+              className="rounded-lg bg-secondColors px-4 py-2 font-semibold text-white hover:bg-mainColors"
+              onClick={() => (window.location.href = data?.music?.url)}
+            >
+              Download Music
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

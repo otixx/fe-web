@@ -1,11 +1,8 @@
-// import SkeletonTable from "@/components/SkeletonTable";
-// import { FormatDayjs } from "@/shared/dayjs/format";
-// import { Button, Pagination } from "antd";
 import SkeletonTable from "@/components/SkeletonTable";
 import { useNavigate } from "react-router-dom";
 import { QfindHistoryTiket } from "@/service/ticket/ticket.service";
 import { FormatDayjs } from "@/shared/dayjs/format";
-import { Empty } from "antd";
+import { Button, Empty } from "antd";
 import dayjs from "dayjs";
 
 const Riwayat = () => {
@@ -73,16 +70,17 @@ const Riwayat = () => {
                           {dayjs(element?.tanggal_expired).format(FormatDayjs)}
                         </td>
                         <td className="flex gap-4 px-6 py-4 text-center">
-                          <button
+                          <Button
+                            type="primary"
+                            className="bg-secondColors font-semibold"
                             onClick={() =>
                               navigate(
                                 `/profile/eo/riwayat/tiket/${element.id}`,
                               )
                             }
-                            style={{ backgroundColor: "#0049cc" }}
                           >
                             View
-                          </button>
+                          </Button>
                         </td>
                       </tr>
                     ))

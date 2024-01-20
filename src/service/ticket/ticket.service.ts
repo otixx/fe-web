@@ -6,6 +6,7 @@ import {
 } from "@/utils/interface/ticket.interface";
 import { privateApi, publicAPi } from "@/shared/axios/axios";
 import { useQuery } from "@tanstack/react-query";
+import { IHistoryTicketDetail } from "@/utils/interface/history.interface";
 
 export interface ISearchParams {
   url?: string;
@@ -64,7 +65,7 @@ export const QHistoryTicketId = (id: string | undefined) => {
   return useQuery({
     queryKey: ["historyticketid"],
     queryFn: fetcher,
-    select(res) {
+    select(res): IHistoryTicketDetail[] {
       return res?.data?.data;
     },
   });

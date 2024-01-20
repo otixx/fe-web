@@ -13,6 +13,10 @@ export interface IHistoryTicketDetail {
   detail_form: string;
   response_payment: string;
   status: string;
+  profile?: {
+    name?: string;
+    alamat?: string;
+  };
   tiket: {
     id: string;
     nama_kegiatan: string;
@@ -85,4 +89,17 @@ export interface IDetailFormHistory extends IAction {
   transaction_id: string;
   transaction_status: string;
   transaction_time: Dayjs;
+}
+
+export interface IHistoryTicketDetailForm {
+  tags?: string;
+  asal_kota: string;
+  instagram: string;
+  judul_lagu: string;
+  music: {
+    idPublic: string;
+    url: string;
+  };
+  nama: string;
+  nohp: string;
 }

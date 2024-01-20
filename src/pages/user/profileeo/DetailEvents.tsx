@@ -16,6 +16,7 @@ import {
 import {
   FormatDayjs,
   FormatDayjsInput,
+  FormatDetailTicket,
   FormatTime,
 } from "@/shared/dayjs/format";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -128,6 +129,7 @@ const DetailEvents = () => {
       toast.error(err?.response?.data?.message);
     }
   };
+
   return (
     <div className="w-full">
       <div className="grid h-28 grid-cols-12 items-center px-2">
@@ -194,6 +196,8 @@ const DetailEvents = () => {
               <tbody>
                 {tiket && tiket?.data && tiket?.data?.length > 0 ? (
                   tiket?.data.map((element, index: number) => {
+                    const hariIni = dayjs().format(FormatDetailTicket);
+                    const dahmulai = hariIni >= element?.event?.tanggal_acara;
                     return (
                       <tr
                         className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
@@ -220,12 +224,14 @@ const DetailEvents = () => {
                         </td>
                         <td className="flex items-center gap-4 px-6 py-4 text-center">
                           <Button
+                            disabled={dahmulai}
                             onClick={() => handleOpenUpdate(element)}
                             type="default"
                           >
                             Edit
                           </Button>
                           <Popconfirm
+                            disabled={dahmulai}
                             title="Hapus Tiket"
                             description="Apakah anda yakin ingin menghapus Tiket ini ?"
                             onConfirm={() => handleDelete(element?.id)}
@@ -233,7 +239,7 @@ const DetailEvents = () => {
                             okType="default"
                             showCancel={false}
                           >
-                            <Button type="primary" danger>
+                            <Button disabled={dahmulai} type="primary" danger>
                               Delete
                             </Button>
                           </Popconfirm>
@@ -265,6 +271,7 @@ const DetailEvents = () => {
           </div>
         </div>
       )}
+
       {open && (
         <Modal
           footer={false}

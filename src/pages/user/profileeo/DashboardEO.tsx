@@ -144,6 +144,7 @@ const DashboardEO = () => {
       toast.error(err?.response?.data?.message);
     }
   };
+
   return (
     <div className="w-full">
       <div className="grid h-28 grid-cols-12 items-center px-2">
@@ -234,7 +235,7 @@ const DashboardEO = () => {
                                 navigate(`/profile/eo/events/${element.id}`)
                               }
                               className={`h-10 w-14 rounded-md font-semibold  ${
-                                dahAbis || dahMulai
+                                dahAbis
                                   ? `border-2  bg-slate-100 text-slate-300`
                                   : `bg-secondColors text-white shadow-sm hover:bg-mainColors`
                               }`}

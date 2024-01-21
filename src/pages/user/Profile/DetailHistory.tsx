@@ -1,15 +1,28 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { QRCodeSVG } from "qrcode.react";
 import dayjs from "dayjs";
-import { FormatDayjsInput } from "@/shared/dayjs/format";
+import { FormatDayjsInput, FormatHistory } from "@/shared/dayjs/format";
 import { QRCode, Tag } from "antd";
 import { QfindHistoryDetail } from "@/service/transaction/history.service";
+import { IHistoryTransactionData } from "@/utils/interface/history.interface";
 
 const Detailhistory = () => {
   const navigate = useNavigate();
   const id = useParams().id;
   const history = QfindHistoryDetail({ id });
-
+  const dataHistory: IHistoryTransactionData | undefined = history?.data as
+    | IHistoryTransactionData
+    | undefined;
+  const hariIni = dayjs().format(FormatHistory);
+  const eventStart = dataHistory?.tiket?.event?.tanggal_acara;
+  const eventTime = dataHistory?.tiket?.event?.waktu_acara;
+  const eventStartTime = dayjs(`${eventStart} ${eventTime}`);
+  const twoHoursBeforeEvent = eventStartTime.subtract(2, "hour");
+  const lastCheckinTime = dayjs(`${eventStart} 23:59:59`);
+  const tanggalAcara = dayjs(dataHistory?.tiket?.event?.tanggal_acara);
+  const belumMulai =
+    tanggalAcara.isAfter(hariIni, "day") ||
+    dayjs().isBefore(twoHoursBeforeEvent);
+  const sudahBerakhir = dayjs().isAfter(lastCheckinTime);
   return (
     <div className="container mx-auto h-screen p-8">
       {history.isFetched && history.data ? (
@@ -17,13 +30,13 @@ const Detailhistory = () => {
           <div className="grid grid-cols-12">
             <div className="col-span-12 md:col-span-8 lg:col-span-8">
               <h1 className="mb-4 text-2xl font-bold">
-                {history?.data?.tiket?.nama_kegiatan}{" "}
+                {dataHistory?.tiket?.nama_kegiatan}{" "}
               </h1>
               <div className="space-y-2">
                 <p>
                   Event :{" "}
                   <span className="font-semibold text-mainColors">
-                    {history?.data?.tiket?.event?.nama_acara}
+                    {dataHistory?.tiket?.event?.nama_acara}
                   </span>
                 </p>
                 <p className="mb-2 text-mainColors">
@@ -32,53 +45,52 @@ const Detailhistory = () => {
                     {new Intl.NumberFormat("id-ID", {
                       style: "currency",
                       currency: "IDR",
-                    }).format(Number(history?.data?.total_harga))}
+                    }).format(Number(dataHistory?.total_harga))}
                   </span>
                 </p>
                 <p className="mb-4 text-mainColors">
                   Tanggal Transaksi:{" "}
-                  {dayjs(history?.data?.createdAt).format(FormatDayjsInput)}
+                  {dayjs(dataHistory?.createdAt).format(FormatDayjsInput)}
                 </p>
                 <p className="mb-4 text-mainColors">
                   Tanggal Mulai:{" "}
-                  {dayjs(history?.data?.tiket?.event?.tanggal_acara).format(
+                  {dayjs(dataHistory?.tiket?.event?.tanggal_acara).format(
                     FormatDayjsInput,
                   )}
                 </p>
                 <p className="mb-4 text-mainColors">
                   Status : {""}
-                  <Tag color="blue">{history?.data?.status}</Tag>
+                  <Tag color="blue">{dataHistory?.status}</Tag>
                 </p>
               </div>
             </div>
 
             <div className="col-span-12 mt-10 md:col-span-4 lg:col-span-4">
-              {dayjs(history?.data?.createdAt).format(FormatDayjsInput) <
-              dayjs().format(FormatDayjsInput) ? (
+              {belumMulai ? (
                 <>
-                  <QRCode
-                    size={300}
-                    iconSize={100}
-                    errorLevel="H"
-                    value={history?.data?.barcode}
-                    icon="https://res.cloudinary.com/dkaxlvjbb/image/upload/v1705650090/OTIXX_tzlegh.png"
-                  />
+                  <p className="font-semibold text-red-500">
+                    Barcode dapat diakses 2 jam sebelum acara dimulai
+                  </p>
                 </>
               ) : (
-                <div>
-                  {dayjs(history?.data?.createdAt).format(FormatDayjsInput) >
-                  dayjs().format(FormatDayjsInput) ? (
-                    <p className="font-semibold text-red-500">
-                      Maaf Barcode tidak dapat ditampilkan karena acara sudah
-                      lewat.
-                    </p>
+                <>
+                  {sudahBerakhir ? (
+                    <>
+                      <p className="font-semibold text-red-500">
+                        Maaf Barcode tidak dapat ditampilkan karena acara Sudah
+                        Berakhir
+                      </p>
+                    </>
                   ) : (
-                    <p className="font-semibold text-red-500">
-                      Maaf Barcode tidak dapat ditampilkan karena acara belum
-                      dimulai.
-                    </p>
+                    <QRCode
+                      size={300}
+                      iconSize={100}
+                      errorLevel="H"
+                      value={dataHistory?.barcode as any}
+                      icon="https://res.cloudinary.com/dkaxlvjbb/image/upload/v1705650090/OTIXX_tzlegh.png"
+                    />
                   )}
-                </div>
+                </>
               )}
               <div className="py-5">
                 <button

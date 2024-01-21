@@ -2,10 +2,12 @@ import SkeletonTable from "@/components/SkeletonTable";
 import { useNavigate } from "react-router-dom";
 import { QfindHistoryTiket } from "@/service/ticket/ticket.service";
 import { FormatDayjs } from "@/shared/dayjs/format";
-import { Button, Empty } from "antd";
+import { Empty, Pagination } from "antd";
 import dayjs from "dayjs";
+import { useState } from "react";
 
 const Riwayat = () => {
+  const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const tiketHistory = QfindHistoryTiket();
   return (
@@ -49,8 +51,8 @@ const Riwayat = () => {
               </thead>
               <tbody>
                 {tiketHistory && tiketHistory?.data ? (
-                  tiketHistory?.data?.length > 0 ? (
-                    tiketHistory?.data?.map((element) => (
+                  tiketHistory?.data?.data?.length > 0 ? (
+                    tiketHistory?.data?.data?.map((element) => (
                       <tr
                         className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
                         key={element.id}
@@ -70,9 +72,8 @@ const Riwayat = () => {
                           {dayjs(element?.tanggal_expired).format(FormatDayjs)}
                         </td>
                         <td className="flex gap-4 px-6 py-4 text-center">
-                          <Button
-                            type="primary"
-                            className="bg-secondColors font-semibold"
+                          <button
+                            className="h-10 w-14 rounded-md bg-secondColors font-semibold text-white transition duration-300 hover:bg-mainColors"
                             onClick={() =>
                               navigate(
                                 `/profile/eo/riwayat/tiket/${element.id}`,
@@ -80,7 +81,7 @@ const Riwayat = () => {
                             }
                           >
                             View
-                          </Button>
+                          </button>
                         </td>
                       </tr>
                     ))
@@ -104,18 +105,18 @@ const Riwayat = () => {
           </div>
         </div>
       </div>
-      {/* {ticket?.data && ticket?.data?.length > 0 && (
+      {tiketHistory?.data && tiketHistory?.data?.data.length > 0 && (
         <div className="flex w-full items-center justify-center ">
           <div className="p-5">
             <Pagination
               current={page}
-              total={50}
+              total={tiketHistory?.data?.jumlah}
               pageSize={10}
               onChange={(page) => setPage(page)}
             />
           </div>
         </div>
-      )} */}
+      )}
     </div>
   );
 };

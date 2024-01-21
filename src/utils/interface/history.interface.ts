@@ -1,10 +1,5 @@
 import { Dayjs } from "dayjs";
-
-export interface IDataTransaction extends IHistoryTicketDetail {
-  data: IHistoryTicketDetail[];
-}
-
-export interface IHistoryTicketDetail {
+export interface IHistoryTransactionData {
   id: string;
   barcode: string;
   createdAt: Dayjs;
@@ -42,6 +37,10 @@ export interface IHistoryTicketDetail {
   status_payment: string;
   total_harga: string;
   updatedAt: Dayjs;
+}
+export interface IHistoryTicketDetail {
+  data: IHistoryTransactionData[];
+  jumlah: number;
 }
 export interface IHistoryTicket {
   id: string;
@@ -96,6 +95,7 @@ export interface IHistoryTicketDetailForm {
   asal_kota: string;
   instagram: string;
   judul_lagu: string;
+  cosplay_name: string;
   music: {
     idPublic: string;
     url: string;

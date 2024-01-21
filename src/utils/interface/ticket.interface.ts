@@ -74,16 +74,21 @@ export interface IDataEventImg {
 }
 
 export interface ITiketHistory {
-  createdAt: Dayjs;
-  event_id: number;
-  harga: number;
-  id: number;
-  image_url: string;
-  isDeleted: boolean;
-  nama_kegiatan: string;
-  quantity: number;
-  tags: string;
-  tanggal_expired: Dayjs;
-  tanggal_preorder: Dayjs;
-  updatedAt: Dayjs;
+  data: [
+    {
+      createdAt: Dayjs;
+      event_id: number;
+      harga: number;
+      id: number;
+      image_url: string;
+      isDeleted: boolean;
+      nama_kegiatan: string;
+      quantity: number;
+      tags: string;
+      tanggal_expired: Dayjs;
+      tanggal_preorder: Dayjs;
+      updatedAt: Dayjs;
+    },
+  ];
+  jumlah: number;
 }

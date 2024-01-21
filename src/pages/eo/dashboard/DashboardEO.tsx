@@ -29,6 +29,8 @@ import {
 import { privateApi } from "@/shared/axios/axios";
 import toast from "react-hot-toast";
 import SkeletonTable from "@/components/SkeletonTable";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const DashboardEO = () => {
   const navigate = useNavigate();
@@ -49,6 +51,7 @@ const DashboardEO = () => {
   };
 
   const handleAddEvents = async (value: ICreateEventsProps) => {
+    console.log(value);
     setLoading(true);
     if (file) {
       const formData = new FormData();
@@ -111,8 +114,8 @@ const DashboardEO = () => {
       window.location.reload();
       setFile([]);
       toast.success(res?.data?.message);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
     }
   };
 
@@ -333,10 +336,7 @@ const DashboardEO = () => {
               name="description"
               label="Deskripsi"
             >
-              <Input.TextArea
-                placeholder="Deskripsi Event"
-                disabled={loading}
-              />
+              <ReactQuill theme="snow" readOnly={loading} />
             </Item>
             <Item
               rules={[{ required: true, message: "Tanggal Event Wajib" }]}
@@ -456,7 +456,7 @@ const DashboardEO = () => {
               <Input size="large" disabled={loading} />
             </Item>
             <Item name="description" label="Deskripsi">
-              <Input.TextArea disabled={loading} />
+              <ReactQuill theme="snow" readOnly={loading} />
             </Item>
             <Item name="tanggal_acara" label="Tanggal Acara">
               <DatePicker

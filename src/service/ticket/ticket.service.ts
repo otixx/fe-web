@@ -54,7 +54,7 @@ export const QfindHistoryTiket = () => {
   return useQuery({
     queryKey: ["tiketEO"],
     queryFn: fetcher,
-    select(res): ITiketHistory[] {
+    select(res): ITiketHistory {
       return res?.data?.data;
     },
   });
@@ -65,7 +65,7 @@ export const QHistoryTicketId = (id: string | undefined) => {
   return useQuery({
     queryKey: ["historyticketid"],
     queryFn: fetcher,
-    select(res): IHistoryTicketDetail[] {
+    select(res): IHistoryTicketDetail {
       return res?.data?.data;
     },
   });

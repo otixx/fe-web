@@ -94,13 +94,11 @@ const DetailEvents = () => {
     formData.append("quantity", value?.quantity);
     formData.append(
       "tanggal_preorder",
-      dayjs(value?.tanggal_pre).format(FormatDayjsInput) +
-        dayjs().hour(0o0).minute(0o0).second(0o0).format(FormatTime),
+      dayjs(value?.tanggal_pre).format(FormatDayjsInput),
     );
     formData.append(
       "tanggal_expired",
-      dayjs(value?.tanggal_exp).format(FormatDayjsInput) +
-        dayjs().hour(0o0).minute(0o0).second(0o0).format(FormatTime),
+      dayjs(value?.tanggal_exp).format(FormatDayjsInput),
     );
     formData.append("file", file);
     try {
@@ -476,7 +474,7 @@ const DetailEvents = () => {
               <Input type="number" size="large" disabled={loading} />
             </Item>
 
-            <Item name="tags" label="Nama Acara">
+            <Item name="tags" label="Tags">
               <Select
                 size="large"
                 disabled={loading}
@@ -490,8 +488,20 @@ const DetailEvents = () => {
                     label: "Music",
                   },
                   {
-                    value: "cosplay",
-                    label: "Cosplay",
+                    value: "coscomp",
+                    label: "Coscomp",
+                  },
+                  {
+                    value: "coswalk",
+                    label: "Coswalk",
+                  },
+                  {
+                    value: "visitor",
+                    label: "Visitor",
+                  },
+                  {
+                    value: "stand",
+                    label: "Stand",
                   },
                 ]}
               />

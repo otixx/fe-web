@@ -71,7 +71,7 @@ const History = () => {
       <h1 className="mb-2 text-3xl font-bold">Transaction History</h1>
       {transactions?.isLoading ? (
         <Skeleton avatar active paragraph={{ rows: 3 }} />
-      ) : transactions.isFetched ? (
+      ) : transactions?.data && transactions?.data?.data.length > 0 ? (
         <div className="min-h-screen">
           <ul className="space-y-4">
             {transactions?.data?.data.map(
@@ -189,7 +189,7 @@ const History = () => {
         </div>
       ) : (
         <div className="flex h-full w-full items-center justify-center">
-          <Empty />
+          <Empty description="Tidak ada History Pembelian Tiket" />
         </div>
       )}
       {transactions?.data && transactions?.data?.data.length > 0 && (

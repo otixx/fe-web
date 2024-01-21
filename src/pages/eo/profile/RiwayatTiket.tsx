@@ -3,12 +3,13 @@ import {
   QHistoryTicketId,
   QTotalPendapatan,
 } from "@/service/ticket/ticket.service";
-import { Col, Modal, Pagination, Row, Statistic } from "antd";
+import { Col, Empty, Modal, Pagination, Row, Statistic } from "antd";
 import {
   IHistoryTicketDetailForm,
   IHistoryTransactionData,
 } from "@/utils/interface/history.interface";
 import { useState } from "react";
+import SkeletonTable from "@/components/SkeletonTable";
 
 const RiwayatTiket = () => {
   const idTiket = useParams();
@@ -21,6 +22,7 @@ const RiwayatTiket = () => {
     setOpen(true);
     setData(e);
   };
+
   return (
     <div className="w-full">
       <div className="grid h-28 grid-cols-12 items-center px-2">
@@ -31,7 +33,7 @@ const RiwayatTiket = () => {
       <div className="grid grid-cols-12 px-2">
         <div className="col-span-12">
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg ">
-            {pendapatan.isFetched && (
+            {pendapatan?.data && (
               <Row style={{ paddingLeft: 20 }}>
                 <Col span={6}>
                   <Statistic
@@ -80,41 +82,63 @@ const RiwayatTiket = () => {
                 </tr>
               </thead>
               <tbody>
-                {detailTicket?.data?.data.map(
-                  (element: IHistoryTransactionData, index: any) => {
-                    const tags: IHistoryTicketDetailForm = JSON.parse(
-                      element?.detail_form,
-                    );
-                    return (
-                      <tr
-                        className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
-                        key={index}
-                      >
-                        <td className="px-6 py-4">{index + 1}</td>
-                        <td className="px-6 py-4">{element?.profile?.name}</td>
-                        <td className="px-6 py-4">
-                          {element?.profile?.alamat}
-                        </td>
-                        <td className="px-6 py-4">{element?.total_harga}</td>
-                        <td className="px-6 py-4">{element?.quantity}</td>
-                        <td className="px-6 py-4">{element?.tiket.tags}</td>
-                        <td className="px-6 py-4">{element?.status_payment}</td>
-                        <td className="px-6 py-4">{element?.status}</td>
-                        <td className="px-6 py-4">
-                          {tags?.tags === "visitor" ? (
-                            tags?.tags
-                          ) : (
-                            <button
-                              onClick={() => handleDetail(tags)}
-                              className="h-10 w-14 rounded-md bg-secondColors font-semibold text-white shadow-sm hover:bg-mainColors "
-                            >
-                              Detail
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  },
+                {detailTicket && detailTicket?.data ? (
+                  detailTicket?.data?.data.length > 0 ? (
+                    detailTicket?.data?.data.map(
+                      (element: IHistoryTransactionData, index: any) => {
+                        const tags: IHistoryTicketDetailForm = JSON.parse(
+                          element?.detail_form,
+                        );
+                        return (
+                          <tr
+                            className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
+                            key={index}
+                          >
+                            <td className="px-6 py-4">{index + 1}</td>
+                            <td className="px-6 py-4">
+                              {element?.profile?.name}
+                            </td>
+                            <td className="px-6 py-4">
+                              {element?.profile?.alamat}
+                            </td>
+                            <td className="px-6 py-4">
+                              {element?.total_harga}
+                            </td>
+                            <td className="px-6 py-4">{element?.quantity}</td>
+                            <td className="px-6 py-4">{element?.tiket.tags}</td>
+                            <td className="px-6 py-4">
+                              {element?.status_payment}
+                            </td>
+                            <td className="px-6 py-4">{element?.status}</td>
+                            <td className="px-6 py-4">
+                              {tags?.music ? (
+                                <button
+                                  onClick={() => handleDetail(tags)}
+                                  className="h-10 w-14 rounded-md bg-secondColors font-semibold text-white shadow-sm hover:bg-mainColors "
+                                >
+                                  Detail
+                                </button>
+                              ) : (
+                                tags?.tags
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      },
+                    )
+                  ) : (
+                    <tr>
+                      <td className="py-4" colSpan={9}>
+                        <Empty description="Tidak ada Hisory Pembelian Tiket" />
+                      </td>
+                    </tr>
+                  )
+                ) : (
+                  <tr>
+                    <td colSpan={9}>
+                      <SkeletonTable totalId={true} />
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>

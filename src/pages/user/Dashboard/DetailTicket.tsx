@@ -23,20 +23,24 @@ const DetailTiket = () => {
   const idTiket = useParams();
   const navigate = useNavigate();
 
-  const { data: ticketDetail } = QfindTicketbyId({
+  const ticketDetail = QfindTicketbyId({
     id: idTiket?.id,
   });
 
+  if (ticketDetail?.data === null) {
+    navigate("/");
+  }
+
   const parseImgData = async () => {
-    if (ticketDetail && ticketDetail?.image_url) {
-      const imageUrl = await JSON.parse(ticketDetail?.image_url);
+    if (ticketDetail?.data && ticketDetail?.data?.image_url) {
+      const imageUrl = await JSON.parse(ticketDetail?.data?.image_url);
       return imageUrl;
     }
   };
 
   const parseImgEventData = async () => {
-    if (ticketDetail && ticketDetail?.event?.img_rundown) {
-      const imageUrl = await JSON.parse(ticketDetail?.event?.img_rundown);
+    if (ticketDetail?.data && ticketDetail?.data?.event?.img_rundown) {
+      const imageUrl = await JSON.parse(ticketDetail?.data?.event?.img_rundown);
       return imageUrl;
     }
   };
@@ -44,8 +48,7 @@ const DetailTiket = () => {
   useEffect(() => {
     parseImgData().then((res) => setDataImg(res));
     parseImgEventData().then((res) => setDataEventImg(res));
-    parseImgEventData();
-  }, [ticketDetail]);
+  }, [ticketDetail?.data]);
 
   const handlePlus = (qty: number) => {
     if (quantity == qty) {
@@ -70,14 +73,15 @@ const DetailTiket = () => {
     e.preventDefault();
     navigate(`/detail/payment/${idTiket?.id}`, { state: { data: quantity } });
   };
-  const tanggalAcara = dayjs(ticketDetail?.tanggal_preorder).format(
+  const tanggalAcara = dayjs(ticketDetail?.data?.tanggal_preorder).format(
     "YYY-MM-DD",
   );
   const hariIni = dayjs().format(FormatDetailTicket);
   const belumMulai =
-    hariIni < dayjs(ticketDetail?.tanggal_preorder).format("YYY-MM-DD");
+    hariIni < dayjs(ticketDetail?.data?.tanggal_preorder).format("YYY-MM-DD");
   const dahAbis =
-    hariIni > dayjs(ticketDetail?.tanggal_expired).format(FormatDetailTicket);
+    hariIni >
+    dayjs(ticketDetail?.data?.tanggal_expired).format(FormatDetailTicket);
 
   return (
     <div className="container mx-auto my-10 max-w-7xl p-5">
@@ -95,8 +99,8 @@ const DetailTiket = () => {
             <div className="h-full w-full rounded-lg bg-white px-2 lg:p-6">
               <div className="space-y-4">
                 <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-                  {ticketDetail ? (
-                    ticketDetail?.nama_kegiatan
+                  {ticketDetail?.data ? (
+                    ticketDetail?.data?.nama_kegiatan
                   ) : (
                     <div
                       role="status"
@@ -113,8 +117,8 @@ const DetailTiket = () => {
                 </h3>
                 <span className="flex items-center gap-2 text-gray-800">
                   <LuCalendarDays />
-                  {ticketDetail ? (
-                    dayjs(ticketDetail?.event?.tanggal_acara).format(
+                  {ticketDetail?.data ? (
+                    dayjs(ticketDetail?.data?.event?.tanggal_acara).format(
                       FormatDayjs,
                     )
                   ) : (
@@ -130,8 +134,8 @@ const DetailTiket = () => {
                 </span>
                 <span className="flex items-center gap-2 text-gray-800">
                   <LuMap />
-                  {ticketDetail ? (
-                    ticketDetail?.event?.lokasi
+                  {ticketDetail?.data ? (
+                    ticketDetail?.data?.event?.lokasi
                   ) : (
                     <div
                       role="status"
@@ -145,12 +149,12 @@ const DetailTiket = () => {
                 </span>
                 <span className="flex items-center gap-2 text-gray-800">
                   <LuTicket />
-                  {ticketDetail ? (
-                    ticketDetail?.quantity == 0 ||
-                    ticketDetail?.quantity === null ? (
+                  {ticketDetail?.data ? (
+                    ticketDetail?.data?.quantity == 0 ||
+                    ticketDetail?.data?.quantity === null ? (
                       "Stok Habis"
                     ) : (
-                      `${ticketDetail?.quantity} Qty`
+                      `${ticketDetail?.data?.quantity} Qty`
                     )
                   ) : (
                     <div
@@ -165,8 +169,8 @@ const DetailTiket = () => {
                 </span>
                 <span className="flex items-center gap-2 font-semibold text-gray-800">
                   <LuKey />
-                  {ticketDetail ? (
-                    <Tag color="blue">{ticketDetail?.tags}</Tag>
+                  {ticketDetail?.data ? (
+                    <Tag color="blue">{ticketDetail?.data?.tags}</Tag>
                   ) : (
                     <div
                       role="status"
@@ -190,8 +194,12 @@ const DetailTiket = () => {
                   Description Event :
                 </h3>
                 <div className="  text-base text-gray-900">
-                  {ticketDetail ? (
-                    ticketDetail?.event?.description
+                  {ticketDetail?.data ? (
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: ticketDetail?.data?.event?.description,
+                      }}
+                    />
                   ) : (
                     <div
                       role="status"
@@ -232,11 +240,11 @@ const DetailTiket = () => {
           <div className="order-3 col-span-9 px-4 lg:col-span-3">
             <h2 className="font-semibold text-mainColors">Harga</h2>
             <div className="truncate px-2 text-lg tracking-tight text-gray-900 lg:px-0 lg:text-3xl">
-              {ticketDetail?.harga ? (
+              {ticketDetail?.data?.harga ? (
                 new Intl.NumberFormat("id-ID", {
                   style: "currency",
                   currency: "IDR",
-                }).format(Number(ticketDetail?.harga) * quantity)
+                }).format(Number(ticketDetail?.data?.harga) * quantity)
               ) : (
                 <div
                   role="status"
@@ -250,9 +258,9 @@ const DetailTiket = () => {
             </div>
             <form className="mt-10" onSubmit={handleCheckout}>
               <div>
-                {ticketDetail ? (
-                  ticketDetail?.quantity &&
-                  ticketDetail?.quantity !== 0 && (
+                {ticketDetail?.data ? (
+                  ticketDetail?.data?.quantity &&
+                  ticketDetail?.data?.quantity !== 0 && (
                     <fieldset className="mt-4">
                       <h1>Qty</h1>
                       <div className="items-center space-x-3">
@@ -275,7 +283,9 @@ const DetailTiket = () => {
                           type="button"
                           disabled={quantity === 5}
                           className="rounded-md bg-gray-200 px-2 py-1 shadow-sm transition duration-150 hover:bg-gray-300"
-                          onClick={() => handlePlus(ticketDetail?.quantity)}
+                          onClick={() =>
+                            handlePlus(ticketDetail?.data?.quantity)
+                          }
                         >
                           +
                         </button>
@@ -296,29 +306,29 @@ const DetailTiket = () => {
               <div className="cursor-pointer">
                 <button
                   disabled={
-                    ticketDetail?.quantity === 0 ||
-                    ticketDetail?.quantity === null ||
+                    ticketDetail?.data?.quantity === 0 ||
+                    ticketDetail?.data?.quantity === null ||
                     belumMulai ||
                     dahAbis
                   }
                   type="submit"
                   className={`mt-10 ${
-                    ticketDetail?.quantity === 0 ||
+                    ticketDetail?.data?.quantity === 0 ||
                     tanggalAcara > hariIni ||
                     dahAbis
                       ? "cursor-not-allowed bg-gray-400"
                       : "bg-secondColors hover:bg-mainColors"
                   } flex w-full items-center justify-center gap-2 rounded-md border border-transparent py-3 text-base font-semibold text-white transition duration-500 `}
                 >
-                  {ticketDetail ? (
-                    ticketDetail?.quantity === 0 ||
-                    ticketDetail?.quantity === null ||
+                  {ticketDetail?.data ? (
+                    ticketDetail?.data?.quantity === 0 ||
+                    ticketDetail?.data?.quantity === null ||
                     belumMulai ? (
                       <>
                         <LuAlertCircle size={20} />
                         {belumMulai
                           ? `Maaf belum tanggal preorder, Mulai Oder ${dayjs(
-                              ticketDetail?.tanggal_preorder,
+                              ticketDetail?.data?.tanggal_preorder,
                             ).format("DD-MM-YYYY")}`
                           : "Tiket Habis"}
                       </>

@@ -1,10 +1,13 @@
 import { Status } from "@/utils/enum/status.enum";
-import { IDetailFormHistory } from "@/utils/interface/history.interface";
-import { useHistory } from "@/service/transaction/history.service";
+import {
+  IDetailFormHistory,
+  IHistoryTransactionData,
+} from "@/utils/interface/history.interface";
+import { QfindHistory } from "@/service/transaction/history.service";
 import { FormatDayjs, FormatHistory } from "@/shared/dayjs/format";
-import { Empty, Modal, Skeleton } from "antd";
+import { Empty, Modal, Pagination, Skeleton } from "antd";
 import dayjs, { Dayjs } from "dayjs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BarcodePopup from "../payment/pay";
 import { useDevice } from "@/service/device/device.service";
@@ -14,6 +17,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 
 const History = () => {
+  const [page, setPage] = useState(1);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -23,8 +27,7 @@ const History = () => {
   const [payment, setPayment] = useState("");
   const [expired, setExpired] = useState<Dayjs | null>(null);
   const navigate = useNavigate();
-  const transactions = useHistory((state) => state?.history);
-  const getHistory = useHistory((state) => state?.getHistory);
+  const transactions = QfindHistory();
   const device = useDevice((state) => state?.device);
 
   const handleSubmit = (data: IDetailFormHistory) => {
@@ -59,26 +62,20 @@ const History = () => {
     }
   };
 
-  useEffect(() => {
-    getHistory();
-  }, []);
-
   return (
     <div
       className={`container mx-auto ${
-        transactions && transactions.length === 0 && "h-[80vh]"
+        transactions?.data?.data.length === 0 && "h-[80vh]"
       } p-8`}
     >
       <h1 className="mb-2 text-3xl font-bold">Transaction History</h1>
-      {transactions ? (
-        transactions?.length === 0 ? (
-          <div className="flex h-full w-full items-center justify-center">
-            <Empty />
-          </div>
-        ) : (
-          <div className="min-h-screen">
-            <ul className="space-y-4">
-              {transactions?.map((transaction, index) => {
+      {transactions?.isLoading ? (
+        <Skeleton avatar active paragraph={{ rows: 3 }} />
+      ) : transactions.isFetched ? (
+        <div className="min-h-screen">
+          <ul className="space-y-4">
+            {transactions?.data?.data.map(
+              (transaction: IHistoryTransactionData, index) => {
                 const formDetail: IDetailFormHistory = JSON.parse(
                   transaction?.response_payment,
                 );
@@ -90,8 +87,8 @@ const History = () => {
                 const eventTime = transaction?.tiket?.event?.waktu_acara;
                 const eventStartTime = dayjs(`${eventStart} ${eventTime}`);
                 const fiveMinutesBeforeEvent = eventStartTime.subtract(
-                  5,
-                  "minutes",
+                  2,
+                  "hour",
                 );
                 const lastCheckinTime = dayjs(`${eventStart} 23:59:59`);
 
@@ -186,12 +183,26 @@ const History = () => {
                     </div>
                   </li>
                 );
-              })}
-            </ul>
-          </div>
-        )
+              },
+            )}
+          </ul>
+        </div>
       ) : (
-        <Skeleton avatar active paragraph={{ rows: 3 }} />
+        <div className="flex h-full w-full items-center justify-center">
+          <Empty />
+        </div>
+      )}
+      {transactions?.data && transactions?.data?.data.length > 0 && (
+        <div className="flex w-full items-center justify-center ">
+          <div className="p-5">
+            <Pagination
+              current={page}
+              total={transactions?.data?.jumlah}
+              pageSize={10}
+              onChange={(page) => setPage(page)}
+            />
+          </div>
+        </div>
       )}
 
       <BarcodePopup

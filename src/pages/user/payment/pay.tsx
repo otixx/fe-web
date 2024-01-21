@@ -22,7 +22,6 @@ const BarcodePopup = ({
   const { Countdown } = Statistic;
 
   const onFinish: CountdownProps["onFinish"] = () => {
-    // console.log("finished!");
     navigate("/");
   };
 

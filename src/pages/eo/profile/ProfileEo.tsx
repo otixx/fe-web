@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { LuInstagram, LuMail, LuUser } from "react-icons/lu";
-// import { LoadingOutlined } from "@ant-design/icons";
 import { Form, Input, Modal } from "antd";
 import { useProfile } from "@/service/user/user.service";
 
@@ -65,7 +64,6 @@ const ProfileEo = () => {
                 className="flex w-32 items-center justify-center rounded-full bg-mainColors py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
               >
                 "Update"
-                {/* {loading ? <LoadingOutlined /> : "Update"} */}
               </button>
             </div>
           </Form>

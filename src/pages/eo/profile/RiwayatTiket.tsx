@@ -3,14 +3,18 @@ import {
   QHistoryTicketId,
   QTotalPendapatan,
 } from "@/service/ticket/ticket.service";
-import { Col, Modal, Row, Statistic } from "antd";
-import { IHistoryTicketDetailForm } from "@/utils/interface/history.interface";
+import { Col, Modal, Pagination, Row, Statistic } from "antd";
+import {
+  IHistoryTicketDetailForm,
+  IHistoryTransactionData,
+} from "@/utils/interface/history.interface";
 import { useState } from "react";
 
 const RiwayatTiket = () => {
   const idTiket = useParams();
   const detailTicket = QHistoryTicketId(idTiket?.id);
   const pendapatan = QTotalPendapatan(idTiket?.id);
+  const [page, setPage] = useState(1);
   const [open, setOpen] = useState(false);
   const [data, setData] = useState({} as IHistoryTicketDetailForm);
   const handleDetail = (e: IHistoryTicketDetailForm) => {
@@ -76,43 +80,59 @@ const RiwayatTiket = () => {
                 </tr>
               </thead>
               <tbody>
-                {detailTicket?.data?.map((element, index: any) => {
-                  const tags: IHistoryTicketDetailForm = JSON.parse(
-                    element?.detail_form,
-                  );
-                  return (
-                    <tr
-                      className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
-                      key={index}
-                    >
-                      <td className="px-6 py-4">{index + 1}</td>
-                      <td className="px-6 py-4">{element?.profile?.name}</td>
-                      <td className="px-6 py-4">{element?.profile?.alamat}</td>
-                      <td className="px-6 py-4">{element?.total_harga}</td>
-                      <td className="px-6 py-4">{element?.quantity}</td>
-                      <td className="px-6 py-4">{element?.tiket.tags}</td>
-                      <td className="px-6 py-4">{element?.status_payment}</td>
-                      <td className="px-6 py-4">{element?.status}</td>
-                      <td className="px-6 py-4">
-                        {tags?.tags === "visitor" ? (
-                          tags?.tags
-                        ) : (
-                          <button
-                            onClick={() => handleDetail(tags)}
-                            className="h-10 w-14 rounded-md bg-secondColors font-semibold text-white shadow-sm hover:bg-mainColors "
-                          >
-                            Detail
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {detailTicket?.data?.data.map(
+                  (element: IHistoryTransactionData, index: any) => {
+                    const tags: IHistoryTicketDetailForm = JSON.parse(
+                      element?.detail_form,
+                    );
+                    return (
+                      <tr
+                        className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
+                        key={index}
+                      >
+                        <td className="px-6 py-4">{index + 1}</td>
+                        <td className="px-6 py-4">{element?.profile?.name}</td>
+                        <td className="px-6 py-4">
+                          {element?.profile?.alamat}
+                        </td>
+                        <td className="px-6 py-4">{element?.total_harga}</td>
+                        <td className="px-6 py-4">{element?.quantity}</td>
+                        <td className="px-6 py-4">{element?.tiket.tags}</td>
+                        <td className="px-6 py-4">{element?.status_payment}</td>
+                        <td className="px-6 py-4">{element?.status}</td>
+                        <td className="px-6 py-4">
+                          {tags?.tags === "visitor" ? (
+                            tags?.tags
+                          ) : (
+                            <button
+                              onClick={() => handleDetail(tags)}
+                              className="h-10 w-14 rounded-md bg-secondColors font-semibold text-white shadow-sm hover:bg-mainColors "
+                            >
+                              Detail
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  },
+                )}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+      {detailTicket?.data && detailTicket?.data?.data.length > 0 && (
+        <div className="flex w-full items-center justify-center ">
+          <div className="p-5">
+            <Pagination
+              current={page}
+              total={detailTicket?.data?.jumlah}
+              pageSize={10}
+              onChange={(page) => setPage(page)}
+            />
+          </div>
+        </div>
+      )}
 
       <Modal
         open={open}
@@ -137,13 +157,22 @@ const RiwayatTiket = () => {
             <strong>No HP:</strong> {data?.nohp}
           </div>
           <div className="mb-4">
-            <strong>Music URL:</strong>{" "}
-            <button
-              className="rounded-lg bg-secondColors px-4 py-2 font-semibold text-white hover:bg-mainColors"
-              onClick={() => (window.location.href = data?.music?.url)}
-            >
-              Download Music
-            </button>
+            {data?.music ? (
+              <>
+                <strong>Music URL:</strong>{" "}
+                <button
+                  className="rounded-lg bg-secondColors px-4 py-2 font-semibold text-white hover:bg-mainColors"
+                  onClick={() => window.open(data?.music?.url, "_blank")}
+                >
+                  Download Music
+                </button>
+              </>
+            ) : (
+              <div className="mb-4">
+                <strong>Cosplay Name:</strong>
+                {data?.cosplay_name}
+              </div>
+            )}
           </div>
         </div>
       </Modal>

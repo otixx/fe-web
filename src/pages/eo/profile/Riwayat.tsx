@@ -5,6 +5,7 @@ import { FormatDayjs } from "@/shared/dayjs/format";
 import { Empty, Pagination } from "antd";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { Helmet } from "react-helmet";
 
 const Riwayat = () => {
   const [page, setPage] = useState(1);
@@ -12,6 +13,10 @@ const Riwayat = () => {
   const tiketHistory = QfindHistoryTiket();
   return (
     <div className="w-full">
+      <Helmet>
+        <meta charSet="utf-8" name="riwayat" />
+        <title>Otakutixx - Riwayat</title>
+      </Helmet>
       <div className="grid h-28 grid-cols-12 items-center px-2">
         <div className="col-span-12 items-center">
           <h1 className="text-2xl font-bold">Tiket</h1>

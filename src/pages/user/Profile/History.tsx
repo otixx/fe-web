@@ -15,6 +15,7 @@ import { EPayment } from "@/utils/enum/payment.enum";
 import { privateApi } from "@/shared/axios/axios";
 import { LoadingOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
+import { Helmet } from "react-helmet";
 
 const History = () => {
   const [page, setPage] = useState(1);
@@ -68,6 +69,10 @@ const History = () => {
         transactions?.data?.data.length === 0 && "h-[80vh]"
       } p-8`}
     >
+      <Helmet>
+        <meta charSet="utf-8" name="history" />
+        <title>Otakutixx - History</title>
+      </Helmet>
       <h1 className="mb-2 text-3xl font-bold">Transaction History</h1>
       {transactions?.isLoading ? (
         <Skeleton avatar active paragraph={{ rows: 3 }} />

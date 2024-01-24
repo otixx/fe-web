@@ -1,14 +1,51 @@
 import { useState } from "react";
 import { LuInstagram, LuMail, LuUser } from "react-icons/lu";
-import { Form, Input, Modal } from "antd";
-import { useProfile } from "@/service/user/user.service";
+import { Form, Input, Modal, Select } from "antd";
+import { updateProfileEO, useProfile } from "@/service/user/user.service";
+import { TProfileEOProps } from "@/utils/types/profile.types";
+import toast from "react-hot-toast";
+import { LoadingOutlined } from "@ant-design/icons";
+import { Helmet } from "react-helmet";
 
 const ProfileEo = () => {
   const [open, setOpen] = useState(false);
-  const profile = useProfile((state) => state?.profile);
+  const [loading, setLoading] = useState(false);
+  const profile = useProfile((state: any) => state?.profile);
   const { Item } = Form;
+
+  const handleUpdate = async (value: TProfileEOProps) => {
+    setLoading(true);
+    try {
+      const res: any = await updateProfileEO({
+        instagram: `https://www.instagram.com/${value?.instagram}`,
+        kota: value?.kota,
+        namaeo: value?.namaeo,
+      });
+      setLoading(false);
+      toast.success(res?.data?.message);
+      setOpen(false);
+    } catch (error: any) {
+      setLoading(false);
+      toast.error(error?.response?.data?.message);
+    }
+  };
+
+  const filterOption = (
+    input: string,
+    option?: { label: string; value: string },
+  ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+
+  const getInstagramUsername = (instagramUrl: string) => {
+    const urlParts = instagramUrl.split("/");
+    const username = urlParts[urlParts.length - 1];
+    return username;
+  };
   return (
     <div className="w-full">
+      <Helmet>
+        <meta charSet="utf-8" name="profileeo" />
+        <title>Otakutixx - Profile EO</title>
+      </Helmet>
       <div className="grid h-28 grid-cols-12 items-center px-2">
         <div className="col-span-6">
           <h1 className="text-2xl font-bold">Profile EO</h1>
@@ -23,6 +60,7 @@ const ProfileEo = () => {
           </button>
         </div>
       </div>
+
       {open && (
         <Modal
           footer={false}
@@ -34,26 +72,62 @@ const ProfileEo = () => {
           <Form
             name="basic"
             layout="vertical"
+            onFinish={handleUpdate}
             fields={[
               {
-                name: "name",
+                name: "namaeo",
                 value: profile?.eo?.nama_eo,
               },
               {
                 name: "instagram",
-                value: profile?.eo?.instagram,
+                value: getInstagramUsername(profile?.eo?.instagram),
+              },
+              {
+                name: "kota",
+                value: profile?.eo?.kota,
               },
             ]}
           >
-            <Item name="name" label="Nama EO">
-              <Input size="large" />
+            <Item
+              name="namaeo"
+              rules={[{ required: true, message: "Nama Wajib diisi" }]}
+              label="Nama EO"
+            >
+              <Input disabled={loading} size="large" />
             </Item>
-            <Item name="instagram" label="Nama Instagram">
-              <Input addonBefore="@" size="large" />
+            <Item
+              name="kota"
+              label="Pilih Kota"
+              rules={[{ required: true, message: "Kota Wajib diisi" }]}
+            >
+              <Select
+                size="large"
+                disabled={loading}
+                showSearch
+                placeholder="Pilih Kota"
+                optionFilterProp="children"
+                filterOption={filterOption}
+                options={[
+                  {
+                    value: "jember",
+                    label: "Jember",
+                  },
+                ]}
+              />
+            </Item>
+            <Item
+              name="instagram"
+              rules={[
+                { required: true, message: "Username instagram Wajib diisi" },
+              ]}
+              label="Nama Instagram"
+            >
+              <Input disabled={loading} addonBefore="@" size="large" />
             </Item>
 
             <div className="flex justify-end gap-2 py-2">
               <button
+                disabled={loading}
                 onClick={() => setOpen(false)}
                 className=" rounded-full border border-mainColors px-10 py-2 text-center text-sm font-semibold text-black focus:outline-none focus:ring-4"
               >
@@ -63,12 +137,13 @@ const ProfileEo = () => {
                 type="submit"
                 className="flex w-32 items-center justify-center rounded-full bg-mainColors py-2 text-center text-sm font-semibold text-white focus:outline-none focus:ring-4"
               >
-                "Update"
+                {loading ? <LoadingOutlined /> : "Update"}
               </button>
             </div>
           </Form>
         </Modal>
       )}
+
       <div className="mt-5 grid grid-cols-12 gap-4 p-4">
         <div className="col-span-12 justify-center space-y-4 lg:col-span-3">
           <div className="relative">

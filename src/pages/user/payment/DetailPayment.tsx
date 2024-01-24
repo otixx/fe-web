@@ -6,9 +6,10 @@ import { QfindTicketbyId } from "@/service/ticket/ticket.service";
 import { Form, Input, Select } from "antd";
 import toast from "react-hot-toast";
 import { LoadingOutlined } from "@ant-design/icons";
-import { paymentMethods } from "@/shared/tempData";
+import { DataCity, paymentMethods } from "@/shared/tempData";
 import { useDevice } from "@/service/device/device.service";
 import { EPayment } from "@/utils/enum/payment.enum";
+import { Helmet } from "react-helmet";
 
 const DetailPayment = () => {
   const idTiket = useParams().id;
@@ -25,6 +26,7 @@ const DetailPayment = () => {
   const qty = location?.state?.data;
   const navigate = useNavigate();
   const { Item } = Form;
+  const { Option } = Select;
 
   const { data: tiket } = QfindTicketbyId({ id: idTiket });
 
@@ -90,6 +92,11 @@ const DetailPayment = () => {
     option?: { label: string; value: string },
   ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
+  const formattedDataCity = DataCity.map((city) => ({
+    label: city?.name,
+    value: city?.name,
+  }));
+
   const handleMusicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
     if (fileList) {
@@ -100,6 +107,10 @@ const DetailPayment = () => {
 
   return (
     <div className="container mx-auto">
+      <Helmet>
+        <meta charSet="utf-8" name="payment" />
+        <title>Otakutixx - Pembayaran</title>
+      </Helmet>
       <div className="space-y-2 p-4">
         <Form layout="vertical" onFinish={handleSubmit}>
           <div className="grid grid-cols-5 gap-2">
@@ -138,17 +149,20 @@ const DetailPayment = () => {
                       <Select
                         size="large"
                         showSearch
-                        disabled={loading}
-                        placeholder="Pilih Kota"
-                        optionFilterProp="children"
+                        placeholder="Pilih kota atau kabupaten"
+                        optionFilterProp="label"
                         filterOption={filterOption}
-                        options={[
-                          {
-                            value: "jember",
-                            label: "Jember",
-                          },
-                        ]}
-                      />
+                      >
+                        {formattedDataCity.map((city) => (
+                          <Option
+                            key={city.value}
+                            value={city.value}
+                            label={city.label}
+                          >
+                            {city.label}
+                          </Option>
+                        ))}
+                      </Select>
                     </Item>
                     <Item
                       name="instagram"

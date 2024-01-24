@@ -5,6 +5,7 @@ import { publicAPi } from "@/shared/axios/axios";
 import { LoadingOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import { IRegisterProps } from "@/utils/interface/register.interface";
+import { Helmet } from "react-helmet";
 
 export const Register = () => {
   const [status, setStatus] = useState(false);
@@ -48,6 +49,10 @@ export const Register = () => {
   return (
     <>
       <div className="w-full justify-start p-4 shadow-lg lg:w-2/5">
+        <Helmet>
+          <meta charSet="utf-8" name="detail" />
+          <title>Otakutixx - Register</title>
+        </Helmet>
         {msg ? <Alert showIcon message={`${msg}`} type="warning" /> : null}
         <Form
           name="basic"

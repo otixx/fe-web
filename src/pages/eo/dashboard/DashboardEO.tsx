@@ -51,7 +51,6 @@ const DashboardEO = () => {
   };
 
   const handleAddEvents = async (value: ICreateEventsProps) => {
-    console.log(value);
     setLoading(true);
     if (file) {
       const formData = new FormData();
@@ -134,6 +133,7 @@ const DashboardEO = () => {
       setFile([...info.fileList]);
     }
   };
+
   const handleDelete = async (id: string) => {
     try {
       const res = await privateApi.delete(`/event/delete`, {
@@ -430,24 +430,12 @@ const DashboardEO = () => {
           onCancel={() => setOpenEdit(false)}
         >
           <Form
-            fields={[
-              {
-                name: "nama_acara",
-                value: valueEdit?.nama_acara,
-              },
-              {
-                name: "description",
-                value: valueEdit?.description,
-              },
-              {
-                name: "lokasi",
-                value: valueEdit?.lokasi,
-              },
-              {
-                name: "tanggal_acara",
-                value: dayjs(valueEdit?.tanggal_acara),
-              },
-            ]}
+            initialValues={{
+              nama_acara: valueEdit?.nama_acara,
+              description: valueEdit?.description,
+              lokasi: valueEdit?.lokasi,
+              tanggal_acara: dayjs(valueEdit?.tanggal_acara),
+            }}
             name="basic"
             layout="vertical"
             onFinish={handleUpdateEvents}

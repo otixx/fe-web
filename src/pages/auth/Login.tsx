@@ -5,6 +5,7 @@ import { Alert, Form, Input } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { toast } from "react-hot-toast";
 import { createLogin } from "@/service/auth/auth.service";
+import { Helmet } from "react-helmet";
 
 const Login = () => {
   const [status, setStatus] = useState(false);
@@ -44,6 +45,10 @@ const Login = () => {
 
   return (
     <div className="w-full justify-start rounded-lg p-4 shadow-lg lg:w-2/5">
+      <Helmet>
+        <meta charSet="utf-8" name="login" />
+        <title>Otakutixx - Login</title>
+      </Helmet>
       {msg ? <Alert showIcon message={`${msg}`} type="warning" /> : null}
       <Form
         name="basic"

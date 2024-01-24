@@ -1,11 +1,8 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import DetailTiket from "./pages/user/Dashboard/DetailTicket";
 import Login from "./pages/auth/Login";
 import { Register } from "./pages/auth/Register";
 import DetailPayment from "./pages/user/payment/DetailPayment";
 import UserLayout from "./pages/user/UserLayout";
-import Index from "./pages/user/Dashboard/Index";
-import Profile from "./pages/user/Profile/Profile";
 import Error from "./pages/error/Error";
 import DetailEvents from "./pages/eo/dashboard/DetailEvents";
 import Riwayat from "./pages/eo/profile/Riwayat";
@@ -16,11 +13,15 @@ import DashboardEO from "./pages/eo/dashboard/DashboardEO";
 import ProfileEo from "./pages/eo/profile/ProfileEo";
 import LayoutEO from "./pages/eo/Layout";
 import LayoutAuth from "./pages/auth/Layout";
-import History from "./pages/user/Profile/History";
-import Detailhistory from "./pages/user/Profile/DetailHistory";
 import QRCodeScannerPage from "./pages/eo/profile/Scan";
 import ResetPasswordForm from "./pages/auth/ResetPasswordForm";
 import ResetPassword from "./pages/auth/ResetPassword";
+import Index from "./pages/user/dashboard/Index";
+import Profile from "./pages/user/profile/Profile";
+import Detailhistory from "./pages/user/profile/DetailHistory";
+import History from "./pages/user/profile/History";
+import DetailTiket from "./pages/user/dashboard/DetailTicket";
+
 function App() {
   return (
     <>

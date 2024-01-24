@@ -1,10 +1,10 @@
 import { LuMail, LuMapPin, LuPhone, LuTarget, LuUser } from "react-icons/lu";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { privateApi } from "@/shared/axios/axios";
 import { Button, Drawer, Form, Input } from "antd";
-import { useProfile } from "@/service/user/user.service";
+import { updateProfile, useProfile } from "@/service/user/user.service";
 import { IProfile } from "@/utils/interface/profile.interface";
+import { Helmet } from "react-helmet";
 
 const Profile = () => {
   const [open, setOpen] = useState(false);
@@ -16,26 +16,27 @@ const Profile = () => {
     getProfile();
   }, []);
 
-  const updateProfile = (values: IProfile) => {
-    privateApi
-      .put(`/profile`, {
+  const handleUpdate = async (values: IProfile) => {
+    try {
+      const res: any = await updateProfile({
         name: values?.name,
         email: values?.email,
         nohp: values?.nohp,
         alamat: values?.alamat,
-      })
-      .then(() => {
-        toast.success("Berhasil Update Profile");
-        setOpen(false);
-        getProfile();
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message);
       });
+      toast.success(res?.data?.message);
+      setOpen(false);
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
   };
 
   return (
     <div className="container mx-auto h-screen">
+      <Helmet>
+        <meta charSet="utf-8" name="profile" />
+        <title>Otakutixx - Profile</title>
+      </Helmet>
       <div className="grid grid-cols-12 p-4">
         <div className="col-span-6">
           <h1 className="text-[18px] font-bold">Profile</h1>
@@ -60,7 +61,7 @@ const Profile = () => {
           <Form
             fields={[
               {
-                name: "username",
+                name: "name",
                 value: profile?.name,
               },
               {
@@ -68,7 +69,7 @@ const Profile = () => {
                 value: profile?.email,
               },
               {
-                name: "phone",
+                name: "nohp",
                 value: profile?.nohp,
               },
               {
@@ -76,12 +77,12 @@ const Profile = () => {
                 value: profile?.alamat,
               },
             ]}
-            onFinish={updateProfile}
+            onFinish={handleUpdate}
             layout="vertical"
           >
             <Item
               label="name"
-              name="username"
+              name="name"
               className="block text-sm font-semibold text-black"
             >
               <Input className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black" />
@@ -95,7 +96,7 @@ const Profile = () => {
             </Item>
             <Item
               label="noHp"
-              name="phone"
+              name="nohp"
               className="block text-sm font-semibold text-black"
             >
               <Input className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black" />

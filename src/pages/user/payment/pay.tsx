@@ -151,7 +151,6 @@ const BarcodePopup = ({
                       alt="Barcode"
                       className="h-2/4 w-2/4 p-4"
                     />
-                    <h1>{barcode}</h1>
                     <div className="py-2 text-center">
                       <h1>Mohon Bayar Sebelum Waktu Habis</h1>
                       <Row justify="center">

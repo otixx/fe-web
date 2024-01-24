@@ -17,7 +17,6 @@ import {
   FormatDayjs,
   FormatDayjsInput,
   FormatDetailTicket,
-  FormatTime,
 } from "@/shared/dayjs/format";
 import { LoadingOutlined } from "@ant-design/icons";
 import { QfindTicketbyEvent } from "@/service/ticket/ticket.service";
@@ -100,7 +99,7 @@ const DetailEvents = () => {
       "tanggal_expired",
       dayjs(value?.tanggal_exp).format(FormatDayjsInput),
     );
-    formData.append("file", file);
+    formData.append("image", file);
     try {
       const res = await privateApi.put(`/tiket/${detailData?.id}`, formData);
       toast.success(res?.data?.message);
@@ -257,6 +256,7 @@ const DetailEvents = () => {
           </div>
         </div>
       </div>
+
       {tiket && tiket?.data?.length > 0 && (
         <div className="flex w-full items-center justify-center ">
           <div className="p-5">
@@ -429,32 +429,40 @@ const DetailEvents = () => {
           onCancel={() => setOpenEdit(false)}
         >
           <Form
-            fields={[
-              {
-                name: "nama_acara",
-                value: detailData?.nama_kegiatan,
-              },
-              {
-                name: "harga",
-                value: detailData?.harga,
-              },
-              {
-                name: "tags",
-                value: detailData?.tags,
-              },
-              {
-                name: "quantity",
-                value: detailData?.quantity,
-              },
-              {
-                name: "tanggal_pre",
-                value: dayjs(detailData?.tanggal_preorder),
-              },
-              {
-                name: "tanggal_exp",
-                value: dayjs(detailData?.tanggal_expired),
-              },
-            ]}
+            initialValues={{
+              nama_acara: detailData?.nama_kegiatan,
+              harga: detailData?.harga,
+              tags: detailData?.tags,
+              quantity: detailData?.quantity,
+              tanggal_pre: dayjs(detailData?.tanggal_preorder),
+              tanggal_exp: dayjs(detailData?.tanggal_expired),
+            }}
+            // fields={[
+            //   {
+            //     name: "nama_acara",
+            //     value: detailData?.nama_kegiatan,
+            //   },
+            //   {
+            //     name: "harga",
+            //     value: detailData?.harga,
+            //   },
+            //   {
+            //     name: "tags",
+            //     value: detailData?.tags,
+            //   },
+            //   {
+            //     name: "quantity",
+            //     value: detailData?.quantity,
+            //   },
+            //   {
+            //     name: "tanggal_pre",
+            //     value: dayjs(detailData?.tanggal_preorder),
+            //   },
+            //   {
+            //     name: "tanggal_exp",
+            //     value: dayjs(detailData?.tanggal_expired),
+            //   },
+            // ]}
             name="basic"
             layout="vertical"
             onFinish={handleUpdateTiket}
@@ -528,6 +536,14 @@ const DetailEvents = () => {
                 disabledDate={(current) =>
                   current && dayjs(current).isBefore(dayjs(), "day")
                 }
+              />
+            </Item>
+            <Item label="Gambar Tiket">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className=" block w-full rounded-sm border border-gray-300  p-2.5 text-sm text-black"
               />
             </Item>
             <div className="flex justify-end gap-2 py-2">

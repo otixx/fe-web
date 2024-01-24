@@ -15,6 +15,7 @@ import {
 import toast from "react-hot-toast";
 import { Image, Tag } from "antd";
 import { IDataEventImg, IDataImgUrl } from "@/utils/interface/ticket.interface";
+import { Helmet } from "react-helmet";
 
 const DetailTiket = () => {
   const [quantity, setQuantity] = useState(1);
@@ -85,6 +86,10 @@ const DetailTiket = () => {
 
   return (
     <div className="container mx-auto my-10 max-w-7xl p-5">
+      <Helmet>
+        <meta charSet="utf-8" name="detail" />
+        <title>Otakutixx - Detail Tiket</title>
+      </Helmet>
       <div className="mx-auto mt-6 space-y-4">
         <div className="grid grid-cols-3 justify-between gap-5">
           <div className="order-1 col-span-3 h-80 lg:col-span-2">

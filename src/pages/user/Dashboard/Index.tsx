@@ -8,6 +8,7 @@ import Carousel from "@/components/Carousel";
 import Card from "@/components/Card";
 import { useEffect, useState } from "react";
 import Notfound from "@/components/Notfound";
+import { Helmet } from "react-helmet";
 const Index = () => {
   const [query, setQuery] = useState("");
   const [url, setUrl] = useState("");
@@ -35,6 +36,10 @@ const Index = () => {
 
   return (
     <div>
+      <Helmet>
+        <meta charSet="utf-8" name="home" />
+        <title>Otakutixx - Home</title>
+      </Helmet>
       <Carousel />
       <div className="container mx-auto py-5">
         <div className="flex w-full justify-end px-4 lg:px-0">

@@ -10,6 +10,7 @@ import {
 } from "@/utils/interface/history.interface";
 import { useState } from "react";
 import SkeletonTable from "@/components/SkeletonTable";
+import { Helmet } from "react-helmet";
 
 const RiwayatTiket = () => {
   const idTiket = useParams();
@@ -25,6 +26,10 @@ const RiwayatTiket = () => {
 
   return (
     <div className="w-full">
+      <Helmet>
+        <meta charSet="utf-8" name="riwayattiket" />
+        <title>Otakutixx - Riwayat Tiket</title>
+      </Helmet>
       <div className="grid h-28 grid-cols-12 items-center px-2">
         <div className="col-span-12 items-center">
           <h1 className="text-2xl font-bold">History / Transaction</h1>

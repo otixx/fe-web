@@ -9,8 +9,8 @@ const Footer = () => {
           <div className="flex flex-col justify-center gap-11 md:flex-row">
             <div className="mb-4 w-full md:mb-0 md:w-1/2 lg:w-1/4">
               <h4 className="mb-2 text-lg font-semibold">Informasi Kontak</h4>
-              <p className="text-gray-400">Email: otatixx@gmail.com</p>
-              <p className="text-gray-400">
+              <p className="text-gray-300">Email: otatixx@gmail.com</p>
+              <p className="text-gray-300">
                 Alamat: Jl. Basuki Rahmat Taman Gading
               </p>
             </div>
@@ -19,10 +19,10 @@ const Footer = () => {
               <h4 className="mb-2 text-lg font-semibold">Navigasi</h4>
               <ul>
                 <li>
-                  <a className="text-gray-400">Kebijakan Privasi</a>
+                  <a className="text-gray-300">Kebijakan Privasi</a>
                 </li>
                 <li>
-                  <a className="text-gray-400">Syarat dan Ketentuan</a>
+                  <a className="text-gray-300">Syarat dan Ketentuan</a>
                 </li>
               </ul>
             </div>
@@ -33,7 +33,7 @@ const Footer = () => {
                 href="https://www.instagram.com/otixx.id/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-gray-400"
+                className="flex items-center gap-2 text-gray-300"
               >
                 <LuInstagram />
                 Instagram
@@ -42,7 +42,7 @@ const Footer = () => {
 
             <div className="mb-4 w-full md:mb-0 md:w-1/2 lg:w-1/4">
               <h4 className="mb-2 text-lg font-semibold ">Tentang Kami</h4>
-              <p className="text-gray-400">
+              <p className="text-gray-300">
                 Deskripsi singkat tentang perusahaan atau proyek.
               </p>
             </div>

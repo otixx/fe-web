@@ -1,36 +1,19 @@
-import { useMatch, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { LuLogOut, LuUser, LuUserCog } from "react-icons/lu";
 import { Avatar, Dropdown } from "antd";
 import { useProfile } from "@/service/user/user.service";
 import logo from "/logo.png";
-import { useEffect } from "react";
-import toast from "react-hot-toast";
 const Navbar = () => {
   const navigate = useNavigate();
   const profile: any = useProfile((state) => state?.profile);
   const isEO = profile?.status_eo;
   const styleMenuItems = `flex cursor-pointer items-center gap-2`;
-  const landing = location.pathname === "/";
-  const detail = useMatch("/detail/:id");
-
+  const token = Cookies.get("token");
   const handleOut = () => {
     Cookies.remove("token");
     navigate("/auth/signin");
   };
-
-  useEffect(() => {
-    if (
-      profile?.status === 403 &&
-      profile?.data === "Forbidden" &&
-      !landing &&
-      !detail
-    ) {
-      Cookies.remove("token");
-      toast.error("Sesi Anda Telah Berakhir");
-      navigate("/auth/signin");
-    }
-  }, []);
 
   const items: any = [
     {
@@ -96,7 +79,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex gap-4">
-            {profile && profile?.status == 403 ? (
+            {!token ? (
               <>
                 <div onClick={() => navigate("/auth/signup")}>
                   <div className="btnSignup hidden cursor-pointer rounded-full border-2 border-secondColors px-8 py-3 text-[14px] transition duration-700 hover:border-mainColors hover:bg-secondColors lg:block">
@@ -112,18 +95,20 @@ const Navbar = () => {
                 </div>
               </>
             ) : (
-              <>
-                <Dropdown menu={{ items }} placement="bottomRight" arrow>
-                  <div className="flex cursor-pointer items-center gap-2 font-semibold text-white">
-                    <Avatar
-                      size={35}
-                      src={`https://api.dicebear.com/7.x/adventurer/svg?seed=Sassy`}
-                    />
-                    Hi,
-                    <span className="font-medium"> {profile?.name}</span>
-                  </div>
-                </Dropdown>
-              </>
+              profile && (
+                <>
+                  <Dropdown menu={{ items }} placement="bottomRight" arrow>
+                    <div className="flex cursor-pointer items-center gap-2 font-semibold text-white">
+                      <Avatar
+                        size={35}
+                        src={`https://api.dicebear.com/7.x/adventurer/svg?seed=Sassy`}
+                      />
+                      Hi,
+                      <span className="font-medium"> {profile?.name}</span>
+                    </div>
+                  </Dropdown>
+                </>
+              )
             )}
           </div>
         </nav>

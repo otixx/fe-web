@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { Outlet, useLocation, useMatch, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import Footer from "@/components/Footer";
-import { useProfile } from "@/service/user/user.service";
 import toast from "react-hot-toast";
 import Navbar from "@/components/Navbar";
 import Loading from "@/components/Loading";
 import { useDevice } from "@/service/device/device.service";
+import { jwtDecode } from "jwt-decode";
+import { useProfile } from "@/service/user/user.service";
 
 const UserLayout = () => {
   const [loading, setLoading] = useState(true);
@@ -17,36 +18,35 @@ const UserLayout = () => {
   const landing = location.pathname === "/";
   const detail = useMatch("/detail/:id");
   const scannerPath = useMatch("/scan/:id");
-  const token = Cookies.get("token");
   const pathname = location.pathname;
-  const profile: any = useProfile((state) => state?.profile);
-  const getProfile = useProfile((state) => state?.getProfile);
   const getDevice = useDevice((state) => state?.getDevice);
+  const getProfile = useProfile((state) => state?.getProfile);
+  const token = Cookies.get("token");
+
+  const sessionExp = () => {
+    const tokenParse = jwtDecode(token ? token : "");
+    const currentTime = Date.now() / 1000;
+
+    if (tokenParse.exp && tokenParse?.exp < currentTime) {
+      Cookies.remove("token");
+      toast.error("Sesi Anda Telah Berakhir");
+      navigate("/auth/signin");
+    }
+  };
 
   const protectRoute = () => {
     if (!token && !landing && !detail) {
       navigate("/auth/signin");
-    } else {
-      if (
-        profile?.status === 403 &&
-        profile?.data === "Forbidden" &&
-        !landing &&
-        !detail
-      ) {
-        Cookies.remove("token");
-        toast.error("Sesi Anda Telah Berakhir");
-        navigate("/auth/signin");
-      }
     }
   };
+
   useEffect(() => {
     const asyncComponentLoad = async () => {
-      await Promise.all([
-        componentLoad(),
-        getProfile(),
-        protectRoute(),
-        getDevice(),
-      ]);
+      if (token) {
+        sessionExp();
+        await getProfile();
+      }
+      await Promise.all([componentLoad(), protectRoute(), getDevice()]);
       setLoading(false);
     };
 

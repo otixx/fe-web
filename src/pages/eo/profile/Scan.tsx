@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { publicAPi } from "@/shared/axios/axios";
+import { io } from "socket.io-client";
 // import { Modal } from "antd";
 
 const QRCodeScannerPage = () => {
   const navigate = useNavigate();
   const idEvent = useParams().id;
+  const socket = io(import.meta.env.VITE_BE_URL);
   // const [modal, setModal] = useState(false);
   const [res, setRes] = useState<any>(null);
   const [html5QrcodeScanner, setHtml5QrcodeScanner] =
@@ -36,6 +38,9 @@ const QRCodeScannerPage = () => {
             idEvent: idEvent,
           });
           // setModal(true);
+          socket.emit("berhasilscan", () => {
+            console.log("kirim Emit");
+          });
           setRes(res);
           setRequestSent(true);
           setScanEnabled(+1);

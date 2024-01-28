@@ -1,20 +1,23 @@
 import { useParams } from "react-router-dom";
-import {
-  QHistoryTicketId,
-  QTotalPendapatan,
-} from "@/service/ticket/ticket.service";
+import { QTotalPendapatan } from "@/service/ticket/ticket.service";
 import { Col, Empty, Modal, Pagination, Row, Statistic } from "antd";
 import {
+  // IHistoryTicketDetail,
   IHistoryTicketDetailForm,
   IHistoryTransactionData,
 } from "@/utils/interface/history.interface";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SkeletonTable from "@/components/SkeletonTable";
 import { Helmet } from "react-helmet";
+import { io } from "socket.io-client";
+import { publicAPi } from "@/shared/axios/axios";
 
 const RiwayatTiket = () => {
+  const socket = io("http://localhost:5000/");
   const idTiket = useParams();
-  const detailTicket = QHistoryTicketId(idTiket?.id);
+  const [detailTicket, setDetailTicket] = useState<any>();
+  const [fetchDataDone, setFetchDataDone] = useState(false);
+  // let detailTicket = QHistoryTicketId(idTiket?.id);
   const pendapatan = QTotalPendapatan(idTiket?.id);
   const [page, setPage] = useState(1);
   const [open, setOpen] = useState(false);
@@ -23,6 +26,35 @@ const RiwayatTiket = () => {
     setOpen(true);
     setData(e);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await publicAPi.get(`/transaction/tiket/${idTiket?.id}`);
+        setDetailTicket(res?.data);
+        setFetchDataDone(true); // Setelah fetch data selesai, set state menjadi true
+      } catch (err) {
+        console.log("error", err);
+        setFetchDataDone(true); // Setelah fetch data gagal, set state menjadi true untuk menghindari loading yang terus menerus
+      }
+    };
+    fetchData();
+
+    socket.on("refreshTransaction", async () => {
+      console.log("refresh");
+      fetchData();
+      // detailTicket = QHistoryTicketId(idTiket?.id);
+    });
+
+    // Clean up the socket connection when the component unmounts
+    return () => {
+      socket.disconnect();
+    };
+  }, [idTiket?.id]);
+
+  if (!fetchDataDone) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="w-full">
@@ -150,12 +182,12 @@ const RiwayatTiket = () => {
           </div>
         </div>
       </div>
-      {detailTicket?.data && detailTicket?.data?.data.length > 0 && (
+      {detailTicket?.data && detailTicket.data?.data.length > 0 && (
         <div className="flex w-full items-center justify-center ">
           <div className="p-5">
             <Pagination
               current={page}
-              total={detailTicket?.data?.jumlah}
+              total={detailTicket?.jumlah}
               pageSize={10}
               onChange={(page) => setPage(page)}
             />

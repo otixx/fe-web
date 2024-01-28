@@ -39,13 +39,6 @@ const Footer = () => {
                 Instagram
               </a>
             </div>
-
-            <div className="mb-4 w-full md:mb-0 md:w-1/2 lg:w-1/4">
-              <h4 className="mb-2 text-lg font-semibold ">Tentang Kami</h4>
-              <p className="text-gray-400">
-                Deskripsi singkat tentang perusahaan atau proyek.
-              </p>
-            </div>
           </div>
 
           <div className="mt-8 text-center">

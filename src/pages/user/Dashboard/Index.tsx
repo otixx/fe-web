@@ -37,8 +37,11 @@ const Index = () => {
   return (
     <div>
       <Helmet>
-        <meta charSet="utf-8" name="home" />
-        <title>Otakutixx - Home</title>
+        <title>Otakutixx - Dashboard Tiket</title>
+        <meta
+          name="description"
+          content="Segera buat event kamu sendiri, atur penjualan tiketmu, dan memudahkan setiap event yang kamu miliki."
+        />
       </Helmet>
       <Carousel />
       <div className="container mx-auto py-5">

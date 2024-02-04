@@ -13,7 +13,7 @@ import { io } from "socket.io-client";
 import { publicAPi } from "@/shared/axios/axios";
 
 const RiwayatTiket = () => {
-  const socket = io("http://localhost:5000/");
+  const socket = io("https://api.otixx.online/");
   const idTiket = useParams();
   const [detailTicket, setDetailTicket] = useState<any>();
   const [fetchDataDone, setFetchDataDone] = useState(false);

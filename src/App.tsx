@@ -16,11 +16,11 @@ import LayoutAuth from "./pages/auth/Layout";
 import QRCodeScannerPage from "./pages/eo/profile/Scan";
 import ResetPasswordForm from "./pages/auth/ResetPasswordForm";
 import ResetPassword from "./pages/auth/ResetPassword";
-import Index from "./pages/user/dashboard/Index";
-import Profile from "./pages/user/profile/Profile";
-import Detailhistory from "./pages/user/profile/DetailHistory";
-import History from "./pages/user/profile/History";
-import DetailTiket from "./pages/user/dashboard/DetailTicket";
+import Index from "./pages/user/Dashboard/Index";
+import DetailTiket from "./pages/user/Dashboard/DetailTicket";
+import Profile from "./pages/user/Profile/Profile";
+import History from "./pages/user/Profile/History";
+import Detailhistory from "./pages/user/Profile/DetailHistory";
 
 function App() {
   return (

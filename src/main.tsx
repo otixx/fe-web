@@ -2,7 +2,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { ConfigProvider } from "antd";
-import { QueryClientProviders } from "./shared/provider/ClientProvider.tsx";
+import { QueryClientProviders } from "./shared/Provider/ClientProvider.tsx";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <QueryClientProviders>
     <ConfigProvider

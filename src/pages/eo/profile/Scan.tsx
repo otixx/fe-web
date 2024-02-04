@@ -9,7 +9,7 @@ import { io } from "socket.io-client";
 const QRCodeScannerPage = () => {
   const navigate = useNavigate();
   const idEvent = useParams().id;
-  const socket = io(import.meta.env.VITE_BE_URL);
+  const socket = io("https://api.otixx.online/");
   // const [modal, setModal] = useState(false);
   const [res, setRes] = useState<any>(null);
   const [html5QrcodeScanner, setHtml5QrcodeScanner] =

@@ -87,8 +87,34 @@ const DetailTiket = () => {
   return (
     <div className="container mx-auto my-10 max-w-7xl p-5">
       <Helmet>
-        <meta charSet="utf-8" name="detail" />
+        {/* <meta charSet="utf-8" property="og:tittle" content="Test" />
+        <meta
+          charSet="utf-8"
+          property="og:url"
+          content="https://otixx.online/tiket"
+        />
+        <meta
+          charSet="utf-8"
+          property="og:description"
+          content="ini adalah sebuah deskripsi"
+        />
+        <meta
+          charSet="utf-8"
+          property="og:site_name"
+          content="ini adalah site name nya otixx"
+        />
+        <meta
+          charSet="utf-8"
+          property="og:image"
+          content="https://res.cloudinary.com/dkaxlvjbb/image/upload/v1705933163/otixx/thumnailTiket/Pengunjung_1705933162548_bd560b3cd9_Payload.png"
+        /> */}
         <title>Otakutixx - Detail Tiket</title>
+        <meta property="og:title" content={ticketDetail?.data?.nama_kegiatan} />
+        <meta property="og:image" content={dataImg && dataImg?.url} />
+        <meta
+          property="og:url"
+          content={`https://www.otixx.online/detail/${ticketDetail?.data?.id}`}
+        />
       </Helmet>
       <div className="mx-auto mt-6 space-y-4">
         <div className="grid grid-cols-3 justify-between gap-5">
